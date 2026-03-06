@@ -163,19 +163,326 @@ const ITEMS = [
 ];
 
 const CAMPAIGNS = [
-  {n:"Lost Mine of Phandelver",lv:"1-5",d:"Classic starter adventure. Explore the Sword Coast, investigate a missing dwarven mine, face the Black Spider.",h:"You were hired by Gundren Rockseeker to escort a wagon of supplies to Phandalin. But Gundren and his bodyguard have gone missing..."},
-  {n:"Curse of Strahd",lv:"1-10",d:"Gothic horror in Barovia. Face vampire lord Strahd von Zarovich in his haunted castle.",h:"Mysterious mists surround you, pulling you into a dark land ruled by an ancient vampire..."},
-  {n:"Storm King's Thunder",lv:"1-11",d:"Giants threaten civilization. Travel the Sword Coast to uncover why the ordning has shattered.",h:"Giants have emerged from their strongholds to threaten civilization as never before..."},
-  {n:"Tomb of Annihilation",lv:"1-11",d:"Death curse plagues the world. Journey into the jungles of Chult.",h:"A death curse has befallen the land — those raised from the dead are wasting away..."},
-  {n:"Waterdeep: Dragon Heist",lv:"1-5",d:"Urban adventure. Race to find 500,000 gold dragons hidden beneath Waterdeep.",h:"Treasure lies beneath Waterdeep, and villains compete to claim it..."},
-  {n:"Descent into Avernus",lv:"1-13",d:"Descend into the Nine Hells to save Elturel.",h:"The holy city of Elturel has been dragged to the first layer of the Nine Hells..."},
-  {n:"Rime of the Frostmaiden",lv:"1-12",d:"Survive the eternal winter of Icewind Dale.",h:"Icewind Dale is trapped in perpetual winter by the Frostmaiden. The sun never rises..."},
-  {n:"Ghosts of Saltmarsh",lv:"1-12",d:"Nautical adventures around coastal Saltmarsh.",h:"The sleepy fishing town sits on the edge of something sinister..."},
-  {n:"Tyranny of Dragons",lv:"1-15",d:"Stop the Cult of the Dragon from freeing Tiamat.",h:"The Cult of the Dragon leads an assault across the Sword Coast..."},
-  {n:"The Wild Beyond the Witchlight",lv:"1-8",d:"Journey into the Feywild to confront the Hourglass Coven.",h:"Something is wrong with the Witchlight Carnival..."},
-  {n:"Keys from the Golden Vault",lv:"1-11",d:"Anthology of heist-themed adventures.",h:"A golden key arrives with an invitation to join the Golden Vault..."},
-  {n:"Custom Campaign",lv:"Any",d:"Create your own world. Full DM control.",h:"Your adventure begins here..."}
+  {n:"Lost Mine of Phandelver",lv:"1-5",d:"Classic starter adventure. Explore the Sword Coast, investigate a missing dwarven mine, face the Black Spider.",h:"You were hired by Gundren Rockseeker to escort a wagon of supplies to Phandalin. But Gundren and his bodyguard have gone missing...",
+    scenes:[
+      {t:"The Road to Phandalin",narr:"You have been traveling south along the High Road from Neverwinter for about half a day when you come upon a pair of dead horses sprawled across the path. Black-feathered arrows pepper their sides. The saddlebags have been looted, and nearby lies an empty leather map case. A trail of broken twigs and disturbed leaves leads into the thick woods to the north.",
+        choices:["Investigate the dead horses","Follow the trail into the woods","Continue past to Phandalin","Search the surrounding area"],
+        encounter:{monsters:["Goblin","Goblin","Goblin","Goblin"],trigger:"trail"},
+        notes:"Goblin Ambush. 4 goblins hide in the woods. DC 10 Perception to spot them before they attack."},
+      {t:"Goblin Trail",narr:"The trail leads through dense, dark forest. After about 15 minutes of walking, you spot a small cave entrance partially hidden by a thicket. A shallow stream flows from the cave mouth. Goblin tracks are everywhere in the mud.",
+        choices:["Enter the cave carefully","Set up an ambush outside","Scout around the cave","Send a scout ahead stealthily"],
+        encounter:{monsters:["Goblin","Goblin","Goblin","Wolf","Wolf"],trigger:"cave"},
+        notes:"Cragmaw Hideout. Traps: snare at entrance (DC 12 Perception), flood trap in stream passage."},
+      {t:"Cragmaw Hideout",narr:"Inside the cave, the stream runs along a low-ceilinged passage. You hear goblin voices echoing from deeper within. In a side chamber, you find Sildar Hallwinter — Gundren's bodyguard — bound and beaten but alive. He gasps: 'They took Gundren to Cragmaw Castle... a place called Wave Echo Cave... the Black Spider wants it...'",
+        choices:["Free Sildar and press deeper","Free Sildar and retreat to Phandalin","Interrogate the goblins","Search for loot before moving on"],
+        notes:"Sildar has 1 HP. Healing him earns his gratitude and info about Cragmaw Castle."},
+      {t:"Arrival in Phandalin",narr:"Phandalin is a frontier town of simple stone buildings and wooden storefronts. The townsfolk eye you warily — they've been terrorized by a gang of ruffians called the Redbrands, led by a mysterious figure called Glasstaff. Sister Garaele at the shrine, Linene at the Lionshield Coster, and Toblen at the Stonehill Inn all have problems that need solving.",
+        choices:["Visit the Stonehill Inn for rumors","Confront the Redbrands at the Sleeping Giant","Speak with Sister Garaele","Explore the Tresendar Manor ruins"],
+        notes:"Multiple quest hooks here. Let players explore freely. Redbrands patrol the town."},
+      {t:"Tresendar Manor - Redbrand Hideout",narr:"Beneath the ruins of Tresendar Manor lies a hidden dungeon. The Redbrands use it as their base. A secret entrance leads into cellars where you hear rough laughter and the clink of dice. The air smells of stale ale and unwashed brigands.",
+        choices:["Storm the front entrance","Use the secret tunnel","Try to bluff your way in","Scout and plan a strategy"],
+        encounter:{monsters:["Bandit","Bandit","Bandit","Bandit"],trigger:"enter"},
+        notes:"Glasstaff is Iarno Albrek, a wizard. He has Gundren's map to Wave Echo Cave."},
+      {t:"Cragmaw Castle",narr:"After days of travel through the wilderness, you reach Cragmaw Castle — a crumbling ruin occupied by a tribe of goblins and their bugbear king, King Grol. Gundren Rockseeker is held somewhere inside. The castle has multiple entry points: a collapsed wall to the south, a main gate, and arrow slits in the towers.",
+        choices:["Assault the main gate","Sneak through the collapsed wall","Climb to the arrow slits","Try to negotiate with the goblins"],
+        encounter:{monsters:["Goblin","Goblin","Goblin","Goblin","Orc","Orc"],trigger:"enter"},
+        notes:"King Grol has Gundren and the map. Doppelganger disguised as a female drow is here."},
+      {t:"Wave Echo Cave",narr:"The entrance to Wave Echo Cave is a narrow tunnel that opens into vast natural caverns. The rhythmic boom of waves crashing against subterranean rocks echoes through the darkness. Ancient dwarven and gnomish mining equipment lies scattered about. Somewhere in these depths, the Black Spider seeks the legendary Forge of Spells.",
+        choices:["Follow the main passage","Explore the northern tunnels","Head toward the booming sounds","Proceed stealthily and scout ahead"],
+        encounter:{monsters:["Skeleton","Skeleton","Skeleton","Zombie","Zombie"],trigger:"explore"},
+        notes:"Final dungeon. Multiple encounters. Black Spider (drow mage) is in the Temple of Dumathoin."},
+      {t:"The Black Spider",narr:"In the heart of the cave, you find the Temple of Dumathoin — and the Black Spider himself, a drow named Nezznar. He stands before the legendary Forge of Spells, a magical brazier of green flame. 'You are too late,' he hisses. 'The power of the Phandelver Pact will be mine!' His giant spider companions skitter forward from the shadows.",
+        choices:["Attack immediately","Try to negotiate or deceive","Attempt to disable the Forge","Split up to flank"],
+        encounter:{monsters:["Giant Spider","Giant Spider"],trigger:"always"},
+        notes:"Nezznar: AC 15, HP 27, drow mage stat block. Victory completes the campaign!"}
+    ]
+  },
+  {n:"Curse of Strahd",lv:"1-10",d:"Gothic horror in Barovia. Face vampire lord Strahd von Zarovich in his haunted castle.",h:"Mysterious mists surround you, pulling you into a dark land ruled by an ancient vampire...",
+    scenes:[
+      {t:"Death House",narr:"The mists part to reveal a village of dark, leaning buildings. Two small children stand in the street — Rose and Thorn Durst. 'Please,' Rose says, 'there's a monster in our basement. Our parents are trapped!' The Durst Manor looms behind them, its windows like hollow eyes.",
+        choices:["Enter Durst Manor with the children","Investigate the village first","Refuse and look for another way","Check if the children are trustworthy"],
+        notes:"Death House is a trap. The children are ghosts. The house is a mimic-like deathtrap dungeon."},
+      {t:"Village of Barovia",narr:"The village is a place of despair. A constant fog hangs over everything. You hear weeping from a townhouse — Mad Mary mourns her daughter Ireena's plight. At the Blood of the Vine tavern, Ismark the Lesser tells you his sister Ireena Kolyana has been bitten twice by the vampire Strahd. He begs you to escort her to safety in Vallaki.",
+        choices:["Agree to help Ireena","Visit the Burgomaster's mansion","Go to the church to find the priest","Investigate the village for supplies"],
+        notes:"Ireena Kolyana is the reincarnation of Tatyana, Strahd's obsession."},
+      {t:"Castle Ravenloft - The Invitation",narr:"A black carriage arrives unbidden. Inside is a letter sealed with a wax bat: 'I, Strahd von Zarovich, invite you to dine at my castle. Come. I insist.' The horses snort impatiently. In the distance, lightning illuminates the towering spires of Castle Ravenloft.",
+        choices:["Accept and ride to the castle","Refuse and continue to Vallaki","Attempt to ambush the carriage","Send a decoy while the party flanks"],
+        encounter:{monsters:["Wolf","Wolf","Wolf","Wolf"],trigger:"refuse"},
+        notes:"Strahd is toying with the party. He cannot be defeated yet without the Sunsword and Holy Symbol."},
+      {t:"Vallaki - Town of Festivals",narr:"Vallaki is larger than Barovia, but no less oppressed. Baron Vallakovich rules with forced merriment — mandatory weekly festivals 'for the happiness of the people.' The innkeeper Urwin Martikov whispers of a resistance, the wereravens of the Keepers of the Feather. Dark secrets lurk behind every door.",
+        choices:["Attend the Baron's festival","Contact the Keepers of the Feather","Visit the Vistani camp outside town","Investigate St. Andral's Church"],
+        notes:"Multiple factions in play. Strahd's spies are everywhere."},
+      {t:"The Amber Temple",narr:"High in the mountains, the ancient Amber Temple holds dark vestiges — imprisoned evil entities that offer dark gifts in exchange for corruption. The temple is guarded by deadly traps and undead. Within its amber sarcophagi lie the secrets of Strahd's power... and perhaps the key to his destruction.",
+        choices:["Explore cautiously room by room","Seek the secret of Strahd's pact","Accept a dark gift for power","Destroy the amber sarcophagi"],
+        encounter:{monsters:["Skeleton","Skeleton","Skeleton","Skeleton","Skeleton","Skeleton"],trigger:"explore"},
+        notes:"Dark gifts offer power at a terrible cost. Key location for endgame."},
+      {t:"Castle Ravenloft - Final Confrontation",narr:"Armed with artifacts and knowledge, you return to Castle Ravenloft for the final battle. The castle is a maze of gothic horror — crypts, torture chambers, and Strahd's own throne room. Somewhere in these halls, the vampire lord waits, supremely confident in his domain.",
+        choices:["Storm the main gates","Enter through the crypts below","Scale the walls to the tower","Use the secret passage from the catacombs"],
+        encounter:{monsters:["Wolf","Wolf","Zombie","Zombie","Skeleton","Skeleton"],trigger:"enter"},
+        notes:"Strahd: AC 16, HP 144. He fights tactically, retreating through walls. Use Sunsword + Holy Symbol."}
+    ]
+  },
+  {n:"Storm King's Thunder",lv:"1-11",d:"Giants threaten civilization. Travel the Sword Coast to uncover why the ordning has shattered.",h:"Giants have emerged from their strongholds to threaten civilization as never before...",scenes:[
+    {t:"Attack on Nightstone",narr:"You arrive at the settlement of Nightstone to find it under attack! Giant boulders have smashed through rooftops, and the town's namesake — a mysterious black obelisk — has been stolen. Goblins and worgs now loot the abandoned buildings. Villagers cower in nearby caves.",choices:["Drive out the goblins","Search for survivors","Investigate the stolen obelisk","Fortify the town's defenses"],encounter:{monsters:["Goblin","Goblin","Goblin","Goblin","Wolf","Wolf"],trigger:"goblins"},notes:"Cloud giants stole the Nightstone. Goblins arrived after."},
+    {t:"The Ordning is Broken",narr:"You learn that the ancient hierarchy of giants — the ordning — has been shattered by the god Annam. Now all giant-kind competes for supremacy, terrorizing the small folk. Hill giants raid farms. Frost giants plunder ships. Fire giants forge weapons of war. Stone giants emerge from their caves in confusion. Only by finding the Storm King's missing daughter can order be restored.",choices:["Seek out the hill giant stronghold","Investigate frost giant raids","Travel to the fire giant forge","Look for allies among civilized folk"],notes:"Players choose which giant threat to pursue. Multiple paths."},
+    {t:"Eye of the All-Father",narr:"The ancient oracle temple of Annam lies in the frozen Spine of the World mountains. Inside, a massive crystal ball called the Eye of the All-Father can reveal the location of Hekaton — the missing Storm King. But the temple is not unguarded, and the journey through the frozen wastes is perilous.",choices:["Brave the mountain pass","Seek a guide from the Uthgardt tribes","Fly if you have airship access","Tunnel through the Underdark"],encounter:{monsters:["Wolf","Wolf","Orc","Orc"],trigger:"mountain"},notes:"Key turning point. The oracle reveals Hekaton is imprisoned."},
+    {t:"Maelstrom - Court of the Storm Giants",narr:"Beneath the Trackless Sea lies Maelstrom, the undersea citadel of the storm giants. Princess Serissa rules in her father's absence, but her advisors plot treachery. You must navigate storm giant politics, prove your worth, and discover who kidnapped King Hekaton before civil war tears the ordning apart forever.",choices:["Present evidence to Serissa","Investigate the treacherous advisors","Challenge the conspirators directly","Seek Hekaton's prison location"],notes:"Political intrigue. Multiple NPCs with agendas. Final act begins here."}
+  ]},
+  {n:"Tomb of Annihilation",lv:"1-11",d:"Death curse plagues the world. Journey into the jungles of Chult.",h:"A death curse has befallen the land — those raised from the dead are wasting away...",scenes:[
+    {t:"Port Nyanzaru",narr:"The port city of Nyanzaru is a vibrant, chaotic trading hub on the northern coast of Chult. Dinosaurs serve as beasts of burden, merchant princes compete for power, and explorers gather before plunging into the deadly jungle. Your mission: find the Soulmonger — an artifact causing a death curse that is killing everyone who has ever been raised from the dead.",choices:["Hire a jungle guide","Visit the merchant princes","Buy supplies at the market","Gather rumors at the taverns"],notes:"Players need a guide. Several available, each with different knowledge."},
+    {t:"Into the Jungle",narr:"The jungle of Chult is one of the most dangerous places in all Faerûn. Undead rise from the ground. Dinosaurs crash through the canopy. Yuan-ti lurk in hidden temples. And the jungle itself seems to fight you — disease, insects, quicksand, and heat threaten your every step. Somewhere deep within lies Omu, the Forbidden City.",choices:["Follow the River Soshenstar south","Head west toward the Heart of Ubtao","Seek the ruins of Orolunga for guidance","Push directly south into the deep jungle"],encounter:{monsters:["Zombie","Zombie","Zombie","Zombie"],trigger:"jungle"},notes:"Hex crawl. Random encounters daily. Diseases: Shivering Sickness, Sight Rot, etc."},
+    {t:"Omu, the Forbidden City",narr:"After weeks of jungle travel, you finally reach the sunken city of Omu, overgrown with vegetation and crawling with yuan-ti. Nine shrines dedicated to the Trickster Gods of Omu lie scattered across the ruins. Each holds a puzzle cube needed to enter the true tomb. The yuan-ti are also searching for the cubes.",choices:["Explore the shrines systematically","Spy on the yuan-ti camp","Search for the tomb entrance first","Ally with or deceive the yuan-ti"],notes:"9 puzzle cubes needed. Each shrine has traps and puzzles."},
+    {t:"The Tomb of the Nine Gods",narr:"Beneath Omu lies the Tomb of the Nine Gods — a deathtrap dungeon created by the archlich Acererak. Five levels of fiendish traps, puzzles, and monsters guard the Soulmonger at its heart. The tomb is designed to kill — every step could be your last.",choices:["Proceed carefully, checking for traps","Rush through to reach the Soulmonger","Split up to cover more ground","Use divination to scout ahead"],encounter:{monsters:["Skeleton","Skeleton","Zombie","Zombie"],trigger:"enter"},notes:"The deadliest dungeon in 5e. Acererak waits at the bottom."}
+  ]},
+  {n:"Custom Campaign",lv:"Any",d:"Create your own world. Full DM control.",h:"Your adventure begins here...",scenes:[
+    {t:"Session Start",narr:"The adventure begins. The Dungeon Master will set the scene and guide the story. Players, prepare your characters and await the DM's narration.",choices:["Ready for adventure"],notes:"DM writes their own scenes from here."}
+  ]}
 ];
+
+// ─── SESSION PLAY COMPONENT ──────────────────────────────────
+function SessionPlay({camp, isDM, chars, mons, setMons, syncAction}) {
+  const {addMsg} = useContext(AppCtx);
+  const [sceneIdx, setSceneIdx] = useState(0);
+  const [journal, setJournal] = useState([]);
+  const [dmNarration, setDmNarration] = useState("");
+  const [customSceneTitle, setCustomSceneTitle] = useState("");
+  const [customSceneNarr, setCustomSceneNarr] = useState("");
+  const [customChoices, setCustomChoices] = useState("");
+  const [showCustom, setShowCustom] = useState(false);
+  const [playerActions, setPlayerActions] = useState([]);
+  const [showEncounter, setShowEncounter] = useState(false);
+  const journalRef = useRef(null);
+
+  const scenes = camp?.scenes || [];
+  const scene = scenes[sceneIdx];
+
+  useEffect(() => {
+    if (journalRef.current) journalRef.current.scrollTop = journalRef.current.scrollHeight;
+  }, [journal]);
+
+  const addJournal = useCallback((entry) => {
+    setJournal(p => [...p, {...entry, ts: Date.now()}]);
+  }, []);
+
+  const postNarration = useCallback((text, title) => {
+    if (!text.trim()) return;
+    addJournal({type:"narration", title: title || "", text});
+    addMsg("system", `📖 ${title ? title+": " : ""}${text.substring(0, 80)}...`);
+    setDmNarration("");
+  }, [addJournal, addMsg]);
+
+  const advanceScene = useCallback((idx) => {
+    const nextIdx = idx !== undefined ? idx : sceneIdx + 1;
+    if (nextIdx < scenes.length) {
+      setSceneIdx(nextIdx);
+      const s = scenes[nextIdx];
+      addJournal({type:"scene", title: s.t, text: s.narr});
+      addMsg("system", `📜 New Scene: ${s.t}`);
+      setShowEncounter(false);
+      setPlayerActions([]);
+    }
+  }, [sceneIdx, scenes, addJournal, addMsg]);
+
+  const handleChoice = useCallback((choice, playerName) => {
+    const action = {player: playerName || "Player", choice, ts: Date.now()};
+    setPlayerActions(p => [...p, action]);
+    addJournal({type:"action", text: `${action.player} chose: "${choice}"`});
+    addMsg("system", `🎭 ${action.player}: "${choice}"`);
+  }, [addJournal, addMsg]);
+
+  const triggerEncounter = useCallback(() => {
+    if (!scene?.encounter) return;
+    const monsToAdd = scene.encounter.monsters.map(mn => {
+      const template = MONSTERS.find(m => m.n === mn);
+      return template ? {...template, id: uid(), curHp: template.hp} : null;
+    }).filter(Boolean);
+    if (syncAction) {
+      syncAction({type:'SET_MONSTERS', payload: monsToAdd});
+    }
+    setShowEncounter(true);
+    addJournal({type:"encounter", text:`Combat! ${monsToAdd.map(m=>m.n).join(", ")} appear!`});
+    addMsg("system", `⚔️ ENCOUNTER: ${monsToAdd.map(m=>m.n).join(", ")}!`);
+  }, [scene, addJournal, addMsg, syncAction]);
+
+  const addCustomScene = useCallback(() => {
+    if (!customSceneNarr.trim()) return;
+    const choices = customChoices.split("\n").map(c => c.trim()).filter(Boolean);
+    const newScene = {t: customSceneTitle || `Scene ${scenes.length + 1}`, narr: customSceneNarr, choices: choices.length > 0 ? choices : ["Continue..."], notes: ""};
+    // Add to journal directly
+    addJournal({type:"scene", title: newScene.t, text: newScene.narr});
+    addMsg("system", `📜 New Scene: ${newScene.t}`);
+    setCustomSceneTitle("");
+    setCustomSceneNarr("");
+    setCustomChoices("");
+    setShowCustom(false);
+  }, [customSceneTitle, customSceneNarr, customChoices, scenes.length, addJournal, addMsg]);
+
+  // Auto-load first scene
+  useEffect(() => {
+    if (scenes.length > 0 && journal.length === 0) {
+      addJournal({type:"scene", title: scenes[0].t, text: scenes[0].narr});
+    }
+  }, []);
+
+  const sessionCSS = `
+    .sess-journal{max-height:400px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;padding:4px}
+    .sess-entry{padding:12px 14px;border-radius:var(--rad);animation:fu .3s ease-out}
+    .sess-narr{background:rgba(0,0,0,.25);border-left:3px solid var(--gold);color:var(--ink);font-size:.95rem;line-height:1.6;font-style:italic}
+    .sess-scene{background:linear-gradient(135deg,rgba(201,168,76,.08),rgba(201,168,76,.02));border:1px solid rgba(201,168,76,.2);border-radius:var(--rad)}
+    .sess-scene .scene-title{font-family:'Cinzel',serif;font-size:1.05rem;font-weight:700;color:var(--gold);margin-bottom:6px;display:flex;align-items:center;gap:8px}
+    .sess-action{background:rgba(90,138,197,.06);border-left:3px solid var(--arc);font-size:.9rem}
+    .sess-enc{background:rgba(139,26,26,.08);border-left:3px solid var(--redb);font-size:.9rem;font-weight:600;color:var(--redb)}
+    .sess-dm{background:rgba(201,168,76,.06);border-left:3px solid var(--goldd);font-size:.9rem}
+    .choice-grid{display:flex;flex-direction:column;gap:6px;margin-top:10px}
+    .choice-btn{font-family:'Crimson Text',serif;font-size:.9rem;padding:10px 14px;background:rgba(0,0,0,.2);
+      border:1px solid rgba(201,168,76,.2);border-radius:var(--rad);color:var(--ink);cursor:pointer;
+      text-align:left;transition:all .2s}
+    .choice-btn:hover{border-color:var(--gold);background:rgba(201,168,76,.08);padding-left:18px}
+    .choice-btn .choice-num{font-family:'Cinzel',serif;font-weight:700;color:var(--gold);margin-right:8px}
+    .dm-tools-bar{display:flex;gap:6px;flex-wrap:wrap;padding:10px;background:rgba(201,168,76,.04);border:1px solid rgba(201,168,76,.15);border-radius:var(--rad)}
+    .scene-nav{display:flex;align-items:center;gap:8px;padding:8px 12px;background:rgba(0,0,0,.2);border-radius:var(--rad)}
+    .scene-dot{width:10px;height:10px;border-radius:50%;border:1px solid var(--goldd);cursor:pointer;transition:all .2s}
+    .scene-dot:hover{border-color:var(--gold);transform:scale(1.2)}
+    .scene-dot.active{background:var(--gold);border-color:var(--goldb);box-shadow:0 0 8px rgba(201,168,76,.4)}
+    .scene-dot.visited{background:var(--goldd)}
+    .dm-note{background:rgba(201,168,76,.04);border:1px dashed rgba(201,168,76,.2);border-radius:var(--rad);padding:10px;font-size:.8rem;color:var(--inkd)}
+  `;
+
+  return <>
+    <style>{sessionCSS}</style>
+    <div className="pnl">
+      <div className="ph">
+        <div>
+          <h2 style={{margin:0}}>{camp.n}</h2>
+          <div className="td2 ts">{camp.lv} • Scene {sceneIdx + 1}/{scenes.length}</div>
+        </div>
+        <div className="fr gs">
+          {scene?.encounter && isDM && !showEncounter && (
+            <button className="btn bs bd" onClick={triggerEncounter}>⚔️ Trigger Encounter</button>
+          )}
+          {showEncounter && <span className="bdg bdg-r">⚔️ In Combat!</span>}
+        </div>
+      </div>
+
+      {/* Scene navigation dots */}
+      {scenes.length > 1 && (
+        <div className="scene-nav mb">
+          <span className="tx td2">Scenes:</span>
+          {scenes.map((s, i) => (
+            <div key={i} className={`scene-dot ${i === sceneIdx ? 'active' : i < sceneIdx ? 'visited' : ''}`}
+              onClick={() => isDM && advanceScene(i)} title={s.t}/>
+          ))}
+          {isDM && sceneIdx < scenes.length - 1 && (
+            <button className="btn bs" onClick={() => advanceScene()}>Next Scene →</button>
+          )}
+        </div>
+      )}
+
+      {/* Journal / Story Feed */}
+      <div className="sess-journal" ref={journalRef}>
+        {journal.map((entry, i) => (
+          <div key={i} className={`sess-entry ${entry.type === 'narration' ? 'sess-narr' : entry.type === 'scene' ? 'sess-scene' : entry.type === 'action' ? 'sess-action' : entry.type === 'encounter' ? 'sess-enc' : 'sess-dm'}`}>
+            {entry.type === 'scene' && <div className="scene-title">📜 {entry.title}</div>}
+            {entry.type === 'encounter' && <span>⚔️ </span>}
+            {entry.type === 'action' && <span>🎭 </span>}
+            {entry.text}
+          </div>
+        ))}
+      </div>
+
+      {/* Player Choices */}
+      {scene?.choices && (
+        <div className="mm">
+          <label>What do you do?</label>
+          <div className="choice-grid">
+            {scene.choices.map((choice, i) => (
+              <button key={i} className="choice-btn" onClick={() => handleChoice(choice, chars[0]?.name || "Player")}>
+                <span className="choice-num">{i + 1}.</span>{choice}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* DM Narration Tools */}
+      {isDM && (
+        <div className="mm fc" style={{gap:8}}>
+          <div className="dm-tools-bar">
+            <span className="tx tg" style={{fontFamily:"Cinzel",fontWeight:600}}>🎭 DM Controls</span>
+            <button className="btn bs" onClick={() => setShowCustom(!showCustom)}>
+              {showCustom ? "Cancel" : "+ Custom Scene"}
+            </button>
+            <button className="btn bs" onClick={() => {
+              const roll = rd(20);
+              addJournal({type:"dm", text: `🎲 DM rolled a secret d20: ${roll}`});
+            }}>🎲 Secret Roll</button>
+            <button className="btn bs" onClick={() => {
+              const desc = ["A cold wind howls through the corridor.","Torchlight flickers and almost dies.","You hear distant footsteps echoing.","A faint magical glow pulses from ahead.","The ground trembles briefly.","An eerie silence falls.","The smell of something burning drifts toward you.","A raven caws from somewhere unseen."];
+              const d = desc[Math.floor(Math.random() * desc.length)];
+              postNarration(d, "Atmosphere");
+            }}>🌙 Atmosphere</button>
+          </div>
+
+          {/* Quick narration */}
+          <div className="fr">
+            <textarea value={dmNarration} onChange={e => setDmNarration(e.target.value)}
+              placeholder="Write narration text for the players to see..."
+              style={{flex:1, minHeight:60, resize:"vertical", fontSize:".9rem"}}/>
+            <button className="btn" onClick={() => postNarration(dmNarration)} disabled={!dmNarration.trim()}
+              style={{alignSelf:"flex-end"}}>📖 Narrate</button>
+          </div>
+
+          {/* DM Notes */}
+          {scene?.notes && (
+            <div className="dm-note">
+              <b>📋 DM Notes:</b> {scene.notes}
+            </div>
+          )}
+
+          {/* Custom scene creator */}
+          {showCustom && (
+            <div className="pnl afu" style={{background:"rgba(0,0,0,.3)"}}>
+              <h3 className="mb">Create Custom Scene</h3>
+              <div className="fc" style={{gap:10}}>
+                <div>
+                  <label>Scene Title</label>
+                  <input type="text" value={customSceneTitle} onChange={e => setCustomSceneTitle(e.target.value)} placeholder="e.g. The Dark Forest"/>
+                </div>
+                <div>
+                  <label>Narration Text</label>
+                  <textarea value={customSceneNarr} onChange={e => setCustomSceneNarr(e.target.value)}
+                    placeholder="Describe the scene. What do the players see, hear, smell?"
+                    style={{minHeight:100, resize:"vertical"}}/>
+                </div>
+                <div>
+                  <label>Player Choices (one per line)</label>
+                  <textarea value={customChoices} onChange={e => setCustomChoices(e.target.value)}
+                    placeholder={"Explore the cave\nTalk to the stranger\nSet up camp\nInvestigate the noise"}
+                    style={{minHeight:70, resize:"vertical"}}/>
+                </div>
+                <button className="btn bp" onClick={addCustomScene} disabled={!customSceneNarr.trim()}>📜 Post Scene</button>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Player actions log */}
+      {playerActions.length > 0 && (
+        <div className="mm">
+          <label>Party Actions</label>
+          <div className="fc" style={{gap:4,marginTop:6}}>
+            {playerActions.map((a, i) => (
+              <div key={i} className="ts" style={{padding:"3px 8px", background:"rgba(90,138,197,.05)", borderRadius:4}}>
+                <b className="ta">{a.player}:</b> {a.choice}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  </>;
+}
 
 // ─── UTILS ──────────────────────────────────────────────────
 const rd = s => Math.floor(Math.random()*s)+1;
@@ -1386,8 +1693,8 @@ export default function App() {
 
   if(!sess) return <Lobby onJoin={setSess}/>;
   const isDM=sess.role==="dm";
-  const nav=isDM?[{k:"campaign",l:"Campaign",i:"📜"},{k:"characters",l:"Characters",i:"🛡️"},{k:"combat",l:"Combat",i:"⚔️"},{k:"map",l:"Map",i:"🗺️"},{k:"dm",l:"DM Tools",i:"🎭"},{k:"spells",l:"Spells",i:"✨"},{k:"dice",l:"Dice",i:"🎲"}]
-    :[{k:"campaign",l:"Campaign",i:"📜"},{k:"characters",l:"Character",i:"🛡️"},{k:"combat",l:"Combat",i:"⚔️"},{k:"map",l:"Map",i:"🗺️"},{k:"spells",l:"Spells",i:"✨"},{k:"dice",l:"Dice",i:"🎲"}];
+  const nav=isDM?[{k:"campaign",l:"Play",i:"📜"},{k:"characters",l:"Characters",i:"🛡️"},{k:"combat",l:"Combat",i:"⚔️"},{k:"map",l:"Map",i:"🗺️"},{k:"dm",l:"DM Tools",i:"🎭"},{k:"spells",l:"Spells",i:"✨"},{k:"dice",l:"Dice",i:"🎲"}]
+    :[{k:"campaign",l:"Play",i:"📜"},{k:"characters",l:"Character",i:"🛡️"},{k:"combat",l:"Combat",i:"⚔️"},{k:"map",l:"Map",i:"🗺️"},{k:"spells",l:"Spells",i:"✨"},{k:"dice",l:"Dice",i:"🎲"}];
 
   return <AppCtx.Provider value={ctx}><style>{CSS}</style><div className="abg">
     <div className="nav"><div className="fr gs">
@@ -1417,9 +1724,10 @@ export default function App() {
             syncAction({type:'SET_CAMPAIGN', payload: c});
             addMsg("system",`📜 Campaign: ${c.n}`);
           }}/>}
-          {page==="campaign"&&camp&&<div className="pnl afu"><h2>{camp.n}</h2><span className="bdg bdg-g">{camp.lv}</span><div className="dv"/><div className="ts">{camp.d}</div><div className="dv"/>
-            <div style={{padding:14,background:"rgba(0,0,0,.15)",borderRadius:4,borderLeft:"3px solid var(--gold)",fontStyle:"italic"}}>{camp.h}</div>
-            {isDM&&<button className="btn bs ml" onClick={()=>syncAction({type:'SET_CAMPAIGN',payload:null})}>Change</button>}</div>}
+          {page==="campaign"&&camp&&<SessionPlay camp={camp} isDM={isDM} chars={chars} mons={mons} setMons={newMons=>{
+            if(typeof newMons==='function'){setMons(p=>{const next=newMons(p);syncAction({type:'SET_MONSTERS',payload:next});return next;});}
+            else syncAction({type:'SET_MONSTERS',payload:newMons});
+          }} syncAction={syncAction}/>}
 
           {page==="characters"&&!creating&&<div className="afu">
             <div className="fb mb"><h2>Characters ({chars.length})</h2><button className="btn bp" onClick={()=>setCreating(true)}>+ New</button></div>
