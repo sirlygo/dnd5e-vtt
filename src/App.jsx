@@ -297,55 +297,73 @@ const CAMPAIGNS = [
 ];
 
 // ─── SESSION PLAY COMPONENT ──────────────────────────────────
-function SessionPlay({camp, isDM, chars, mons, setMons, syncAction}) {
-  const {addMsg} = useContext(AppCtx);
-  const [sceneIdx, setSceneIdx] = useState(0);
-  const [journal, setJournal] = useState([]);
+function SessionPlay({camp, isDM, chars, mons, setMons, syncAction, sceneData}) {
+  const {addMsg, pn, sess} = useContext(AppCtx);
   const [dmNarration, setDmNarration] = useState("");
   const [customSceneTitle, setCustomSceneTitle] = useState("");
   const [customSceneNarr, setCustomSceneNarr] = useState("");
   const [customChoices, setCustomChoices] = useState("");
   const [showCustom, setShowCustom] = useState(false);
-  const [playerActions, setPlayerActions] = useState([]);
   const [showEncounter, setShowEncounter] = useState(false);
   const journalRef = useRef(null);
+  const initRef = useRef(false);
 
   const scenes = camp?.scenes || [];
+  const {sceneIdx, journal, choiceMade, waitingForDM, playerActions} = sceneData;
   const scene = scenes[sceneIdx];
+  const playerName = pn || sess?.name || "Player";
+
+  // Helper to update synced scene data
+  const updateScene = useCallback((updates) => {
+    const newData = {...sceneData, ...updates};
+    syncAction({type:'SCENE_UPDATE', payload: newData});
+  }, [sceneData, syncAction]);
 
   useEffect(() => {
     if (journalRef.current) journalRef.current.scrollTop = journalRef.current.scrollHeight;
   }, [journal]);
 
-  const addJournal = useCallback((entry) => {
-    setJournal(p => [...p, {...entry, ts: Date.now()}]);
-  }, []);
-
   const postNarration = useCallback((text, title) => {
     if (!text.trim()) return;
-    addJournal({type:"narration", title: title || "", text});
+    const entry = {type:"narration", title: title || "", text, ts: Date.now()};
+    updateScene({journal: [...journal, entry]});
     addMsg("system", `📖 ${title ? title+": " : ""}${text.substring(0, 80)}...`);
     setDmNarration("");
-  }, [addJournal, addMsg]);
+  }, [journal, updateScene, addMsg]);
 
   const advanceScene = useCallback((idx) => {
     const nextIdx = idx !== undefined ? idx : sceneIdx + 1;
     if (nextIdx < scenes.length) {
-      setSceneIdx(nextIdx);
       const s = scenes[nextIdx];
-      addJournal({type:"scene", title: s.t, text: s.narr});
+      const entry = {type:"scene", title: s.t, text: s.narr, ts: Date.now()};
+      updateScene({
+        sceneIdx: nextIdx,
+        journal: [...journal, entry],
+        choiceMade: false,
+        waitingForDM: false,
+        playerActions: []
+      });
       addMsg("system", `📜 New Scene: ${s.t}`);
       setShowEncounter(false);
-      setPlayerActions([]);
+    } else {
+      const entry = {type:"scene", title: "🏆 Campaign Complete!", text: "Congratulations, adventurers! Your deeds will be remembered in song and story for generations to come.", ts: Date.now()};
+      updateScene({journal: [...journal, entry], choiceMade: true, waitingForDM: false});
+      addMsg("system", "🏆 Campaign Complete! Well played, adventurers!");
     }
-  }, [sceneIdx, scenes, addJournal, addMsg]);
+  }, [sceneIdx, scenes, journal, updateScene, addMsg]);
 
-  const handleChoice = useCallback((choice, playerName) => {
-    const action = {player: playerName || "Player", choice, ts: Date.now()};
-    setPlayerActions(p => [...p, action]);
-    addJournal({type:"action", text: `${action.player} chose: "${choice}"`});
-    addMsg("system", `🎭 ${action.player}: "${choice}"`);
-  }, [addJournal, addMsg]);
+  const handleChoice = useCallback((choice) => {
+    if (choiceMade) return;
+    const action = {player: playerName, choice, ts: Date.now()};
+    const entry = {type:"action", text: `${playerName} chose: "${choice}"`, ts: Date.now()};
+    updateScene({
+      journal: [...journal, entry],
+      playerActions: [...playerActions, action],
+      choiceMade: true,
+      waitingForDM: true
+    });
+    addMsg("system", `🎭 ${playerName}: "${choice}"`);
+  }, [journal, playerActions, playerName, choiceMade, updateScene, addMsg]);
 
   const triggerEncounter = useCallback(() => {
     if (!scene?.encounter) return;
@@ -353,33 +371,37 @@ function SessionPlay({camp, isDM, chars, mons, setMons, syncAction}) {
       const template = MONSTERS.find(m => m.n === mn);
       return template ? {...template, id: uid(), curHp: template.hp} : null;
     }).filter(Boolean);
-    if (syncAction) {
-      syncAction({type:'SET_MONSTERS', payload: monsToAdd});
-    }
+    syncAction({type:'SET_MONSTERS', payload: monsToAdd});
     setShowEncounter(true);
-    addJournal({type:"encounter", text:`Combat! ${monsToAdd.map(m=>m.n).join(", ")} appear!`});
+    const entry = {type:"encounter", text:`Combat! ${monsToAdd.map(m=>m.n).join(", ")} appear!`, ts: Date.now()};
+    updateScene({journal: [...journal, entry]});
     addMsg("system", `⚔️ ENCOUNTER: ${monsToAdd.map(m=>m.n).join(", ")}!`);
-  }, [scene, addJournal, addMsg, syncAction]);
+  }, [scene, journal, updateScene, addMsg, syncAction]);
 
   const addCustomScene = useCallback(() => {
     if (!customSceneNarr.trim()) return;
-    const choices = customChoices.split("\n").map(c => c.trim()).filter(Boolean);
-    const newScene = {t: customSceneTitle || `Scene ${scenes.length + 1}`, narr: customSceneNarr, choices: choices.length > 0 ? choices : ["Continue..."], notes: ""};
-    // Add to journal directly
-    addJournal({type:"scene", title: newScene.t, text: newScene.narr});
-    addMsg("system", `📜 New Scene: ${newScene.t}`);
+    const entry = {type:"scene", title: customSceneTitle || "New Scene", text: customSceneNarr, ts: Date.now()};
+    updateScene({
+      journal: [...journal, entry],
+      playerActions: [],
+      choiceMade: false,
+      waitingForDM: false
+    });
+    addMsg("system", `📜 New Scene: ${customSceneTitle || "New Scene"}`);
     setCustomSceneTitle("");
     setCustomSceneNarr("");
     setCustomChoices("");
     setShowCustom(false);
-  }, [customSceneTitle, customSceneNarr, customChoices, scenes.length, addJournal, addMsg]);
+  }, [customSceneTitle, customSceneNarr, customChoices, journal, updateScene, addMsg]);
 
-  // Auto-load first scene
+  // Auto-load first scene once
   useEffect(() => {
-    if (scenes.length > 0 && journal.length === 0) {
-      addJournal({type:"scene", title: scenes[0].t, text: scenes[0].narr});
+    if (scenes.length > 0 && journal.length === 0 && !initRef.current) {
+      initRef.current = true;
+      const entry = {type:"scene", title: scenes[0].t, text: scenes[0].narr, ts: Date.now()};
+      updateScene({journal: [entry]});
     }
-  }, []);
+  }, [scenes, journal, updateScene]);
 
   const sessionCSS = `
     .sess-journal{max-height:400px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;padding:4px}
@@ -448,16 +470,51 @@ function SessionPlay({camp, isDM, chars, mons, setMons, syncAction}) {
       </div>
 
       {/* Player Choices */}
-      {scene?.choices && (
+      {scene?.choices && !choiceMade && (
         <div className="mm">
           <label>What do you do?</label>
           <div className="choice-grid">
             {scene.choices.map((choice, i) => (
-              <button key={i} className="choice-btn" onClick={() => handleChoice(choice, chars[0]?.name || "Player")}>
+              <button key={i} className="choice-btn" onClick={() => handleChoice(choice)}>
                 <span className="choice-num">{i + 1}.</span>{choice}
               </button>
             ))}
           </div>
+        </div>
+      )}
+
+      {/* After choice — waiting state */}
+      {choiceMade && waitingForDM && (
+        <div className="mm">
+          {isDM ? (
+            <div className="pnl" style={{background:"rgba(201,168,76,.04)",borderColor:"rgba(201,168,76,.3)"}}>
+              <div className="fb">
+                <div>
+                  <div className="ts tg" style={{fontFamily:"Cinzel",fontWeight:600}}>Party has decided</div>
+                  <div className="tx td2 mt">Choose how to continue:</div>
+                </div>
+              </div>
+              <div className="fr mm" style={{gap:8,flexWrap:"wrap"}}>
+                {scene?.encounter && !showEncounter && (
+                  <button className="btn bd" onClick={triggerEncounter}>⚔️ Trigger Combat</button>
+                )}
+                {sceneIdx < scenes.length - 1 ? (
+                  <button className="btn bp" onClick={() => advanceScene()}>📜 Next Scene →</button>
+                ) : (
+                  <button className="btn bp" onClick={() => advanceScene()}>🏆 Complete Campaign</button>
+                )}
+                <button className="btn" onClick={() => updateScene({choiceMade:false,waitingForDM:false,playerActions:[]})}>
+                  🔄 Let Party Re-choose
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="pnl tc" style={{background:"rgba(90,138,197,.04)",borderColor:"rgba(90,138,197,.2)",padding:20}}>
+              <div className="ta" style={{fontSize:"1.1rem"}}>⏳</div>
+              <div className="ts ta mt">Your choice has been recorded.</div>
+              <div className="tx td2">Waiting for the Dungeon Master to advance the story...</div>
+            </div>
+          )}
         </div>
       )}
 
@@ -1641,14 +1698,15 @@ export default function App() {
   const [chars,setChars]=useState([]);const [aCh,setACh]=useState(0);
   const [mons,setMons]=useState([]);const [camp,setCamp]=useState(null);
   const [msgs,setMsgs]=useState([]);const [creating,setCreating]=useState(false);
+  const [sceneData,setSceneData]=useState({sceneIdx:0,journal:[],choiceMade:false,waitingForDM:false,playerActions:[]});
   const stateVerRef = useRef(0); // version counter to detect changes
 
   const mp = useMultiplayer(sess);
 
   // Build the game state object (for sync)
   const getGameState = useCallback(() => ({
-    chars, mons, camp, msgs, v: stateVerRef.current
-  }), [chars, mons, camp, msgs]);
+    chars, mons, camp, msgs, sceneData, v: stateVerRef.current
+  }), [chars, mons, camp, msgs, sceneData]);
 
   // Apply received game state (players only)
   const applyGameState = useCallback((state) => {
@@ -1657,6 +1715,7 @@ export default function App() {
     if (state.mons !== undefined) setMons(state.mons);
     if (state.camp !== undefined) setCamp(state.camp);
     if (state.msgs) setMsgs(state.msgs);
+    if (state.sceneData) setSceneData(state.sceneData);
   }, []);
 
   // Host: listen for player actions
@@ -1677,7 +1736,8 @@ export default function App() {
           break;
         case 'SET_CAMPAIGN':
           setCamp(action.payload);
-          setMsgs(p => [...p, {t:"system",tx:`📜 Campaign: ${action.payload.n}`,s:"System",ts:Date.now()}]);
+          if (action.payload) setMsgs(p => [...p, {t:"system",tx:`📜 Campaign: ${action.payload.n}`,s:"System",ts:Date.now()}]);
+          setSceneData({sceneIdx:0,journal:[],choiceMade:false,waitingForDM:false,playerActions:[]});
           break;
         case 'ADD_MONSTER':
           setMons(p => [...p, action.payload]);
@@ -1687,6 +1747,9 @@ export default function App() {
           break;
         case 'SET_MONSTERS':
           setMons(action.payload);
+          break;
+        case 'SCENE_UPDATE':
+          setSceneData(action.payload);
           break;
       }
     });
@@ -1706,7 +1769,7 @@ export default function App() {
       mp.broadcastState(getGameState());
     }, 50); // small debounce
     return () => clearTimeout(timer);
-  }, [chars, mons, camp, msgs, sess, mp, getGameState]);
+  }, [chars, mons, camp, msgs, sceneData, sess, mp, getGameState]);
 
   // ── Synced action helpers ──
   // These either apply locally (host) or send to host (player)
@@ -1734,6 +1797,9 @@ export default function App() {
           break;
         case 'SET_MONSTERS':
           setMons(action.payload);
+          break;
+        case 'SCENE_UPDATE':
+          setSceneData(action.payload);
           break;
       }
     } else {
@@ -1780,9 +1846,10 @@ export default function App() {
         <div>
           {page==="campaign"&&!camp&&<CampSel onSel={c=>{
             syncAction({type:'SET_CAMPAIGN', payload: c});
+            syncAction({type:'SCENE_UPDATE', payload: {sceneIdx:0,journal:[],choiceMade:false,waitingForDM:false,playerActions:[]}});
             addMsg("system",`📜 Campaign: ${c.n}`);
           }}/>}
-          {page==="campaign"&&camp&&<SessionPlay camp={camp} isDM={isDM} chars={chars} mons={mons} setMons={newMons=>{
+          {page==="campaign"&&camp&&<SessionPlay camp={camp} isDM={isDM} chars={chars} mons={mons} sceneData={sceneData} setMons={newMons=>{
             if(typeof newMons==='function'){setMons(p=>{const next=newMons(p);syncAction({type:'SET_MONSTERS',payload:next});return next;});}
             else syncAction({type:'SET_MONSTERS',payload:newMons});
           }} syncAction={syncAction}/>}
