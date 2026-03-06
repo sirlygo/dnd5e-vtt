@@ -1037,12 +1037,13 @@ function MonRef({onSpawn}) {
 function CampSel({onSel}) {
   const [sel,setSel]=useState(null);
   return <div style={{maxWidth:860,margin:"0 auto"}}><h2 className="td mb">📜 Select Campaign</h2>
-    <div className="fc gs">{CAMPAIGNS.map(c=><div key={c.n} className={`cc ${sel===c.n?"sel":""}`} onClick={()=>setSel(c.n)}>
+    <div className="fc gs">{CAMPAIGNS.map(c=><div key={c.n} className={`cc ${sel===c.n?"sel":""}`} onClick={()=>setSel(sel===c.n?null:c.n)}>
       <div className="fb"><h3 style={{margin:0,fontSize:".95rem"}}>{c.n}</h3><span className="bdg bdg-g">{c.lv}</span></div>
       <div className="td2 ts mt">{c.d}</div>
       {sel===c.n&&<div className="afu mm" style={{padding:10,background:"rgba(0,0,0,.15)",borderRadius:4,borderLeft:"3px solid var(--gold)"}}>
         <div className="ts"><b>Hook:</b></div><div className="ts" style={{fontStyle:"italic"}}>{c.h}</div>
-        <button className="btn bp bs mm" onClick={()=>onSel(c)}>Begin →</button></div>}
+        <div className="ts mm td2">{c.scenes?`${c.scenes.length} scenes ready`:""}</div>
+        <button className="btn bp bl mm" onClick={(e)=>{e.stopPropagation();onSel(c);}} style={{width:"100%"}}>⚔️ Begin Adventure</button></div>}
     </div>)}</div>
   </div>;
 }
