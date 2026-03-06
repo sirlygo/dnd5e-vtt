@@ -1,0 +1,1180 @@
+import { useState, useEffect, useCallback, useRef, useMemo, createContext, useContext } from "react";
+
+/* ═══════════════════════════════════════════════════════════════════════
+   D&D 5e VIRTUAL TABLETOP — COMPREHENSIVE SRD PLATFORM
+   Full character creation, combat, spells, DM tools, battle map, dice
+   ═══════════════════════════════════════════════════════════════════════ */
+
+const ABILITIES = ["STR","DEX","CON","INT","WIS","CHA"];
+const ABILITY_FULL = {STR:"Strength",DEX:"Dexterity",CON:"Constitution",INT:"Intelligence",WIS:"Wisdom",CHA:"Charisma"};
+const STANDARD_ARRAY = [15,14,13,12,10,8];
+const PB_COST = {8:0,9:1,10:2,11:3,12:4,13:5,14:7,15:9};
+
+const SKILLS = [
+  {name:"Acrobatics",ab:"DEX"},{name:"Animal Handling",ab:"WIS"},{name:"Arcana",ab:"INT"},
+  {name:"Athletics",ab:"STR"},{name:"Deception",ab:"CHA"},{name:"History",ab:"INT"},
+  {name:"Insight",ab:"WIS"},{name:"Intimidation",ab:"CHA"},{name:"Investigation",ab:"INT"},
+  {name:"Medicine",ab:"WIS"},{name:"Nature",ab:"INT"},{name:"Perception",ab:"WIS"},
+  {name:"Performance",ab:"CHA"},{name:"Persuasion",ab:"CHA"},{name:"Religion",ab:"INT"},
+  {name:"Sleight of Hand",ab:"DEX"},{name:"Stealth",ab:"DEX"},{name:"Survival",ab:"WIS"}
+];
+
+const CONDITIONS = [
+  {n:"Blinded",d:"Can't see. Auto-fail sight checks. Attacks have disadvantage. Attacks against have advantage.",i:"👁️‍🗨️"},
+  {n:"Charmed",d:"Can't attack charmer. Charmer has advantage on social checks.",i:"💕"},
+  {n:"Deafened",d:"Can't hear. Auto-fail hearing checks.",i:"🔇"},
+  {n:"Frightened",d:"Disadvantage on checks/attacks while source in sight. Can't willingly move closer.",i:"😨"},
+  {n:"Grappled",d:"Speed becomes 0. Ends if grappler incapacitated or moved out of reach.",i:"✊"},
+  {n:"Incapacitated",d:"Can't take actions or reactions.",i:"💫"},
+  {n:"Invisible",d:"Impossible to see without magic. Attacks have advantage. Attacks against have disadvantage.",i:"👻"},
+  {n:"Paralyzed",d:"Incapacitated. Can't move or speak. Auto-fail STR/DEX saves. Melee hits are crits.",i:"⚡"},
+  {n:"Petrified",d:"Turned to stone. Weight x10. Immune to poison/disease. Resistant to all damage.",i:"🗿"},
+  {n:"Poisoned",d:"Disadvantage on attack rolls and ability checks.",i:"☠️"},
+  {n:"Prone",d:"Disadvantage on attacks. Melee against has advantage. Ranged against has disadvantage.",i:"🔽"},
+  {n:"Restrained",d:"Speed 0. Attacks have disadvantage. Attacks against have advantage. Disadvantage DEX saves.",i:"⛓️"},
+  {n:"Stunned",d:"Incapacitated. Can't move. Auto-fail STR/DEX saves. Attacks against have advantage.",i:"💥"},
+  {n:"Unconscious",d:"Incapacitated. Drop items. Fall prone. Auto-fail STR/DEX saves.",i:"💤"},
+  {n:"Exhaustion",d:"Cumulative levels 1-6. Level 6 = death.",i:"😩"},
+  {n:"Concentrating",d:"Must maintain. CON save on damage (DC 10 or half damage taken).",i:"🎯"}
+];
+
+const RACES = {
+  Human:{sp:30,sz:"Medium",ab:{STR:1,DEX:1,CON:1,INT:1,WIS:1,CHA:1},tr:["Extra Language"],dv:0,desc:"Versatile and ambitious, the most adaptable of all races."},
+  "Variant Human":{sp:30,sz:"Medium",ab:{},tr:["Feat at 1st Level","Extra Skill","Choose +1 to two abilities"],dv:0,desc:"Gain a feat and flexible ability scores."},
+  "High Elf":{sp:30,sz:"Medium",ab:{DEX:2,INT:1},tr:["Darkvision 60ft","Keen Senses","Fey Ancestry","Trance","Cantrip","Extra Language"],dv:60,desc:"Masters of both sword and spell."},
+  "Wood Elf":{sp:35,sz:"Medium",ab:{DEX:2,WIS:1},tr:["Darkvision 60ft","Keen Senses","Fey Ancestry","Trance","Fleet of Foot","Mask of the Wild"],dv:60,desc:"Swift and stealthy forest dwellers."},
+  "Hill Dwarf":{sp:25,sz:"Medium",ab:{CON:2,WIS:1},tr:["Darkvision 60ft","Dwarven Resilience","Stonecunning","Dwarven Toughness (+1 HP/level)"],dv:60,desc:"Keen senses and remarkable resilience."},
+  "Mountain Dwarf":{sp:25,sz:"Medium",ab:{CON:2,STR:2},tr:["Darkvision 60ft","Dwarven Resilience","Dwarven Armor Training"],dv:60,desc:"Strong and hardy, accustomed to rugged life."},
+  "Lightfoot Halfling":{sp:25,sz:"Small",ab:{DEX:2,CHA:1},tr:["Lucky","Brave","Halfling Nimbleness","Naturally Stealthy"],dv:0,desc:"Can hide behind larger creatures."},
+  "Stout Halfling":{sp:25,sz:"Small",ab:{DEX:2,CON:1},tr:["Lucky","Brave","Halfling Nimbleness","Stout Resilience"],dv:0,desc:"Hardier than most halflings, resistant to poison."},
+  Dragonborn:{sp:30,sz:"Medium",ab:{STR:2,CHA:1},tr:["Draconic Ancestry","Breath Weapon","Damage Resistance"],dv:0,desc:"Born of dragons, walking proudly through the world."},
+  "Rock Gnome":{sp:25,sz:"Small",ab:{INT:2,CON:1},tr:["Darkvision 60ft","Gnome Cunning","Artificer's Lore","Tinker"],dv:60,desc:"Natural inventors and illusionists."},
+  "Half-Elf":{sp:30,sz:"Medium",ab:{CHA:2},tr:["Darkvision 60ft","Fey Ancestry","Skill Versatility","Choose +1 to two abilities"],dv:60,desc:"Combining the best of humans and elves."},
+  "Half-Orc":{sp:30,sz:"Medium",ab:{STR:2,CON:1},tr:["Darkvision 60ft","Menacing","Relentless Endurance","Savage Attacks"],dv:60,desc:"Fierce warriors combining human versatility with orcish might."},
+  Tiefling:{sp:30,sz:"Medium",ab:{CHA:2,INT:1},tr:["Darkvision 60ft","Hellish Resistance (fire)","Infernal Legacy"],dv:60,desc:"Bearing the mark of their infernal bloodline."}
+};
+
+const CLASSES = {
+  Barbarian:{hd:12,pa:"STR",st:["STR","CON"],sk:["Animal Handling","Athletics","Intimidation","Nature","Perception","Survival"],ns:2,ap:"Light, Medium, Shields",wp:"Simple, Martial",sc:false,ft:{1:["Rage (2/day)","Unarmored Defense"]},desc:"A fierce warrior channeling primal rage."},
+  Bard:{hd:8,pa:"CHA",st:["DEX","CHA"],sk:SKILLS.map(s=>s.name),ns:3,ap:"Light",wp:"Simple, Hand Crossbows, Longswords, Rapiers, Shortswords",sc:true,sa:"CHA",ck:2,skn:4,sl:{1:[2]},ft:{1:["Spellcasting","Bardic Inspiration (d6)"]},desc:"A master of song, speech, and magic."},
+  Cleric:{hd:8,pa:"WIS",st:["WIS","CHA"],sk:["History","Insight","Medicine","Persuasion","Religion"],ns:2,ap:"Light, Medium, Shields",wp:"Simple",sc:true,sa:"WIS",ck:3,sl:{1:[2]},ft:{1:["Spellcasting","Divine Domain"]},desc:"A priestly champion wielding divine magic."},
+  Druid:{hd:8,pa:"WIS",st:["INT","WIS"],sk:["Arcana","Animal Handling","Insight","Medicine","Nature","Perception","Religion","Survival"],ns:2,ap:"Light, Medium, Shields (nonmetal)",wp:"Clubs, Daggers, Darts, Javelins, Maces, Quarterstaffs, Scimitars, Sickles, Slings, Spears",sc:true,sa:"WIS",ck:2,sl:{1:[2]},ft:{1:["Druidic","Spellcasting"]},desc:"A priest of the Old Faith wielding nature's power."},
+  Fighter:{hd:10,pa:"STR",st:["STR","CON"],sk:["Acrobatics","Animal Handling","Athletics","History","Insight","Intimidation","Perception","Survival"],ns:2,ap:"All armor, Shields",wp:"Simple, Martial",sc:false,ft:{1:["Fighting Style","Second Wind (1d10+level HP)"]},desc:"A master of martial combat."},
+  Monk:{hd:8,pa:"DEX",st:["STR","DEX"],sk:["Acrobatics","Athletics","History","Insight","Religion","Stealth"],ns:2,ap:"None",wp:"Simple, Shortswords",sc:false,ft:{1:["Unarmored Defense (10+DEX+WIS)","Martial Arts (d4)"]},desc:"A master of martial arts harnessing body power."},
+  Paladin:{hd:10,pa:"STR",st:["WIS","CHA"],sk:["Athletics","Insight","Intimidation","Medicine","Persuasion","Religion"],ns:2,ap:"All armor, Shields",wp:"Simple, Martial",sc:true,sa:"CHA",sl:{1:[0],2:[2]},ft:{1:["Divine Sense","Lay on Hands"]},desc:"A holy warrior bound to a sacred oath."},
+  Ranger:{hd:10,pa:"DEX",st:["STR","DEX"],sk:["Animal Handling","Athletics","Insight","Investigation","Nature","Perception","Stealth","Survival"],ns:3,ap:"Light, Medium, Shields",wp:"Simple, Martial",sc:true,sa:"WIS",sl:{1:[0],2:[2]},ft:{1:["Favored Enemy","Natural Explorer"]},desc:"A warrior of the wilderness, hunter and tracker."},
+  Rogue:{hd:8,pa:"DEX",st:["DEX","INT"],sk:["Acrobatics","Athletics","Deception","Insight","Intimidation","Investigation","Perception","Performance","Persuasion","Sleight of Hand","Stealth"],ns:4,ap:"Light",wp:"Simple, Hand Crossbows, Longswords, Rapiers, Shortswords",sc:false,ft:{1:["Expertise","Sneak Attack (1d6)","Thieves' Cant"]},desc:"A scoundrel using stealth and trickery."},
+  Sorcerer:{hd:6,pa:"CHA",st:["CON","CHA"],sk:["Arcana","Deception","Insight","Intimidation","Persuasion","Religion"],ns:2,ap:"None",wp:"Daggers, Darts, Slings, Quarterstaffs, Light Crossbows",sc:true,sa:"CHA",ck:4,skn:2,sl:{1:[2]},ft:{1:["Spellcasting","Sorcerous Origin"]},desc:"A spellcaster with innate magical power."},
+  Warlock:{hd:8,pa:"CHA",st:["WIS","CHA"],sk:["Arcana","Deception","History","Intimidation","Investigation","Nature","Religion"],ns:2,ap:"Light",wp:"Simple",sc:true,sa:"CHA",ck:2,skn:2,sl:{1:[1]},ft:{1:["Otherworldly Patron","Pact Magic"]},desc:"Magic gained through an extraplanar pact."},
+  Wizard:{hd:6,pa:"INT",st:["INT","WIS"],sk:["Arcana","History","Insight","Investigation","Medicine","Religion"],ns:2,ap:"None",wp:"Daggers, Darts, Slings, Quarterstaffs, Light Crossbows",sc:true,sa:"INT",ck:3,skn:6,sl:{1:[2]},ft:{1:["Spellcasting","Arcane Recovery"]},desc:"A scholarly magic-user commanding arcane power."}
+};
+
+const BACKGROUNDS = {
+  Acolyte:{sk:["Insight","Religion"],eq:"Holy symbol, prayer book, vestments, 15 gp",feat:"Shelter of the Faithful"},
+  Criminal:{sk:["Deception","Stealth"],eq:"Crowbar, dark clothes with hood, 15 gp",feat:"Criminal Contact"},
+  "Folk Hero":{sk:["Animal Handling","Survival"],eq:"Artisan's tools, shovel, common clothes, 10 gp",feat:"Rustic Hospitality"},
+  Noble:{sk:["History","Persuasion"],eq:"Fine clothes, signet ring, scroll of pedigree, 25 gp",feat:"Position of Privilege"},
+  Sage:{sk:["Arcana","History"],eq:"Bottle of ink, quill, small knife, common clothes, 10 gp",feat:"Researcher"},
+  Soldier:{sk:["Athletics","Intimidation"],eq:"Insignia of rank, trophy, dice set, common clothes, 10 gp",feat:"Military Rank"},
+  Charlatan:{sk:["Deception","Sleight of Hand"],eq:"Fine clothes, disguise kit, 15 gp",feat:"False Identity"},
+  Entertainer:{sk:["Acrobatics","Performance"],eq:"Musical instrument, costume, 15 gp",feat:"By Popular Demand"},
+  "Guild Artisan":{sk:["Insight","Persuasion"],eq:"Artisan's tools, letter, traveler's clothes, 15 gp",feat:"Guild Membership"},
+  Hermit:{sk:["Medicine","Religion"],eq:"Scroll case, winter blanket, herbalism kit, 5 gp",feat:"Discovery"},
+  Outlander:{sk:["Athletics","Survival"],eq:"Staff, hunting trap, traveler's clothes, 10 gp",feat:"Wanderer"},
+  Urchin:{sk:["Sleight of Hand","Stealth"],eq:"Small knife, map, pet mouse, common clothes, 10 gp",feat:"City Secrets"}
+};
+
+const ALIGNMENTS = ["Lawful Good","Neutral Good","Chaotic Good","Lawful Neutral","True Neutral","Chaotic Neutral","Lawful Evil","Neutral Evil","Chaotic Evil"];
+
+const SPELLS = [
+  {n:"Fire Bolt",l:0,s:"Evocation",ct:"1 action",rng:"120 ft",dur:"Instantaneous",d:"Ranged spell attack: 1d10 fire damage. Scales at 5th/11th/17th.",cls:["Sorcerer","Wizard"],c:false},
+  {n:"Mage Hand",l:0,s:"Conjuration",ct:"1 action",rng:"30 ft",dur:"1 minute",d:"Spectral hand manipulates objects up to 10 lbs.",cls:["Bard","Sorcerer","Warlock","Wizard"],c:false},
+  {n:"Light",l:0,s:"Evocation",ct:"1 action",rng:"Touch",dur:"1 hour",d:"Object sheds bright light 20 ft, dim light 20 ft more.",cls:["Bard","Cleric","Sorcerer","Wizard"],c:false},
+  {n:"Sacred Flame",l:0,s:"Evocation",ct:"1 action",rng:"60 ft",dur:"Instantaneous",d:"DEX save or 1d8 radiant. No cover benefit. Scales.",cls:["Cleric"],c:false},
+  {n:"Eldritch Blast",l:0,s:"Evocation",ct:"1 action",rng:"120 ft",dur:"Instantaneous",d:"Ranged spell attack: 1d10 force. Extra beams at 5th/11th/17th.",cls:["Warlock"],c:false},
+  {n:"Prestidigitation",l:0,s:"Transmutation",ct:"1 action",rng:"10 ft",dur:"Up to 1 hour",d:"Minor trick: sensory effect, light/snuff, clean/soil, warm/cool, mark, trinket.",cls:["Bard","Sorcerer","Warlock","Wizard"],c:false},
+  {n:"Minor Illusion",l:0,s:"Illusion",ct:"1 action",rng:"30 ft",dur:"1 minute",d:"Sound or image up to 5-ft cube. Investigation check to see through.",cls:["Bard","Sorcerer","Warlock","Wizard"],c:false},
+  {n:"Ray of Frost",l:0,s:"Evocation",ct:"1 action",rng:"60 ft",dur:"Instantaneous",d:"Ranged spell attack: 1d8 cold. Speed -10 ft until next turn.",cls:["Sorcerer","Wizard"],c:false},
+  {n:"Guidance",l:0,s:"Divination",ct:"1 action",rng:"Touch",dur:"Conc, 1 min",d:"Target adds 1d4 to one ability check.",cls:["Cleric","Druid"],c:true},
+  {n:"Thaumaturgy",l:0,s:"Transmutation",ct:"1 action",rng:"30 ft",dur:"Up to 1 min",d:"Minor divine wonder: booming voice, tremors, sounds, etc.",cls:["Cleric"],c:false},
+  {n:"Vicious Mockery",l:0,s:"Enchantment",ct:"1 action",rng:"60 ft",dur:"Instantaneous",d:"WIS save or 1d4 psychic + disadvantage on next attack.",cls:["Bard"],c:false},
+  {n:"Druidcraft",l:0,s:"Transmutation",ct:"1 action",rng:"30 ft",dur:"Instantaneous",d:"Create tiny nature effect: weather prediction, bloom, sensory.",cls:["Druid"],c:false},
+  {n:"Magic Missile",l:1,s:"Evocation",ct:"1 action",rng:"120 ft",dur:"Instantaneous",d:"3 darts, 1d4+1 force each. Always hits. +1 dart per slot above 1st.",cls:["Sorcerer","Wizard"],c:false},
+  {n:"Shield",l:1,s:"Abjuration",ct:"1 reaction",rng:"Self",dur:"1 round",d:"+5 AC until next turn, including triggering attack. Blocks Magic Missile.",cls:["Sorcerer","Wizard"],c:false},
+  {n:"Cure Wounds",l:1,s:"Evocation",ct:"1 action",rng:"Touch",dur:"Instantaneous",d:"Heal 1d8 + spell mod. +1d8 per slot above 1st.",cls:["Bard","Cleric","Druid","Paladin","Ranger"],c:false},
+  {n:"Healing Word",l:1,s:"Evocation",ct:"1 bonus action",rng:"60 ft",dur:"Instantaneous",d:"Heal 1d4 + spell mod. +1d4 per slot above 1st.",cls:["Bard","Cleric","Druid"],c:false},
+  {n:"Guiding Bolt",l:1,s:"Evocation",ct:"1 action",rng:"120 ft",dur:"1 round",d:"Ranged spell attack: 4d6 radiant. Next attack against target has advantage.",cls:["Cleric"],c:false},
+  {n:"Thunderwave",l:1,s:"Evocation",ct:"1 action",rng:"Self (15-ft cube)",dur:"Instantaneous",d:"CON save: 2d8 thunder (half on save). Pushed 10 ft.",cls:["Bard","Druid","Sorcerer","Wizard"],c:false},
+  {n:"Detect Magic",l:1,s:"Divination",ct:"1 action",rng:"Self",dur:"Conc, 10 min",d:"Sense magic within 30 ft. Action to see aura and school.",cls:["Bard","Cleric","Druid","Paladin","Ranger","Sorcerer","Wizard"],c:true},
+  {n:"Sleep",l:1,s:"Enchantment",ct:"1 action",rng:"90 ft",dur:"1 minute",d:"5d8 HP of creatures fall asleep, starting lowest HP. +2d8 per slot above 1st.",cls:["Bard","Sorcerer","Wizard"],c:false},
+  {n:"Bless",l:1,s:"Enchantment",ct:"1 action",rng:"30 ft",dur:"Conc, 1 min",d:"Up to 3 creatures add 1d4 to attacks and saves.",cls:["Cleric","Paladin"],c:true},
+  {n:"Burning Hands",l:1,s:"Evocation",ct:"1 action",rng:"Self (15-ft cone)",dur:"Instantaneous",d:"DEX save: 3d6 fire (half on save). +1d6 per slot above 1st.",cls:["Sorcerer","Wizard"],c:false},
+  {n:"Charm Person",l:1,s:"Enchantment",ct:"1 action",rng:"30 ft",dur:"1 hour",d:"WIS save (advantage if fighting). Charmed: regards you as friendly.",cls:["Bard","Druid","Sorcerer","Warlock","Wizard"],c:false},
+  {n:"Mage Armor",l:1,s:"Abjuration",ct:"1 action",rng:"Touch",dur:"8 hours",d:"Base AC becomes 13 + DEX. Must not wear armor.",cls:["Sorcerer","Wizard"],c:false},
+  {n:"Hex",l:1,s:"Enchantment",ct:"1 bonus action",rng:"90 ft",dur:"Conc, 1 hr",d:"+1d6 necrotic on attacks. Choose ability: target has disadvantage on its checks.",cls:["Warlock"],c:true},
+  {n:"Hunter's Mark",l:1,s:"Divination",ct:"1 bonus action",rng:"90 ft",dur:"Conc, 1 hr",d:"+1d6 weapon damage. Advantage on Perception/Survival to find it.",cls:["Ranger"],c:true},
+  {n:"Entangle",l:1,s:"Conjuration",ct:"1 action",rng:"90 ft",dur:"Conc, 1 min",d:"20-ft square. STR save or restrained. Difficult terrain.",cls:["Druid"],c:true},
+  {n:"Faerie Fire",l:1,s:"Evocation",ct:"1 action",rng:"60 ft",dur:"Conc, 1 min",d:"20-ft cube. DEX save or outlined. Attacks against have advantage. Can't be invisible.",cls:["Bard","Druid"],c:true},
+  {n:"Fireball",l:3,s:"Evocation",ct:"1 action",rng:"150 ft",dur:"Instantaneous",d:"20-ft sphere. DEX save: 8d6 fire (half on save). +1d6 per slot above 3rd.",cls:["Sorcerer","Wizard"],c:false},
+  {n:"Counterspell",l:3,s:"Abjuration",ct:"1 reaction",rng:"60 ft",dur:"Instantaneous",d:"Interrupt spellcasting. Auto if ≤3rd level. Higher: DC 10+spell level check.",cls:["Sorcerer","Warlock","Wizard"],c:false},
+  {n:"Lightning Bolt",l:3,s:"Evocation",ct:"1 action",rng:"Self (100-ft line)",dur:"Instantaneous",d:"5-ft wide 100-ft line. DEX save: 8d6 lightning (half). +1d6 per slot above 3rd.",cls:["Sorcerer","Wizard"],c:false},
+  {n:"Revivify",l:3,s:"Necromancy",ct:"1 action",rng:"Touch",dur:"Instantaneous",d:"Dead ≤1 min returns with 1 HP. 300 gp diamond consumed.",cls:["Cleric","Paladin"],c:false},
+  {n:"Spirit Guardians",l:3,s:"Conjuration",ct:"1 action",rng:"Self (15-ft radius)",dur:"Conc, 10 min",d:"Spirits protect 15 ft. Enemies: half speed, WIS save or 3d8 radiant/necrotic.",cls:["Cleric"],c:true},
+];
+
+const MONSTERS = [
+  {n:"Goblin",cr:"1/4",t:"Humanoid",ac:15,hp:7,sp:"30ft",s:8,d:14,co:10,i:10,w:8,ch:8,atk:[{n:"Scimitar",b:4,dm:"1d6+2 slash"},{n:"Shortbow",b:4,dm:"1d6+2 pierce",r:"80/320ft"}],tr:["Nimble Escape"],xp:50},
+  {n:"Kobold",cr:"1/8",t:"Humanoid",ac:12,hp:5,sp:"30ft",s:7,d:15,co:9,i:8,w:7,ch:8,atk:[{n:"Dagger",b:4,dm:"1d4+2 pierce"},{n:"Sling",b:4,dm:"1d4+2 bludg",r:"30/120ft"}],tr:["Sunlight Sensitivity","Pack Tactics"],xp:25},
+  {n:"Skeleton",cr:"1/4",t:"Undead",ac:13,hp:13,sp:"30ft",s:10,d:14,co:15,i:6,w:8,ch:5,atk:[{n:"Shortsword",b:4,dm:"1d6+2 pierce"},{n:"Shortbow",b:4,dm:"1d6+2 pierce",r:"80/320ft"}],tr:["Vulnerable: bludgeoning","Immune: poison"],xp:50},
+  {n:"Zombie",cr:"1/4",t:"Undead",ac:8,hp:22,sp:"20ft",s:13,d:6,co:16,i:3,w:6,ch:5,atk:[{n:"Slam",b:3,dm:"1d6+1 bludg"}],tr:["Undead Fortitude"],xp:50},
+  {n:"Wolf",cr:"1/4",t:"Beast",ac:13,hp:11,sp:"40ft",s:12,d:15,co:12,i:3,w:12,ch:6,atk:[{n:"Bite",b:4,dm:"2d4+2 pierce + DC 11 STR or prone"}],tr:["Pack Tactics","Keen Hearing/Smell"],xp:50},
+  {n:"Orc",cr:"1/2",t:"Humanoid",ac:13,hp:15,sp:"30ft",s:16,d:12,co:16,i:7,w:11,ch:10,atk:[{n:"Greataxe",b:5,dm:"1d12+3 slash"},{n:"Javelin",b:5,dm:"1d6+3 pierce",r:"30/120ft"}],tr:["Aggressive"],xp:100},
+  {n:"Bandit",cr:"1/8",t:"Humanoid",ac:12,hp:11,sp:"30ft",s:11,d:12,co:12,i:10,w:10,ch:10,atk:[{n:"Scimitar",b:3,dm:"1d6+1 slash"},{n:"Lt. Crossbow",b:3,dm:"1d8+1 pierce",r:"80/320ft"}],tr:[],xp:25},
+  {n:"Giant Spider",cr:"1",t:"Beast",ac:14,hp:26,sp:"30ft/climb 30ft",s:14,d:16,co:12,i:2,w:11,ch:4,atk:[{n:"Bite",b:5,dm:"1d8+3 pierce + 2d8 poison (DC11 CON half)"},{n:"Web",b:5,dm:"Restrained (DC12 STR)",r:"30/60ft"}],tr:["Spider Climb","Web Sense","Web Walker"],xp:200},
+  {n:"Ogre",cr:"2",t:"Giant",ac:11,hp:59,sp:"40ft",s:19,d:8,co:16,i:5,w:7,ch:7,atk:[{n:"Greatclub",b:6,dm:"2d8+4 bludg"},{n:"Javelin",b:6,dm:"2d6+4 pierce",r:"30/120ft"}],tr:[],xp:450},
+  {n:"Owlbear",cr:"3",t:"Monstrosity",ac:13,hp:59,sp:"40ft",s:20,d:12,co:17,i:3,w:12,ch:7,atk:[{n:"Beak",b:7,dm:"1d10+5 pierce"},{n:"Claws",b:7,dm:"2d8+5 slash"}],tr:["Multiattack","Keen Sight/Smell"],xp:700},
+  {n:"Troll",cr:"5",t:"Giant",ac:15,hp:84,sp:"30ft",s:18,d:13,co:20,i:7,w:9,ch:7,atk:[{n:"Bite",b:7,dm:"1d6+4 pierce"},{n:"Claw (x2)",b:7,dm:"2d6+4 slash"}],tr:["Multiattack","Regeneration 10HP (fire/acid stops)","Keen Smell"],xp:1800},
+  {n:"Young Red Dragon",cr:"10",t:"Dragon",ac:18,hp:178,sp:"40ft/fly 80ft",s:23,d:10,co:21,i:14,w:11,ch:19,atk:[{n:"Bite",b:10,dm:"2d10+6 pierce + 1d6 fire"},{n:"Claw",b:10,dm:"2d6+6 slash"}],tr:["Multiattack","Fire Breath (DC17 DEX, 16d6 fire, recharge 5-6)","Immune: fire"],xp:5900},
+  {n:"Adult Red Dragon",cr:"17",t:"Dragon",ac:19,hp:256,sp:"40ft/fly 80ft",s:27,d:10,co:25,i:16,w:13,ch:21,atk:[{n:"Bite",b:14,dm:"2d10+8+2d6 fire"},{n:"Claw",b:14,dm:"2d6+8 slash"},{n:"Tail",b:14,dm:"2d8+8 bludg"}],tr:["Multiattack","Frightful Presence (DC19)","Fire Breath (DC21, 18d6)","3 Legendary Actions"],xp:18000},
+  {n:"Lich",cr:"21",t:"Undead",ac:17,hp:135,sp:"30ft",s:11,d:16,co:16,i:20,w:14,ch:16,atk:[{n:"Paralyzing Touch",b:12,dm:"3d6 cold + DC18 CON or paralyzed"}],tr:["Legendary Resistance (3/day)","Rejuvenation","18th-level Spellcaster","3 Legendary Actions","Turn Resistance"],xp:33000}
+];
+
+const ITEMS = [
+  {n:"Longsword",t:"Weapon",c:"15 gp",w:3,dm:"1d8 slash (versatile 1d10)",p:"Versatile"},
+  {n:"Shortsword",t:"Weapon",c:"10 gp",w:2,dm:"1d6 pierce",p:"Finesse, Light"},
+  {n:"Greataxe",t:"Weapon",c:"30 gp",w:7,dm:"1d12 slash",p:"Heavy, Two-Handed"},
+  {n:"Greatsword",t:"Weapon",c:"50 gp",w:6,dm:"2d6 slash",p:"Heavy, Two-Handed"},
+  {n:"Rapier",t:"Weapon",c:"25 gp",w:2,dm:"1d8 pierce",p:"Finesse"},
+  {n:"Dagger",t:"Weapon",c:"2 gp",w:1,dm:"1d4 pierce",p:"Finesse, Light, Thrown 20/60"},
+  {n:"Longbow",t:"Weapon",c:"50 gp",w:2,dm:"1d8 pierce",p:"Ammo 150/600, Heavy, Two-Handed"},
+  {n:"Light Crossbow",t:"Weapon",c:"25 gp",w:5,dm:"1d8 pierce",p:"Ammo 80/320, Loading, Two-Handed"},
+  {n:"Quarterstaff",t:"Weapon",c:"2 sp",w:4,dm:"1d6 bludg (versatile 1d8)",p:"Versatile"},
+  {n:"Chain Mail",t:"Armor",c:"75 gp",w:55,ac:16,p:"Heavy, Stealth Disadv, STR 13"},
+  {n:"Leather Armor",t:"Armor",c:"10 gp",w:10,ac:"11+DEX",p:"Light"},
+  {n:"Studded Leather",t:"Armor",c:"45 gp",w:13,ac:"12+DEX",p:"Light"},
+  {n:"Scale Mail",t:"Armor",c:"50 gp",w:45,ac:"14+DEX(max 2)",p:"Medium, Stealth Disadv"},
+  {n:"Half Plate",t:"Armor",c:"750 gp",w:40,ac:"15+DEX(max 2)",p:"Medium, Stealth Disadv"},
+  {n:"Plate",t:"Armor",c:"1,500 gp",w:65,ac:18,p:"Heavy, Stealth Disadv, STR 15"},
+  {n:"Shield",t:"Armor",c:"10 gp",w:6,ac:"+2"},
+  {n:"Healing Potion",t:"Potion",c:"50 gp",w:0.5,d:"Heal 2d4+2 HP"},
+  {n:"Bag of Holding",t:"Wondrous",c:"-",w:15,d:"Interior 500 lbs / 64 cu ft. Always weighs 15 lbs.",r:"Uncommon"},
+  {n:"+1 Longsword",t:"Magic Weapon",c:"-",w:3,dm:"1d8+1 slash",d:"+1 to attack and damage.",r:"Uncommon"},
+  {n:"Cloak of Protection",t:"Wondrous",c:"-",w:1,d:"+1 AC and saves. Requires attunement.",r:"Uncommon",att:true},
+];
+
+const CAMPAIGNS = [
+  {n:"Lost Mine of Phandelver",lv:"1-5",d:"Classic starter adventure. Explore the Sword Coast, investigate a missing dwarven mine, face the Black Spider.",h:"You were hired by Gundren Rockseeker to escort a wagon of supplies to Phandalin. But Gundren and his bodyguard have gone missing..."},
+  {n:"Curse of Strahd",lv:"1-10",d:"Gothic horror in Barovia. Face vampire lord Strahd von Zarovich in his haunted castle.",h:"Mysterious mists surround you, pulling you into a dark land ruled by an ancient vampire..."},
+  {n:"Storm King's Thunder",lv:"1-11",d:"Giants threaten civilization. Travel the Sword Coast to uncover why the ordning has shattered.",h:"Giants have emerged from their strongholds to threaten civilization as never before..."},
+  {n:"Tomb of Annihilation",lv:"1-11",d:"Death curse plagues the world. Journey into the jungles of Chult.",h:"A death curse has befallen the land — those raised from the dead are wasting away..."},
+  {n:"Waterdeep: Dragon Heist",lv:"1-5",d:"Urban adventure. Race to find 500,000 gold dragons hidden beneath Waterdeep.",h:"Treasure lies beneath Waterdeep, and villains compete to claim it..."},
+  {n:"Descent into Avernus",lv:"1-13",d:"Descend into the Nine Hells to save Elturel.",h:"The holy city of Elturel has been dragged to the first layer of the Nine Hells..."},
+  {n:"Rime of the Frostmaiden",lv:"1-12",d:"Survive the eternal winter of Icewind Dale.",h:"Icewind Dale is trapped in perpetual winter by the Frostmaiden. The sun never rises..."},
+  {n:"Ghosts of Saltmarsh",lv:"1-12",d:"Nautical adventures around coastal Saltmarsh.",h:"The sleepy fishing town sits on the edge of something sinister..."},
+  {n:"Tyranny of Dragons",lv:"1-15",d:"Stop the Cult of the Dragon from freeing Tiamat.",h:"The Cult of the Dragon leads an assault across the Sword Coast..."},
+  {n:"The Wild Beyond the Witchlight",lv:"1-8",d:"Journey into the Feywild to confront the Hourglass Coven.",h:"Something is wrong with the Witchlight Carnival..."},
+  {n:"Keys from the Golden Vault",lv:"1-11",d:"Anthology of heist-themed adventures.",h:"A golden key arrives with an invitation to join the Golden Vault..."},
+  {n:"Custom Campaign",lv:"Any",d:"Create your own world. Full DM control.",h:"Your adventure begins here..."}
+];
+
+// ─── UTILS ──────────────────────────────────────────────────
+const rd = s => Math.floor(Math.random()*s)+1;
+const rdN = (n,s) => Array.from({length:n},()=>rd(s));
+const r4d6 = () => { const r=rdN(4,6).sort((a,b)=>b-a); return {rolls:r,kept:r.slice(0,3),total:r.slice(0,3).reduce((a,b)=>a+b,0)}; };
+const aMod = s => Math.floor((s-10)/2);
+const ms = m => m>=0?`+${m}`:`${m}`;
+const pb = l => Math.ceil(l/4)+1;
+const uid = () => Math.random().toString(36).substr(2,9);
+
+const AppCtx = createContext();
+
+// ─── CSS ────────────────────────────────────────────────────
+const CSS = `
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Cinzel+Decorative:wght@400;700;900&family=Crimson+Text:ital,wght@0,400;0,600;0,700;1,400&display=swap');
+:root{--bg:#12100d;--bg2:#1a1610;--bg3:#221e18;--gold:#c9a84c;--goldb:#e8c84c;--goldd:#8a7234;--red:#8b1a1a;--redb:#c42b2b;--ink:#e8dcc8;--inkd:#9a8e7a;--inkf:#5a5248;--arc:#5a8ac5;--nat:#3a8a4a;--bdr:rgba(201,168,76,.25);--pnl:rgba(18,14,10,.96);--rad:5px}
+*{margin:0;padding:0;box-sizing:border-box}
+body,#root{font-family:'Crimson Text',Georgia,serif;background:var(--bg);color:var(--ink);min-height:100vh}
+.abg{min-height:100vh;background:radial-gradient(ellipse at 20% 0%,rgba(201,168,76,.04),transparent 50%),radial-gradient(ellipse at 80% 100%,rgba(139,26,26,.03),transparent 50%),linear-gradient(180deg,#12100d,#0a0908)}
+h1,h2,h3,h4{font-family:'Cinzel',serif;color:var(--gold);letter-spacing:.04em}
+h1{font-size:1.8rem;font-weight:900}h2{font-size:1.3rem;font-weight:700}h3{font-size:1.05rem;font-weight:600}
+.td{font-family:'Cinzel Decorative',serif;text-align:center;text-shadow:0 0 20px rgba(201,168,76,.3)}
+.pnl{background:var(--pnl);border:1px solid var(--bdr);border-radius:var(--rad);padding:16px;backdrop-filter:blur(8px)}
+.ph{display:flex;align-items:center;justify-content:space-between;padding-bottom:10px;margin-bottom:12px;border-bottom:1px solid var(--bdr)}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.g6{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}
+.fr{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.fc{display:flex;flex-direction:column;gap:6px}
+.fb{display:flex;justify-content:space-between;align-items:center}
+.gs{gap:4px}.gl{gap:16px}
+.mt{margin-top:6px}.mm{margin-top:12px}.ml{margin-top:16px}.mb{margin-bottom:12px}
+.tc{text-align:center}.ts{font-size:.82rem}.tx{font-size:.72rem}
+.tg{color:var(--gold)}.td2{color:var(--inkd)}.tr{color:var(--redb)}.ta{color:var(--arc)}
+.dv{height:1px;background:linear-gradient(90deg,transparent,var(--bdr),transparent);margin:14px 0}
+.btn{font-family:'Cinzel',serif;font-size:.78rem;font-weight:600;padding:7px 16px;border:1px solid var(--goldd);background:linear-gradient(180deg,rgba(201,168,76,.12),rgba(201,168,76,.04));color:var(--gold);border-radius:var(--rad);cursor:pointer;transition:all .2s;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap}
+.btn:hover{background:linear-gradient(180deg,rgba(201,168,76,.22),rgba(201,168,76,.08));border-color:var(--gold);text-shadow:0 0 6px rgba(201,168,76,.2)}
+.btn:active{transform:scale(.97)}
+.bp{background:linear-gradient(180deg,var(--gold),var(--goldd));color:var(--bg);border-color:var(--gold)}
+.bp:hover{background:linear-gradient(180deg,var(--goldb),var(--gold))}
+.bd{border-color:var(--red);color:var(--redb);background:linear-gradient(180deg,rgba(139,26,26,.12),rgba(139,26,26,.04))}
+.bd:hover{background:rgba(139,26,26,.2);border-color:var(--redb)}
+.bs{padding:3px 10px;font-size:.7rem}.bl{padding:12px 28px;font-size:1rem}.bx{padding:15px 40px;font-size:1.15rem;letter-spacing:.08em}
+.bi{padding:5px 8px;font-size:.9rem;min-width:32px;display:flex;align-items:center;justify-content:center}
+.bg{border:none;background:none}.bg:hover{background:rgba(201,168,76,.06)}
+.brl{background:linear-gradient(135deg,var(--red),#5b0b0b);border:2px solid var(--redb);color:#fff;font-size:1rem;padding:14px 28px;text-shadow:0 2px 4px rgba(0,0,0,.5);box-shadow:0 4px 16px rgba(139,26,26,.35)}
+.brl:hover{background:linear-gradient(135deg,var(--redb),var(--red));box-shadow:0 6px 24px rgba(196,43,43,.45);transform:translateY(-1px)}
+select,input[type="text"],input[type="number"],textarea{font-family:'Crimson Text',serif;font-size:.95rem;background:rgba(0,0,0,.3);border:1px solid var(--bdr);color:var(--ink);padding:7px 10px;border-radius:var(--rad);outline:none;transition:border-color .2s;width:100%}
+select:focus,input:focus,textarea:focus{border-color:var(--gold);box-shadow:0 0 6px rgba(201,168,76,.12)}
+select option{background:var(--bg)}
+label{font-family:'Cinzel',serif;font-size:.7rem;font-weight:600;color:var(--goldd);text-transform:uppercase;letter-spacing:.06em}
+.abx{background:rgba(0,0,0,.28);border:1px solid var(--bdr);border-radius:var(--rad);padding:10px 6px;text-align:center;cursor:pointer;transition:all .2s}
+.abx:hover{border-color:var(--gold);background:rgba(201,168,76,.04)}
+.abl{font-family:'Cinzel',serif;font-size:.65rem;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:.08em}
+.abs{font-family:'Cinzel',serif;font-size:1.8rem;font-weight:900;color:var(--ink);line-height:1;margin:2px 0}
+.abm{font-family:'Cinzel',serif;font-size:.95rem;font-weight:700;color:var(--goldb);background:rgba(0,0,0,.35);border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;margin:3px auto 0;border:1px solid var(--bdr)}
+.dr{font-family:'Cinzel Decorative',serif;font-size:2.5rem;font-weight:900;text-align:center;color:var(--goldb);text-shadow:0 0 16px rgba(201,168,76,.35);line-height:1}
+.d20{color:var(--goldb);animation:gl 1s ease-in-out infinite alternate}
+.d1{color:var(--redb);animation:pr .5s 3}
+@keyframes gl{from{text-shadow:0 0 16px rgba(201,168,76,.35)}to{text-shadow:0 0 32px rgba(232,200,76,.7),0 0 60px rgba(201,168,76,.2)}}
+@keyframes pr{0%,100%{text-shadow:0 0 16px rgba(196,43,43,.35)}50%{text-shadow:0 0 32px rgba(196,43,43,.7)}}
+@keyframes ri{0%{transform:scale(0) rotate(180deg);opacity:0}60%{transform:scale(1.15) rotate(-8deg);opacity:1}100%{transform:scale(1) rotate(0)}}
+@keyframes fu{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes sx{0%,100%{transform:translateX(0)}25%{transform:translateX(-3px) rotate(-1deg)}75%{transform:translateX(3px) rotate(1deg)}}
+.ari{animation:ri .4s cubic-bezier(.34,1.56,.64,1)}.afu{animation:fu .25s ease-out}.asx{animation:sx .25s}
+.tabs{display:flex;gap:0;border-bottom:2px solid var(--bdr);overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{font-family:'Cinzel',serif;font-size:.72rem;font-weight:600;padding:8px 16px;border:none;background:none;color:var(--inkd);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .2s;white-space:nowrap;text-transform:uppercase;letter-spacing:.04em}
+.tab:hover{color:var(--ink);background:rgba(201,168,76,.04)}.tab.a{color:var(--gold);border-bottom-color:var(--gold)}
+.bdg{display:inline-flex;align-items:center;gap:3px;font-family:'Cinzel',serif;font-size:.65rem;font-weight:600;padding:2px 8px;border-radius:16px;text-transform:uppercase;letter-spacing:.04em}
+.bdg-g{background:rgba(201,168,76,.12);color:var(--gold);border:1px solid rgba(201,168,76,.25)}
+.bdg-r{background:rgba(139,26,26,.12);color:var(--redb);border:1px solid rgba(139,26,26,.25)}
+.bdg-a{background:rgba(90,138,197,.12);color:var(--arc);border:1px solid rgba(90,138,197,.25)}
+.hpbg{width:100%;height:14px;background:rgba(0,0,0,.45);border-radius:7px;overflow:hidden;border:1px solid var(--bdr)}
+.hpf{height:100%;border-radius:7px;transition:width .4s,background .4s}
+.hpg{background:linear-gradient(90deg,#2a6a2a,#4a9a4a)}.hpy{background:linear-gradient(90deg,#8a7a2a,#baa44a)}.hpr{background:linear-gradient(90deg,#6a1a1a,#9a2a2a)}
+.bgrd{display:grid;gap:1px;background:rgba(201,168,76,.08);border:1px solid var(--bdr);border-radius:var(--rad);overflow:auto;max-height:480px}
+.gc{width:36px;height:36px;background:rgba(0,0,0,.28);display:flex;align-items:center;justify-content:center;font-size:1.1rem;cursor:pointer;transition:background .12s}
+.gc:hover{background:rgba(201,168,76,.12)}.gc.occ{background:rgba(201,168,76,.04)}.gc.fog{background:rgba(0,0,0,.8)}.gc.hl{background:rgba(90,138,197,.15);box-shadow:inset 0 0 8px rgba(90,138,197,.2)}
+.chbx{height:280px;overflow-y:auto;background:rgba(0,0,0,.28);border:1px solid var(--bdr);border-radius:var(--rad);padding:10px;display:flex;flex-direction:column;gap:4px}
+.chm{font-size:.85rem;padding:3px 0;animation:fu .2s}.chm .chs{font-family:'Cinzel',serif;font-weight:600;font-size:.75rem;color:var(--gold)}
+.chm.sys{color:var(--inkd);font-style:italic}.chm.rl{background:rgba(201,168,76,.04);padding:6px 10px;border-radius:var(--rad);border-left:2px solid var(--goldd)}
+.ii{display:flex;align-items:center;gap:10px;padding:6px 10px;border:1px solid transparent;border-radius:var(--rad);transition:all .2s}
+.ii.act{border-color:var(--gold);background:rgba(201,168,76,.06);box-shadow:0 0 10px rgba(201,168,76,.08)}
+.io{font-family:'Cinzel',serif;font-size:1.1rem;font-weight:900;color:var(--gold);min-width:28px;text-align:center}
+::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:rgba(0,0,0,.15)}::-webkit-scrollbar-thumb{background:var(--goldd);border-radius:3px}::-webkit-scrollbar-thumb:hover{background:var(--gold)}
+.sc{background:rgba(0,0,0,.18);border:1px solid var(--bdr);border-radius:var(--rad);padding:10px;cursor:pointer;transition:all .2s}
+.sc:hover{border-color:var(--arc);background:rgba(90,138,197,.04)}
+.mc{background:rgba(0,0,0,.18);border:1px solid var(--bdr);border-radius:var(--rad);padding:14px;cursor:pointer;transition:all .2s}
+.mc:hover{border-color:var(--redb);background:rgba(139,26,26,.04)}
+.cc{background:rgba(0,0,0,.18);border:1px solid var(--bdr);border-radius:var(--rad);padding:16px;cursor:pointer;transition:all .3s}
+.cc:hover{border-color:var(--gold);background:rgba(201,168,76,.04);transform:translateY(-1px);box-shadow:0 6px 20px rgba(0,0,0,.25)}
+.cc.sel{border-color:var(--gold);background:rgba(201,168,76,.08);box-shadow:0 0 16px rgba(201,168,76,.1)}
+.nav{background:var(--pnl);border-bottom:1px solid var(--bdr);padding:6px 14px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
+.nb{font-family:'Cinzel',serif;font-size:.68rem;font-weight:600;padding:5px 12px;background:none;border:1px solid transparent;color:var(--inkd);cursor:pointer;border-radius:var(--rad);transition:all .2s;text-transform:uppercase;letter-spacing:.03em;white-space:nowrap}
+.nb:hover{color:var(--ink);background:rgba(201,168,76,.04)}.nb.a{color:var(--gold);border-color:var(--goldd);background:rgba(201,168,76,.06)}
+.ck{display:flex;align-items:center;gap:6px;cursor:pointer;padding:3px 0}
+.ck input[type="checkbox"]{width:14px;height:14px;accent-color:var(--gold)}
+.dsb{width:18px;height:18px;border:2px solid var(--bdr);border-radius:50%;cursor:pointer;transition:all .2s}
+.dsb.ok{background:var(--nat);border-color:#4a9a4a}.dsb.fl{background:var(--red);border-color:var(--redb)}
+@media(max-width:900px){.g2,.g3{grid-template-columns:1fr}.g6{grid-template-columns:repeat(3,1fr)}h1{font-size:1.4rem}.bx{padding:12px 24px;font-size:.95rem}.pnl{padding:12px}.lay{grid-template-columns:1fr!important}.sb{display:none!important}}
+`;
+
+// ═══════════════════════════════════════════════════════════════
+// COMPONENTS
+// ═══════════════════════════════════════════════════════════════
+
+function DiceRoller({onRoll}) {
+  const [res, setRes] = useState([]);
+  const [mod, setMod] = useState(0);
+  const [adv, setAdv] = useState("normal");
+  const [anim, setAnim] = useState(false);
+  const {addMsg} = useContext(AppCtx);
+
+  const roll = useCallback((sides,count=1,lbl="") => {
+    setAnim(true);
+    setTimeout(() => {
+      let rolls = rdN(count,sides), extra=null, total;
+      if(sides===20&&count===1&&adv!=="normal") {
+        extra=rd(20);
+        total = adv==="advantage" ? Math.max(rolls[0],extra)+mod : Math.min(rolls[0],extra)+mod;
+      } else total = rolls.reduce((a,b)=>a+b,0)+mod;
+      const r = {id:uid(),sides,count,rolls,extra,mod,adv,total,
+        label:lbl||`${count}d${sides}${mod?(mod>0?`+${mod}`:mod):""}`,
+        nat20:sides===20&&count===1&&(rolls[0]===20||(extra===20)),
+        nat1:sides===20&&count===1&&rolls[0]===1&&(!extra||extra===1),ts:Date.now()};
+      setRes(p=>[r,...p].slice(0,15));setAnim(false);onRoll?.(r);
+      addMsg("roll",`rolled ${r.label} = ${r.total}${r.nat20?" ✨ NAT 20!":""}${r.nat1?" 💀 NAT 1!":""}`,{rolls:r.rolls,extra:r.extra});
+    }, 280);
+  }, [mod,adv,onRoll,addMsg]);
+
+  return (
+    <div className="pnl">
+      <div className="ph"><h3>🎲 Dice Roller</h3>
+        <select value={adv} onChange={e=>setAdv(e.target.value)} style={{width:"auto",fontSize:".8rem"}}>
+          <option value="normal">Normal</option><option value="advantage">Advantage</option><option value="disadvantage">Disadvantage</option>
+        </select>
+      </div>
+      <div className="fr" style={{justifyContent:"center",marginBottom:14}}>
+        {[4,6,8,10,12,20,100].map(d=><button key={d} className="btn" onClick={()=>roll(d)} style={{minWidth:46}}>d{d}</button>)}
+      </div>
+      <div className="fr" style={{justifyContent:"center",marginBottom:14}}>
+        <label style={{fontSize:".75rem"}}>Modifier:</label>
+        <input type="number" value={mod} onChange={e=>setMod(parseInt(e.target.value)||0)} style={{width:55,textAlign:"center"}}/>
+      </div>
+      {res.length>0&&<div className="tc">
+        <div className={`dr ${anim?"asx":"ari"} ${res[0]?.nat20?"d20":""} ${res[0]?.nat1?"d1":""}`}>{res[0]?.total}</div>
+        <div className="td2 ts mt">{res[0]?.label} [{res[0]?.rolls?.join(",")}]{res[0]?.extra!=null?` + [${res[0].extra}] (${res[0].adv})`:""}{res[0]?.mod?` ${ms(res[0].mod)}`:""}</div>
+        {res.length>1&&<div className="mm" style={{maxHeight:120,overflowY:"auto"}}>
+          {res.slice(1,6).map(r=><div key={r.id} className="td2 tx" style={{padding:"1px 0"}}>{r.label}: <span className="tg">{r.total}</span> [{r.rolls.join(",")}]</div>)}
+        </div>}
+      </div>}
+    </div>
+  );
+}
+
+function StatGen({stats,setStats}) {
+  const [method,setMethod]=useState("standard");
+  const [rr,setRR]=useState(null);
+  const [pbs,setPBS]=useState({STR:8,DEX:8,CON:8,INT:8,WIS:8,CHA:8});
+  const [animR,setAnimR]=useState(false);
+  const pbt=useMemo(()=>Object.values(pbs).reduce((s,v)=>s+(PB_COST[v]||0),0),[pbs]);
+
+  const doRand=useCallback(()=>{
+    setAnimR(true);
+    setTimeout(()=>{
+      const r=ABILITIES.map(ab=>({ab,...r4d6()}));setRR(r);
+      const ns={};r.forEach(x=>ns[x.ab]=x.total);setStats(ns);setAnimR(false);
+    },500);
+  },[setStats]);
+
+  const doPB=useCallback((ab,dir)=>{
+    setPBS(p=>{const c=p[ab],n=c+dir;if(n<8||n>15)return p;const ns={...p,[ab]:n};
+      if(Object.values(ns).reduce((s,v)=>s+(PB_COST[v]||0),0)>27)return p;
+      setStats(s=>({...s,[ab]:n}));return ns;});
+  },[setStats]);
+
+  useEffect(()=>{
+    if(method==="standard")setStats({STR:15,DEX:14,CON:13,INT:12,WIS:10,CHA:8});
+    else if(method==="pointbuy"){setStats({STR:8,DEX:8,CON:8,INT:8,WIS:8,CHA:8});setPBS({STR:8,DEX:8,CON:8,INT:8,WIS:8,CHA:8});}
+  },[method,setStats]);
+
+  return <div>
+    <div className="fr mb">{["standard","pointbuy","roll","manual"].map(m=>
+      <button key={m} className={`btn bs ${method===m?"bp":""}`} onClick={()=>setMethod(m)}>
+        {m==="standard"?"Standard Array":m==="pointbuy"?"Point Buy":m==="roll"?"4d6 Drop Lowest":"Manual"}
+      </button>)}
+    </div>
+    {method==="roll"&&<div className="tc mb">
+      <button className={`brl btn ${animR?"asx":""}`} onClick={doRand}>🎲 RANDOMIZE STATS</button>
+      {rr&&<div className="g6 mm">{rr.map(r=><div key={r.ab} className="abx ari">
+        <div className="abl">{r.ab}</div><div className="abs">{r.total}</div>
+        <div className="tx td2">[{r.rolls.join(",")}]</div><div className="abm">{ms(aMod(r.total))}</div>
+      </div>)}</div>}
+    </div>}
+    {method==="standard"&&<div className="g6">{ABILITIES.map(ab=>
+      <div key={ab} className="abx"><div className="abl">{ab}</div>
+        <select value={stats[ab]||""} onChange={e=>setStats(p=>({...p,[ab]:parseInt(e.target.value)}))}
+          style={{textAlign:"center",fontSize:"1.1rem",fontWeight:700,background:"transparent",border:"none",color:"var(--ink)"}}>
+          {STANDARD_ARRAY.map(v=><option key={v} value={v}>{v}</option>)}
+        </select><div className="abm">{ms(aMod(stats[ab]||10))}</div></div>)}</div>}
+    {method==="pointbuy"&&<div>
+      <div className="fb mb"><span className="td2">Points:</span><span className={`bdg ${pbt>27?"bdg-r":"bdg-g"}`}>{pbt}/27</span></div>
+      <div className="g6">{ABILITIES.map(ab=><div key={ab} className="abx"><div className="abl">{ab}</div>
+        <div className="fr" style={{justifyContent:"center",gap:3}}>
+          <button className="btn bs bi" onClick={()=>doPB(ab,-1)}>−</button>
+          <div className="abs" style={{fontSize:"1.3rem"}}>{pbs[ab]}</div>
+          <button className="btn bs bi" onClick={()=>doPB(ab,1)}>+</button>
+        </div><div className="tx td2">Cost:{PB_COST[pbs[ab]]}</div><div className="abm">{ms(aMod(pbs[ab]))}</div>
+      </div>)}</div></div>}
+    {method==="manual"&&<div className="g6">{ABILITIES.map(ab=><div key={ab} className="abx"><div className="abl">{ab}</div>
+      <input type="number" min="1" max="30" value={stats[ab]||10} onChange={e=>setStats(p=>({...p,[ab]:parseInt(e.target.value)||10}))}
+        style={{textAlign:"center",fontSize:"1.3rem",fontWeight:700,width:"100%",background:"transparent"}}/>
+      <div className="abm">{ms(aMod(stats[ab]||10))}</div></div>)}</div>}
+  </div>;
+}
+
+function CharCreate({onDone}) {
+  const [step,setSt]=useState(0);
+  const [ch,setCh]=useState({name:"",race:"Human",cls:"Fighter",bg:"Soldier",align:"True Neutral",level:1,
+    stats:{STR:15,DEX:14,CON:13,INT:12,WIS:10,CHA:8},skills:[],spells:[],equip:[],gold:0,
+    hp:0,mhp:0,thp:0,ac:10,ds:{s:0,f:0},conds:[],id:uid()});
+  const race=RACES[ch.race],cls=CLASSES[ch.cls],bg=BACKGROUNDS[ch.bg];
+  const tStats=useMemo(()=>{const s={...ch.stats};if(race?.ab)Object.entries(race.ab).forEach(([k,v])=>{if(s[k]!=null)s[k]+=v;});return s;},[ch.stats,race]);
+  const cHP=useCallback(()=>cls?(cls.hd+aMod(tStats.CON)):10,[cls,tStats]);
+  const cAC=useCallback(()=>{const d=aMod(tStats.DEX);if(ch.cls==="Barbarian")return 10+d+aMod(tStats.CON);if(ch.cls==="Monk")return 10+d+aMod(tStats.WIS);return 10+d;},[ch.cls,tStats]);
+  const fin=useCallback(()=>{const hp=cHP(),ac=cAC(),p=pb(1),init=aMod(tStats.DEX),pp=10+aMod(tStats.WIS)+(ch.skills.includes("Perception")?p:0);
+    onDone({...ch,stats:tStats,mhp:hp,hp,ac,init,pb:p,pp,st:cls?.st||[],feats:cls?.ft?.[1]||[],speed:race?.sp||30,dv:race?.dv||0,traits:race?.tr||[]});
+  },[ch,tStats,cHP,cAC,cls,race,onDone]);
+  const steps=["Name & Race","Class","Background","Ability Scores","Skills & Spells","Review"];
+
+  return <div style={{maxWidth:860,margin:"0 auto"}}>
+    <h2 className="td mb">⚔️ Create Your Character</h2>
+    <div className="tabs mb">{steps.map((s,i)=><button key={s} className={`tab ${step===i?"a":""}`} onClick={()=>setSt(i)}>{s}</button>)}</div>
+
+    {step===0&&<div className="pnl afu"><div className="fc gl">
+      <div><label>Character Name</label><input type="text" value={ch.name} onChange={e=>setCh(c=>({...c,name:e.target.value}))} placeholder="Enter character name..." style={{fontSize:"1.1rem"}}/></div>
+      <div className="g2"><div><label>Race</label>
+        <select value={ch.race} onChange={e=>setCh(c=>({...c,race:e.target.value}))}>{Object.keys(RACES).map(r=><option key={r}>{r}</option>)}</select>
+        {race&&<div className="mt" style={{padding:10,background:"rgba(0,0,0,.18)",borderRadius:4}}>
+          <div className="ts td2">{race.desc}</div>
+          <div className="ts mt"><b>Speed:</b> {race.sp}ft | <b>Size:</b> {race.sz}{race.dv?` | Darkvision: ${race.dv}ft`:""}</div>
+          <div className="ts"><b>Traits:</b> {race.tr.join(", ")}</div>
+          <div className="ts"><b>Bonuses:</b> {Object.entries(race.ab).map(([k,v])=>`${k}+${v}`).join(", ")||"Flexible"}</div>
+        </div>}
+      </div><div><label>Alignment</label><select value={ch.align} onChange={e=>setCh(c=>({...c,align:e.target.value}))}>{ALIGNMENTS.map(a=><option key={a}>{a}</option>)}</select></div></div>
+    </div></div>}
+
+    {step===1&&<div className="pnl afu"><label>Class</label>
+      <select value={ch.cls} onChange={e=>setCh(c=>({...c,cls:e.target.value}))}>{Object.keys(CLASSES).map(c=><option key={c}>{c}</option>)}</select>
+      {cls&&<div className="mm" style={{padding:14,background:"rgba(0,0,0,.18)",borderRadius:4}}>
+        <div className="ts td2">{cls.desc}</div>
+        <div className="g2 mt" style={{fontSize:".85rem"}}>
+          <div><b>Hit Die:</b> d{cls.hd}</div><div><b>Primary:</b> {cls.pa}</div>
+          <div><b>Saves:</b> {cls.st.join(", ")}</div><div><b>Armor:</b> {cls.ap}</div>
+          <div><b>Weapons:</b> {cls.wp}</div><div><b>Skills:</b> Choose {cls.ns}</div>
+        </div>
+        {cls.ft?.[1]&&<div className="mm"><b className="ts">Level 1:</b><div className="fr gs mt">{cls.ft[1].map(f=><span key={f} className="bdg bdg-g">{f}</span>)}</div></div>}
+        {cls.sc&&<div className="mt bdg bdg-a">✨ Spellcaster — {cls.sa}</div>}
+      </div>}
+    </div>}
+
+    {step===2&&<div className="pnl afu"><label>Background</label>
+      <select value={ch.bg} onChange={e=>setCh(c=>({...c,bg:e.target.value}))}>{Object.keys(BACKGROUNDS).map(b=><option key={b}>{b}</option>)}</select>
+      {bg&&<div className="mm" style={{padding:14,background:"rgba(0,0,0,.18)",borderRadius:4}}>
+        <div><b>Skills:</b> {bg.sk.join(", ")}</div>
+        <div><b>Equipment:</b> {bg.eq}</div>
+        <div className="mt"><b>Feature:</b> <span className="tg">{bg.feat}</span></div>
+      </div>}
+    </div>}
+
+    {step===3&&<div className="pnl afu"><h3 className="mb">Ability Scores</h3>
+      <StatGen stats={ch.stats} setStats={s=>setCh(c=>({...c,stats:typeof s==="function"?s(c.stats):s}))}/>
+    </div>}
+
+    {step===4&&<div className="pnl afu"><div className="g2">
+      <div><h3 className="mb">Skills (Choose {cls?.ns||2})</h3>
+        <div className="fc" style={{maxHeight:380,overflowY:"auto"}}>
+          {(cls?.sk||[]).map(sk=>{const bgSk=bg?.sk?.includes(sk);return <label key={sk} className="ck">
+            <input type="checkbox" checked={ch.skills.includes(sk)||bgSk} disabled={bgSk}
+              onChange={e=>{if(bgSk)return;setCh(c=>({...c,skills:e.target.checked?[...c.skills,sk].slice(0,cls?.ns||2):c.skills.filter(s=>s!==sk)}));}}/>
+            <span>{sk}</span><span className="td2 tx">({SKILLS.find(s=>s.name===sk)?.ab})</span>
+            {bgSk&&<span className="bdg bdg-g tx">BG</span>}
+          </label>;})}
+        </div>
+      </div>
+      {cls?.sc&&<div><h3 className="mb">Spells{cls.ck?` (${cls.ck} cantrips`:""}{cls.skn?`, ${cls.skn} 1st-level)`:cls.ck?")":""}</h3>
+        <div className="fc" style={{maxHeight:380,overflowY:"auto"}}>
+          {SPELLS.filter(sp=>sp.cls.includes(ch.cls)).map(sp=><label key={sp.n} className="ck">
+            <input type="checkbox" checked={ch.spells.some(s=>s.n===sp.n)}
+              onChange={e=>setCh(c=>({...c,spells:e.target.checked?[...c.spells,sp]:c.spells.filter(s=>s.n!==sp.n)}))}/>
+            <span>{sp.n}</span><span className="bdg bdg-a tx">{sp.l===0?"Cantrip":`Lvl ${sp.l}`}</span>
+          </label>)}
+        </div>
+      </div>}
+    </div></div>}
+
+    {step===5&&<div className="pnl afu">
+      <h3 className="mb">Character Summary</h3>
+      <div className="g2 gl">
+        <div>
+          <div style={{fontSize:"1.3rem",fontFamily:"Cinzel",fontWeight:700,color:"var(--gold)"}}>{ch.name||"Unnamed Hero"}</div>
+          <div className="td2">{ch.race} {ch.cls} • Level {ch.level}</div>
+          <div className="td2">{ch.bg} • {ch.align}</div>
+          <div className="dv"/>
+          <div className="g3 gs">
+            <div className="tc"><label>HP</label><div style={{fontSize:"1.4rem",fontWeight:700}}>{cHP()}</div></div>
+            <div className="tc"><label>AC</label><div style={{fontSize:"1.4rem",fontWeight:700}}>{cAC()}</div></div>
+            <div className="tc"><label>Speed</label><div style={{fontSize:"1.4rem",fontWeight:700}}>{race?.sp||30}</div></div>
+          </div>
+          <div className="dv"/>
+          <div className="ts"><b>Initiative:</b> {ms(aMod(tStats.DEX))}</div>
+          <div className="ts"><b>Proficiency:</b> +{pb(1)}</div>
+          <div className="ts"><b>Passive Perception:</b> {10+aMod(tStats.WIS)+(ch.skills.includes("Perception")?pb(1):0)}</div>
+          <div className="ts"><b>Saves:</b> {cls?.st?.join(", ")}</div>
+          {ch.skills.length>0&&<div className="ts"><b>Skills:</b> {ch.skills.join(", ")}</div>}
+          {ch.spells.length>0&&<div className="ts"><b>Spells:</b> {ch.spells.map(s=>s.n).join(", ")}</div>}
+        </div>
+        <div>
+          <div className="g6 gs">{ABILITIES.map(ab=><div key={ab} className="abx">
+            <div className="abl">{ab}</div><div className="abs" style={{fontSize:"1.3rem"}}>{tStats[ab]}</div>
+            <div className="abm" style={{width:28,height:28,fontSize:".8rem"}}>{ms(aMod(tStats[ab]))}</div>
+          </div>)}</div>
+          {race?.tr?.length>0&&<div className="mm"><label>Racial Traits</label><div className="fr gs mt">{race.tr.map(t=><span key={t} className="bdg bdg-g">{t}</span>)}</div></div>}
+          {cls?.ft?.[1]&&<div className="mm"><label>Class Features</label><div className="fr gs mt">{cls.ft[1].map(f=><span key={f} className="bdg bdg-a">{f}</span>)}</div></div>}
+        </div>
+      </div>
+      <div className="dv"/><div className="tc"><button className="btn bp bl" onClick={fin}>⚔️ Complete Character</button></div>
+    </div>}
+
+    <div className="fb ml">
+      <button className="btn" onClick={()=>setSt(Math.max(0,step-1))} disabled={step===0}>← Back</button>
+      <span className="td2 ts">Step {step+1}/{steps.length}</span>
+      <button className="btn" onClick={()=>setSt(Math.min(steps.length-1,step+1))} disabled={step===steps.length-1}>Next →</button>
+    </div>
+  </div>;
+}
+
+function CharSheet({ch,onUp}) {
+  const [tab,setTab]=useState("stats");
+  const {addMsg,pn}=useContext(AppCtx);
+  const cls=CLASSES[ch.cls];const p=pb(ch.level||1);
+
+  const rollAb=(ab)=>{const m=aMod(ch.stats[ab]),r=rd(20);addMsg("roll",`${ABILITY_FULL[ab]} check: ${r} ${ms(m)} = ${r+m}${r===20?" ✨NAT 20!":""}${r===1?" 💀NAT 1!":""}`);}
+  const rollSv=(ab)=>{const m=aMod(ch.stats[ab])+(ch.st?.includes(ab)?p:0),r=rd(20);addMsg("roll",`${ABILITY_FULL[ab]} save: ${r} ${ms(m)} = ${r+m}`);}
+  const rollSk=(sk)=>{const ab=SKILLS.find(s=>s.name===sk)?.ab||"STR",m=aMod(ch.stats[ab])+(ch.skills?.includes(sk)?p:0),r=rd(20);addMsg("roll",`${sk}: ${r} ${ms(m)} = ${r+m}`);}
+  const rollInit=()=>{const m=aMod(ch.stats.DEX),r=rd(20);addMsg("roll",`Initiative: ${r} ${ms(m)} = ${r+m}`);}
+  const hpp=ch.mhp>0?Math.max(0,(ch.hp/ch.mhp)*100):100;
+  const hpc=hpp>50?"hpg":hpp>25?"hpy":"hpr";
+
+  return <div className="pnl">
+    <div className="fb mb"><div>
+      <h2 style={{marginBottom:0}}>{ch.name||"Unnamed"}</h2>
+      <div className="td2 ts">{ch.race} {ch.cls} • Lv{ch.level} • {ch.align}</div>
+    </div><button className="btn bs" onClick={rollInit}>🎲 Initiative</button></div>
+
+    <div className="mb">
+      <div className="fb ts" style={{marginBottom:3}}>
+        <span>HP: {ch.hp}/{ch.mhp}{ch.thp>0?` (+${ch.thp})`:""}</span>
+        <div className="fr gs">
+          <button className="btn bs bd" onClick={()=>{const d=parseInt(prompt("Damage:"));if(d>0)onUp({...ch,hp:Math.max(0,ch.hp-d)});}}>−HP</button>
+          <button className="btn bs" style={{borderColor:"var(--nat)",color:"#4a9a4a"}} onClick={()=>{const h=parseInt(prompt("Heal:"));if(h>0)onUp({...ch,hp:Math.min(ch.mhp,ch.hp+h)});}}>+HP</button>
+        </div>
+      </div>
+      <div className="hpbg"><div className={`hpf ${hpc}`} style={{width:`${hpp}%`}}/></div>
+    </div>
+
+    <div className="g3 mb" style={{textAlign:"center"}}>
+      <div className="abx" onClick={rollInit}><div className="abl">AC</div><div className="abs">{ch.ac}</div></div>
+      <div className="abx"><div className="abl">Speed</div><div className="abs">{ch.speed||30}</div></div>
+      <div className="abx"><div className="abl">Prof</div><div className="abs">+{p}</div></div>
+    </div>
+
+    <div className="tabs mb">{["stats","skills","spells","inventory","features"].map(t=>
+      <button key={t} className={`tab ${tab===t?"a":""}`} onClick={()=>setTab(t)}>{t[0].toUpperCase()+t.slice(1)}</button>)}</div>
+
+    {tab==="stats"&&<div className="afu">
+      <div className="g6 mb">{ABILITIES.map(ab=><div key={ab} className="abx" onClick={()=>rollAb(ab)} title={`Roll ${ABILITY_FULL[ab]}`}>
+        <div className="abl">{ab}</div><div className="abs">{ch.stats[ab]}</div><div className="abm">{ms(aMod(ch.stats[ab]))}</div>
+      </div>)}</div>
+      <h3 className="mb">Saving Throws</h3>
+      <div className="g3 gs">{ABILITIES.map(ab=>{const prof=ch.st?.includes(ab),m=aMod(ch.stats[ab])+(prof?p:0);
+        return <div key={ab} className="fr" style={{cursor:"pointer",padding:"3px 6px",borderRadius:4,background:prof?"rgba(201,168,76,.06)":"transparent"}} onClick={()=>rollSv(ab)}>
+          <span style={{width:5,height:5,borderRadius:"50%",background:prof?"var(--gold)":"var(--inkf)"}}/><span className="ts">{ABILITY_FULL[ab]}</span>
+          <span className="ts tg" style={{marginLeft:"auto"}}>{ms(m)}</span>
+        </div>;})}</div>
+      {ch.hp===0&&<div className="mm pnl" style={{borderColor:"var(--red)"}}>
+        <h3 className="tr">💀 Death Saves</h3>
+        <div className="fr mt"><span className="ts" style={{minWidth:70}}>Success:</span>{[0,1,2].map(i=><div key={`s${i}`} className={`dsb ${i<(ch.ds?.s||0)?"ok":""}`} onClick={()=>onUp({...ch,ds:{...ch.ds,s:Math.min(3,(ch.ds?.s||0)+1)}})}/>)}</div>
+        <div className="fr mt"><span className="ts" style={{minWidth:70}}>Failure:</span>{[0,1,2].map(i=><div key={`f${i}`} className={`dsb ${i<(ch.ds?.f||0)?"fl":""}`} onClick={()=>onUp({...ch,ds:{...ch.ds,f:Math.min(3,(ch.ds?.f||0)+1)}})}/>)}</div>
+        <button className="btn bs mt" onClick={()=>{const r=rd(20),s=ch.ds?.s||0,f=ch.ds?.f||0;
+          if(r===20){addMsg("roll","Death Save: NAT 20! Regains 1 HP!");onUp({...ch,hp:1,ds:{s:0,f:0}});}
+          else if(r===1){addMsg("roll","Death Save: NAT 1! Two failures!");onUp({...ch,ds:{s,f:Math.min(3,f+2)}});}
+          else if(r>=10){addMsg("roll",`Death Save: ${r} — Success (${s+1}/3)`);onUp({...ch,ds:{s:Math.min(3,s+1),f}});}
+          else{addMsg("roll",`Death Save: ${r} — Failure (${f+1}/3)`);onUp({...ch,ds:{s,f:Math.min(3,f+1)}});}
+        }}>🎲 Roll Death Save</button>
+      </div>}
+    </div>}
+
+    {tab==="skills"&&<div className="afu fc">{SKILLS.map(sk=>{const prof=ch.skills?.includes(sk.name),m=aMod(ch.stats[sk.ab])+(prof?p:0);
+      return <div key={sk.name} className="fr" style={{cursor:"pointer",padding:"2px 6px",borderRadius:4}} onClick={()=>rollSk(sk.name)}>
+        <span style={{width:5,height:5,borderRadius:"50%",background:prof?"var(--gold)":"var(--inkf)",flexShrink:0}}/><span className="ts" style={{flex:1}}>{sk.name}</span>
+        <span className="tx td2">{sk.ab}</span><span className="ts tg" style={{minWidth:28,textAlign:"right"}}>{ms(m)}</span>
+      </div>;})}
+      <div className="mm ts td2">Passive Perception: <b className="tg">{ch.pp||10+aMod(ch.stats.WIS)}</b></div>
+    </div>}
+
+    {tab==="spells"&&<div className="afu">{ch.spells?.length>0?<div className="fc">
+      {cls?.sa&&<div className="fr mb"><span className="bdg bdg-a">Ability: {cls.sa}</span>
+        <span className="bdg bdg-a">Save DC: {8+p+aMod(ch.stats[cls.sa])}</span>
+        <span className="bdg bdg-a">Attack: {ms(p+aMod(ch.stats[cls.sa]))}</span></div>}
+      {[0,1,2,3,4,5,6,7,8,9].map(lv=>{const sps=ch.spells.filter(s=>s.l===lv);if(!sps.length)return null;
+        return <div key={lv} className="mb"><h3 style={{fontSize:".85rem"}}>{lv===0?"Cantrips":`Level ${lv}`}</h3>
+          <div className="fc gs mt">{sps.map(sp=><SpellCard key={sp.n} sp={sp}/>)}</div></div>;})}
+    </div>:<div className="tc td2" style={{padding:36}}>{cls?.sc?"No spells selected.":"Not a spellcaster."}</div>}</div>}
+
+    {tab==="inventory"&&<div className="afu">
+      <div className="fb mb"><h3>Equipment</h3><div className="fr gs">
+        <span className="bdg bdg-g">💰 {ch.gold||0} gp</span>
+        <button className="btn bs" onClick={()=>{const i=prompt("Add item:");if(i)onUp({...ch,equip:[...(ch.equip||[]),i]});}}>+ Add</button>
+      </div></div>
+      {(ch.equip||[]).length>0?<div className="fc">{ch.equip.map((it,i)=><div key={i} className="fb" style={{padding:"3px 0",borderBottom:"1px solid rgba(201,168,76,.08)"}}>
+        <span className="ts">{it}</span><button className="btn bs bg td2" onClick={()=>onUp({...ch,equip:ch.equip.filter((_,j)=>j!==i)})}>✕</button>
+      </div>)}</div>:<div className="tc td2" style={{padding:36}}>Empty inventory.</div>}
+    </div>}
+
+    {tab==="features"&&<div className="afu fc gl">
+      {ch.traits?.length>0&&<div><h3>Racial Traits</h3><div className="fr gs mt">{ch.traits.map(t=><span key={t} className="bdg bdg-g">{t}</span>)}</div></div>}
+      {ch.feats?.length>0&&<div><h3>Class Features</h3><div className="fr gs mt">{ch.feats.map(f=><span key={f} className="bdg bdg-a">{f}</span>)}</div></div>}
+      {ch.conds?.length>0&&<div><h3>Conditions</h3><div className="fr gs mt">{ch.conds.map(c=>{const cd=CONDITIONS.find(x=>x.n===c);
+        return <span key={c} className="bdg bdg-r" style={{cursor:"pointer"}} title={cd?.d} onClick={()=>onUp({...ch,conds:ch.conds.filter(x=>x!==c)})}>{cd?.i} {c} ✕</span>;})}</div></div>}
+      <button className="btn bs" onClick={()=>{const c=prompt(`Condition:\n${CONDITIONS.map(c=>c.n).join(", ")}`);
+        if(c){const m=CONDITIONS.find(x=>x.n.toLowerCase()===c.toLowerCase());if(m)onUp({...ch,conds:[...(ch.conds||[]),m.n]});}}}>+ Condition</button>
+    </div>}
+  </div>;
+}
+
+function SpellCard({sp}) {
+  const [open,setOpen]=useState(false);
+  return <div className="sc" onClick={()=>setOpen(!open)}>
+    <div className="fb"><b>{sp.n}</b><div className="fr gs"><span className="bdg bdg-a tx">{sp.l===0?"Cantrip":`Lvl ${sp.l}`}</span>{sp.c&&<span className="bdg bdg-r tx">C</span>}</div></div>
+    {open&&<div className="mt afu"><div className="ts">{sp.d}</div>
+      <div className="tx td2 mt"><b>Cast:</b> {sp.ct} | <b>Range:</b> {sp.rng} | <b>Dur:</b> {sp.dur}</div>
+      <div className="tx td2"><b>School:</b> {sp.s} | <b>Classes:</b> {sp.cls.join(", ")}</div></div>}
+  </div>;
+}
+
+function Combat({chars,mons,onUp}) {
+  const [cmbs,setCmbs]=useState([]);const [turn,setTurn]=useState(0);const [rnd,setRnd]=useState(1);const [live,setLive]=useState(false);
+  const {addMsg}=useContext(AppCtx);
+
+  const rollAll=useCallback(()=>{const e=[];
+    chars.forEach(c=>e.push({...c,init:rd(20)+aMod(c.stats?.DEX||10),isMon:false,actA:false,actB:false}));
+    mons.forEach(m=>e.push({...m,id:m.id||uid(),init:rd(20)+aMod(m.d||10),isMon:true,curHp:m.hp,actA:false,actB:false}));
+    e.sort((a,b)=>b.init-a.init);setCmbs(e);setTurn(0);setRnd(1);setLive(true);
+    addMsg("system",`⚔️ Combat! ${e.length} combatants. Round 1.`);
+  },[chars,mons,addMsg]);
+
+  const next=useCallback(()=>{const n=(turn+1)%cmbs.length;if(n===0){setRnd(r=>r+1);addMsg("system",`Round ${rnd+1}!`);}
+    setTurn(n);setCmbs(p=>p.map((c,i)=>i===n?{...c,actA:false,actB:false}:c));addMsg("system",`➡️ ${cmbs[n]?.name||cmbs[n]?.n}'s turn`);
+  },[turn,cmbs,rnd,addMsg]);
+
+  return <div className="pnl">
+    <div className="ph"><h3>⚔️ Combat</h3><div className="fr gs">
+      {!live?<button className="btn bp bs" onClick={rollAll} disabled={!chars.length&&!mons.length}>Roll Initiative</button>
+      :<><span className="bdg bdg-r">Round {rnd}</span><button className="btn bs" onClick={next}>Next →</button>
+        <button className="btn bs bd" onClick={()=>{setLive(false);setCmbs([]);addMsg("system","Combat ended.");}}>End</button></>}
+    </div></div>
+    {live&&cmbs.length>0?<div className="fc">{cmbs.map((c,i)=>{const act=i===turn;const hp=c.isMon?(c.curHp??c.hp):c.hp;const mx=c.isMon?c.hp:c.mhp;const pct=mx>0?Math.max(0,(hp/mx)*100):0;
+      return <div key={c.id||i} className={`ii ${act?"act":""}`}>
+        <div className="io">{c.init}</div>
+        <div style={{flex:1}}><div className="fb">
+          <span style={{fontFamily:"Cinzel",fontWeight:600,color:c.isMon?"var(--redb)":"var(--ink)",fontSize:".9rem"}}>{c.isMon?"👹":"🛡️"} {c.name||c.n}</span>
+          <span className="tx td2">AC {c.ac}</span></div>
+          <div className="hpbg" style={{height:7,marginTop:3}}><div className={`hpf ${pct>50?"hpg":pct>25?"hpy":"hpr"}`} style={{width:`${pct}%`}}/></div>
+          <div className="tx td2">{hp}/{mx} HP</div></div>
+        {act&&<div className="fr gs">
+          <span className={`bdg ${c.actA?"bdg-g":""}`} style={{cursor:"pointer",opacity:c.actA?.5:1}}
+            onClick={()=>setCmbs(p=>p.map((x,j)=>j===i?{...x,actA:true}:x))}>Action</span>
+          <span className={`bdg ${c.actB?"bdg-g":""}`} style={{cursor:"pointer",opacity:c.actB?.5:1}}
+            onClick={()=>setCmbs(p=>p.map((x,j)=>j===i?{...x,actB:true}:x))}>Bonus</span></div>}
+        {c.isMon&&<div className="fr gs">
+          <button className="btn bs bd" style={{padding:"1px 6px",fontSize:".65rem"}} onClick={()=>{const d=parseInt(prompt(`Dmg to ${c.n}:`));if(d>0)setCmbs(p=>p.map((x,j)=>j===i?{...x,curHp:Math.max(0,(x.curHp??x.hp)-d)}:x));}}>−</button>
+          <button className="btn bs" style={{padding:"1px 6px",fontSize:".65rem",borderColor:"var(--nat)",color:"#4a9a4a"}} onClick={()=>{const h=parseInt(prompt(`Heal ${c.n}:`));if(h>0)setCmbs(p=>p.map((x,j)=>j===i?{...x,curHp:Math.min(x.hp,(x.curHp??x.hp)+h)}:x));}}>+</button>
+        </div>}
+      </div>;})}</div>
+    :<div className="tc td2" style={{padding:36}}>Add characters & monsters, then roll initiative.</div>}
+  </div>;
+}
+
+function BattleMap({chars,mons}) {
+  const [toks,setToks]=useState([]);const [fog,setFog]=useState(new Set());const [fogM,setFogM]=useState(false);const [sel,setSel]=useState(null);
+  const cols=20,rows=14;
+
+  useEffect(()=>{const t=[];
+    chars.forEach((c,i)=>t.push({id:c.id,name:c.name,em:"🛡️",col:2,row:2+i*2,isMon:false}));
+    mons.forEach((m,i)=>t.push({id:m.id||uid(),name:m.n,em:"👹",col:15,row:2+i*2,isMon:true}));
+    setToks(t);
+  },[chars.length,mons.length]);
+
+  const click=(c,r)=>{if(fogM){const k=`${c}-${r}`;setFog(p=>{const n=new Set(p);n.has(k)?n.delete(k):n.add(k);return n;});return;}
+    if(sel!=null){setToks(p=>p.map(t=>t.id===sel?{...t,col:c,row:r}:t));setSel(null);}};
+  const at=(c,r)=>toks.find(t=>t.col===c&&t.row===r);
+
+  return <div className="pnl">
+    <div className="ph"><h3>🗺️ Battle Map</h3><div className="fr gs">
+      <button className={`btn bs ${fogM?"bp":""}`} onClick={()=>setFogM(!fogM)}>🌫️ Fog{fogM?" ON":""}</button>
+      {sel&&<span className="bdg bdg-g">Click destination</span>}</div></div>
+    <div className="bgrd" style={{gridTemplateColumns:`repeat(${cols},36px)`,gridTemplateRows:`repeat(${rows},36px)`}}>
+      {Array.from({length:rows*cols}).map((_,idx)=>{const c=idx%cols,r=Math.floor(idx/cols),tok=at(c,r),isFog=fog.has(`${c}-${r}`);
+        return <div key={idx} className={`gc ${tok?"occ":""} ${isFog?"fog":""} ${tok&&tok.id===sel?"hl":""}`}
+          onClick={()=>tok&&!fogM?setSel(tok.id):click(c,r)} title={tok?`${tok.name} (${c*5}ft,${r*5}ft)`:`${c*5}ft,${r*5}ft`}>
+          {!isFog&&tok&&<span style={{fontSize:"1.05rem",cursor:"grab"}}>{tok.em}</span>}</div>;})}
+    </div>
+    <div className="tx td2 mt">Click token → click cell to move. Each cell = 5ft.</div>
+  </div>;
+}
+
+function SpellRef() {
+  const [q,setQ]=useState("");const [lf,setLF]=useState("all");const [cf,setCF]=useState("all");const [ex,setEx]=useState(null);
+  const f=SPELLS.filter(s=>{if(q&&!s.n.toLowerCase().includes(q.toLowerCase()))return false;if(lf!=="all"&&s.l!==parseInt(lf))return false;if(cf!=="all"&&!s.cls.includes(cf))return false;return true;});
+  return <div className="pnl"><div className="ph"><h3>📖 Spells</h3><span className="td2 ts">{f.length}</span></div>
+    <div className="fr mb"><input type="text" placeholder="Search..." value={q} onChange={e=>setQ(e.target.value)} style={{flex:1}}/>
+      <select value={lf} onChange={e=>setLF(e.target.value)} style={{width:100}}><option value="all">All Lvl</option><option value="0">Cantrips</option>
+        {[1,2,3,4,5,6,7,8,9].map(l=><option key={l} value={l}>Lvl {l}</option>)}</select>
+      <select value={cf} onChange={e=>setCF(e.target.value)} style={{width:100}}><option value="all">All Class</option>
+        {Object.keys(CLASSES).filter(c=>CLASSES[c].sc).map(c=><option key={c}>{c}</option>)}</select></div>
+    <div className="fc" style={{maxHeight:460,overflowY:"auto"}}>{f.map(sp=><SpellCard key={sp.n} sp={sp}/>)}</div>
+  </div>;
+}
+
+function MonRef({onSpawn}) {
+  const [q,setQ]=useState("");const [ex,setEx]=useState(null);
+  const f=MONSTERS.filter(m=>!q||m.n.toLowerCase().includes(q.toLowerCase()));
+  return <div className="pnl"><div className="ph"><h3>👹 Monsters</h3></div>
+    <input type="text" placeholder="Search..." value={q} onChange={e=>setQ(e.target.value)} className="mb"/>
+    <div className="fc" style={{maxHeight:460,overflowY:"auto"}}>{f.map(m=><div key={m.n} className="mc" onClick={()=>setEx(ex===m.n?null:m.n)}>
+      <div className="fb"><b style={{color:"var(--redb)",fontFamily:"Cinzel"}}>{m.n}</b>
+        <div className="fr gs"><span className="bdg bdg-r tx">CR {m.cr}</span><span className="tx td2">{m.t}</span></div></div>
+      {ex===m.n&&<div className="mt afu">
+        <div className="g6 gs mt" style={{fontSize:".75rem"}}>{[["STR",m.s],["DEX",m.d],["CON",m.co],["INT",m.i],["WIS",m.w],["CHA",m.ch]].map(([a,v])=>
+          <div key={a} className="tc"><label>{a}</label><div>{v} ({ms(aMod(v))})</div></div>)}</div>
+        <div className="ts mt"><b>AC:</b> {m.ac} | <b>HP:</b> {m.hp} | <b>Speed:</b> {m.sp}</div>
+        {m.atk?.map((a,i)=><div key={i} className="ts mt" style={{padding:"3px 6px",background:"rgba(0,0,0,.15)",borderRadius:3}}>
+          <b>{a.n}:</b> +{a.b}, {a.dm}{a.r?`, ${a.r}`:""}</div>)}
+        {m.tr?.map((t,i)=><div key={i} className="tx td2 mt">• {t}</div>)}
+        <div className="tx td2 mt">XP: {m.xp}</div>
+        {onSpawn&&<button className="btn bs bd mt" onClick={e=>{e.stopPropagation();onSpawn({...m,id:uid(),curHp:m.hp});}}>👹 Spawn</button>}
+      </div>}
+    </div>)}</div>
+  </div>;
+}
+
+function CampSel({onSel}) {
+  const [sel,setSel]=useState(null);
+  return <div style={{maxWidth:860,margin:"0 auto"}}><h2 className="td mb">📜 Select Campaign</h2>
+    <div className="fc gs">{CAMPAIGNS.map(c=><div key={c.n} className={`cc ${sel===c.n?"sel":""}`} onClick={()=>setSel(c.n)}>
+      <div className="fb"><h3 style={{margin:0,fontSize:".95rem"}}>{c.n}</h3><span className="bdg bdg-g">{c.lv}</span></div>
+      <div className="td2 ts mt">{c.d}</div>
+      {sel===c.n&&<div className="afu mm" style={{padding:10,background:"rgba(0,0,0,.15)",borderRadius:4,borderLeft:"3px solid var(--gold)"}}>
+        <div className="ts"><b>Hook:</b></div><div className="ts" style={{fontStyle:"italic"}}>{c.h}</div>
+        <button className="btn bp bs mm" onClick={()=>onSel(c)}>Begin →</button></div>}
+    </div>)}</div>
+  </div>;
+}
+
+function DMTools({mons,setMons,camp}) {
+  const [tool,setTool]=useState("encounter");const {addMsg}=useContext(AppCtx);
+  const names=["Aldric","Bramble","Cedric","Dara","Elara","Finn","Greta","Halvard","Isolde","Jorik","Kira","Lyra","Magnus","Nessa","Orin","Petra","Quinn","Rowan","Sera","Theron"];
+  const lasts=["Thornwood","Stonehelm","Brightvale","Darkmore","Ironforge","Shadowmere","Goldweaver","Frostborne"];
+  const jobs=["Blacksmith","Tavern Keep","Merchant","Guard Captain","Healer","Sage","Farmer","Noble","Thief","Priest","Bard","Sailor"];
+  const quirks=["speaks in riddles","nervous tic","never makes eye contact","laughs too loudly","paranoid about spies","terrible jokes","has a secret","deeply in debt","former adventurer"];
+  const tavs=["The Prancing Pony","The Dragon's Flagon","The Rusty Nail","The Golden Griffin","The Silver Stag","The Laughing Lich","The Broken Blade","The Wanderer's Rest"];
+  const pick=a=>a[Math.floor(Math.random()*a.length)];
+
+  return <div className="pnl"><div className="ph"><h3>🎭 DM Tools</h3>{camp&&<span className="bdg bdg-g">{camp.n}</span>}</div>
+    <div className="tabs mb">{["encounter","monsters","generators","loot","conditions","items"].map(t=>
+      <button key={t} className={`tab ${tool===t?"a":""}`} onClick={()=>setTool(t)}>{t[0].toUpperCase()+t.slice(1)}</button>)}</div>
+
+    {tool==="encounter"&&<div className="afu fc gl">
+      <div><h3>Encounter Monsters</h3>{mons.length>0?<div className="fc mt">{mons.map((m,i)=><div key={m.id||i} className="fb" style={{padding:"4px 0",borderBottom:"1px solid rgba(201,168,76,.08)"}}>
+        <span>👹 {m.n} <span className="td2 tx">(CR {m.cr}, {m.hp}HP)</span></span>
+        <button className="btn bs bd" onClick={()=>setMons(p=>p.filter((_,j)=>j!==i))}>Remove</button></div>)}</div>
+      :<div className="td2 ts mt">No monsters. Use Monsters tab to spawn.</div>}</div>
+      <button className="btn" onClick={()=>{const enc=["2d4 goblins ambush!","A lone ogre demands a toll.","1d6 wolves emerge!","Bandits block the road.","A giant spider drops from above!","An owlbear crashes through!","Skeletons rise around you!"];
+        addMsg("system",`⚔️ Random: ${pick(enc)}`);}}>🎲 Random Encounter</button>
+    </div>}
+    {tool==="monsters"&&<MonRef onSpawn={m=>setMons(p=>[...p,m])}/>}
+    {tool==="generators"&&<div className="afu fc gl">
+      <div className="g2">
+        <button className="btn bl" onClick={()=>{addMsg("system",`🧑 NPC: ${pick(names)} ${pick(lasts)}, ${pick(Object.keys(RACES))} ${pick(jobs)} — ${pick(quirks)}`);}}>🧑 Generate NPC</button>
+        <button className="btn bl" onClick={()=>{addMsg("system",`🍺 Tavern: "${pick(tavs)}" — ${Math.floor(Math.random()*20)+5} patrons`);}}>🍺 Generate Tavern</button>
+      </div>
+      <button className="btn" onClick={()=>{const rooms=Math.floor(Math.random()*8)+3;const feats=["pit trap","locked iron door","mysterious altar","dark pool","crumbling stairs","ancient runes","treasure chest","scattered bones","flickering torchlight"];
+        addMsg("system",`🏰 Dungeon: ${rooms} rooms. ${Array.from({length:Math.min(rooms,4)},()=>pick(feats)).join("; ")}`);}}>🏰 Generate Dungeon</button>
+      <button className="btn" onClick={()=>addMsg("roll",`DM secret roll: d20 = ${rd(20)}`)}>🎲 Secret Roll</button>
+    </div>}
+    {tool==="loot"&&<div className="afu"><h3 className="mb">Loot Generator</h3><div className="g3 gs">
+      {["1/4","1","3","5","10","15"].map(cr=><button key={cr} className="btn" onClick={()=>{const g=Math.floor(parseFloat(cr)*parseFloat(cr)*10+Math.random()*parseFloat(cr)*20);
+        const it=Array.from({length:Math.floor(Math.random()*3)+1},()=>pick(ITEMS).n);
+        addMsg("system",`💰 CR ${cr} Loot: ${g} gp, ${it.join(", ")}`);}}>CR {cr}</button>)}</div></div>}
+    {tool==="conditions"&&<div className="afu fc">{CONDITIONS.map(c=><div key={c.n} style={{padding:"6px 0",borderBottom:"1px solid rgba(201,168,76,.08)"}}>
+      <b>{c.i} {c.n}</b><div className="ts td2">{c.d}</div></div>)}</div>}
+    {tool==="items"&&<div className="afu fc" style={{maxHeight:460,overflowY:"auto"}}>{ITEMS.map(it=><div key={it.n} style={{padding:"6px 0",borderBottom:"1px solid rgba(201,168,76,.08)"}}>
+      <div className="fb"><b>{it.n}</b><div className="fr gs"><span className="bdg bdg-g tx">{it.t}</span>{it.c&&<span className="tx td2">{it.c}</span>}</div></div>
+      {it.d&&<div className="ts td2">{it.d}</div>}{it.dm&&<div className="ts">Damage: <b>{it.dm}</b></div>}
+      {it.p&&<div className="tx td2">Props: {it.p}</div>}{it.r&&<span className="bdg bdg-a tx">{it.r}</span>}
+    </div>)}</div>}
+  </div>;
+}
+
+function Chat({msgs}) {
+  const ref=useRef(null);const [inp,setInp]=useState("");const {addMsg,pn}=useContext(AppCtx);
+  useEffect(()=>{if(ref.current)ref.current.scrollTop=ref.current.scrollHeight;},[msgs]);
+  const send=()=>{if(!inp.trim())return;addMsg("chat",inp.trim());setInp("");};
+  return <div className="pnl" style={{display:"flex",flexDirection:"column",height:"100%"}}>
+    <div className="ph"><h3>💬 Chat</h3><span className="td2 tx">{msgs.length}</span></div>
+    <div className="chbx" ref={ref} style={{flex:1}}>{msgs.map((m,i)=><div key={i} className={`chm ${m.t}`}>
+      {m.t==="chat"&&<span className="chs">{m.s}: </span>}
+      {m.t==="system"&&<span style={{color:"var(--goldd)"}}>⚙️ </span>}
+      {m.t==="roll"&&<span style={{color:"var(--arc)"}}>🎲 {m.s||pn} </span>}
+      {m.tx}</div>)}</div>
+    <div className="fr mt"><input type="text" value={inp} onChange={e=>setInp(e.target.value)} onKeyDown={e=>e.key==="Enter"&&send()} placeholder="Type..." style={{flex:1}}/>
+      <button className="btn bs" onClick={send}>Send</button></div>
+  </div>;
+}
+
+function Lobby({onJoin}) {
+  const [mode,setMode]=useState(null);const [rc,setRC]=useState("");const [name,setName]=useState("");const [role,setRole]=useState("player");
+  const [loaded,setLoaded]=useState(false);const [particles]=useState(()=>Array.from({length:40},(_,i)=>({id:i,x:Math.random()*100,y:Math.random()*100,s:Math.random()*3+1,d:Math.random()*20+10,del:Math.random()*8})));
+  const [floatingRunes]=useState(()=>{const runes=["ᚠ","ᚢ","ᚦ","ᚨ","ᚱ","ᚲ","ᚷ","ᚹ","ᚺ","ᚾ","ᛁ","ᛃ","ᛇ","ᛈ","ᛉ","ᛊ","ᛏ","ᛒ","ᛖ","ᛗ","ᛚ","ᛝ","ᛞ","ᛟ"];return Array.from({length:12},(_,i)=>({id:i,r:runes[Math.floor(Math.random()*runes.length)],x:Math.random()*100,d:Math.random()*15+8,del:Math.random()*6,sz:Math.random()*14+10}));});
+  useEffect(()=>{setTimeout(()=>setLoaded(true),100);},[]);
+
+  const lobbyCSS = `
+    .lobby-root{min-height:100vh;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;
+      background:#080705}
+    .lobby-bg{position:fixed;inset:0;z-index:0;
+      background:
+        radial-gradient(ellipse 80% 60% at 50% 30%, rgba(201,168,76,.06) 0%, transparent 70%),
+        radial-gradient(ellipse 60% 50% at 20% 80%, rgba(139,26,26,.05) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 40% at 85% 20%, rgba(90,60,20,.04) 0%, transparent 50%),
+        linear-gradient(180deg, #0a0908 0%, #12100d 40%, #0a0806 100%);
+    }
+    .lobby-vignette{position:fixed;inset:0;z-index:1;
+      background:radial-gradient(ellipse 70% 60% at 50% 45%, transparent 30%, rgba(0,0,0,.7) 100%);pointer-events:none}
+    .lobby-noise{position:fixed;inset:0;z-index:1;opacity:.03;pointer-events:none;
+      background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size:128px 128px}
+    .lobby-particles{position:fixed;inset:0;z-index:2;pointer-events:none;overflow:hidden}
+    .ember{position:absolute;border-radius:50%;background:radial-gradient(circle,rgba(232,200,76,.9),rgba(201,168,76,.3),transparent);
+      animation:ember-rise var(--dur) var(--del) ease-in infinite;opacity:0;filter:blur(0.5px)}
+    @keyframes ember-rise{0%{transform:translateY(0) translateX(0) scale(1);opacity:0}
+      10%{opacity:.8}50%{opacity:.6;transform:translateY(-40vh) translateX(20px) scale(.7)}
+      100%{transform:translateY(-100vh) translateX(-10px) scale(.2);opacity:0}}
+    .rune-float{position:absolute;color:rgba(201,168,76,.06);font-size:var(--sz);
+      animation:rune-drift var(--dur) var(--del) ease-in-out infinite;opacity:0;pointer-events:none}
+    @keyframes rune-drift{0%{transform:translateY(10vh) rotate(0deg);opacity:0}
+      20%{opacity:1}80%{opacity:.6}100%{transform:translateY(-100vh) rotate(180deg);opacity:0}}
+    .lobby-content{position:relative;z-index:10;max-width:520px;width:100%;padding:24px}
+
+    /* ── Crest / Logo ── */
+    .lobby-crest{text-align:center;margin-bottom:32px}
+    .crest-d20{position:relative;width:120px;height:120px;margin:0 auto 20px;
+      opacity:0;transform:scale(.5) rotate(-30deg);transition:all 1s cubic-bezier(.34,1.56,.64,1) .3s}
+    .crest-d20.show{opacity:1;transform:scale(1) rotate(0deg)}
+    .crest-d20 svg{width:100%;height:100%;filter:drop-shadow(0 0 20px rgba(201,168,76,.3)) drop-shadow(0 0 60px rgba(201,168,76,.1))}
+    .crest-d20::after{content:'';position:absolute;inset:-20px;border-radius:50%;
+      background:radial-gradient(circle,rgba(201,168,76,.08),transparent 70%);animation:crest-pulse 4s ease-in-out infinite}
+    @keyframes crest-pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.15);opacity:.6}}
+
+    .lobby-title{font-family:'Cinzel Decorative',serif;font-size:2.6rem;font-weight:900;line-height:1.1;
+      color:var(--gold);letter-spacing:.04em;
+      text-shadow:0 0 30px rgba(201,168,76,.25),0 2px 0 rgba(0,0,0,.5);
+      opacity:0;transform:translateY(16px);transition:all .8s ease-out .6s}
+    .lobby-title.show{opacity:1;transform:translateY(0)}
+    .lobby-sub{font-family:'Cinzel',serif;font-size:.95rem;font-weight:600;letter-spacing:.2em;text-transform:uppercase;
+      color:var(--goldd);margin-top:6px;
+      opacity:0;transform:translateY(10px);transition:all .7s ease-out .9s}
+    .lobby-sub.show{opacity:1;transform:translateY(0)}
+
+    .lobby-divider{display:flex;align-items:center;gap:16px;margin:20px auto;max-width:340;
+      opacity:0;transition:opacity .6s 1.1s}
+    .lobby-divider.show{opacity:1}
+    .lobby-divider .ld-line{flex:1;height:1px;background:linear-gradient(90deg,transparent,var(--goldd),transparent)}
+    .lobby-divider .ld-gem{width:8px;height:8px;background:var(--gold);transform:rotate(45deg);box-shadow:0 0 10px rgba(201,168,76,.4);flex-shrink:0}
+
+    /* ── Form Panel ── */
+    .lobby-panel{
+      background:linear-gradient(180deg,rgba(18,14,10,.92),rgba(10,8,6,.96));
+      border:1px solid rgba(201,168,76,.2);border-radius:8px;padding:28px 24px;
+      box-shadow:0 20px 60px rgba(0,0,0,.5),0 0 1px rgba(201,168,76,.3),inset 0 1px 0 rgba(201,168,76,.06);
+      backdrop-filter:blur(12px);position:relative;overflow:hidden;
+      opacity:0;transform:translateY(20px);transition:all .8s ease-out 1.2s}
+    .lobby-panel.show{opacity:1;transform:translateY(0)}
+    .lobby-panel::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;
+      background:linear-gradient(90deg,transparent 10%,rgba(201,168,76,.4) 50%,transparent 90%)}
+    .lobby-panel::after{content:'';position:absolute;inset:0;pointer-events:none;
+      background:radial-gradient(ellipse at 50% 0%,rgba(201,168,76,.03),transparent 60%)}
+
+    .lobby-input{font-family:'Crimson Text',serif;font-size:1.05rem;background:rgba(0,0,0,.35);
+      border:1px solid rgba(201,168,76,.15);color:var(--ink);padding:12px 16px;border-radius:6px;
+      outline:none;transition:all .3s;width:100%}
+    .lobby-input:focus{border-color:rgba(201,168,76,.5);box-shadow:0 0 16px rgba(201,168,76,.08);background:rgba(0,0,0,.45)}
+    .lobby-input::placeholder{color:rgba(154,142,122,.5)}
+
+    .lobby-label{font-family:'Cinzel',serif;font-size:.7rem;font-weight:600;color:var(--goldd);
+      text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px;display:block}
+
+    /* ── Role Selector ── */
+    .role-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .role-card{position:relative;padding:16px 12px;border:1px solid rgba(201,168,76,.15);border-radius:6px;
+      background:rgba(0,0,0,.25);cursor:pointer;transition:all .3s;text-align:center;overflow:hidden}
+    .role-card:hover{border-color:rgba(201,168,76,.35);background:rgba(201,168,76,.04)}
+    .role-card.active{border-color:var(--gold);background:rgba(201,168,76,.08);
+      box-shadow:0 0 20px rgba(201,168,76,.1),inset 0 0 20px rgba(201,168,76,.03)}
+    .role-card.active::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;
+      background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+    .role-icon{font-size:2rem;margin-bottom:6px;display:block;
+      filter:drop-shadow(0 2px 8px rgba(0,0,0,.4));transition:transform .3s}
+    .role-card:hover .role-icon{transform:scale(1.1)}
+    .role-card.active .role-icon{transform:scale(1.15);filter:drop-shadow(0 0 12px rgba(201,168,76,.3))}
+    .role-name{font-family:'Cinzel',serif;font-size:.85rem;font-weight:700;color:var(--ink);letter-spacing:.06em}
+    .role-desc{font-size:.72rem;color:var(--inkd);margin-top:2px}
+    .role-card.active .role-name{color:var(--gold)}
+
+    /* ── Action Buttons ── */
+    .lobby-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:20px}
+    .lobby-btn{font-family:'Cinzel',serif;font-size:.9rem;font-weight:700;padding:14px 20px;
+      border-radius:6px;cursor:pointer;transition:all .3s;letter-spacing:.06em;text-transform:uppercase;
+      position:relative;overflow:hidden}
+    .lobby-btn::before{content:'';position:absolute;inset:0;opacity:0;transition:opacity .3s;
+      background:radial-gradient(circle at 50% 50%,rgba(255,255,255,.1),transparent 70%)}
+    .lobby-btn:hover::before{opacity:1}
+    .lobby-btn:active{transform:scale(.97)}
+    .lobby-btn-primary{background:linear-gradient(180deg,#d4b04e,#9a7a34);color:#0a0908;
+      border:1px solid var(--gold);box-shadow:0 4px 20px rgba(201,168,76,.25),inset 0 1px 0 rgba(255,255,255,.15)}
+    .lobby-btn-primary:hover{background:linear-gradient(180deg,#e8c84c,#b8943e);
+      box-shadow:0 6px 30px rgba(201,168,76,.35),inset 0 1px 0 rgba(255,255,255,.2);transform:translateY(-1px)}
+    .lobby-btn-primary:disabled{opacity:.4;cursor:not-allowed;transform:none;box-shadow:none}
+    .lobby-btn-secondary{background:rgba(0,0,0,.3);color:var(--gold);
+      border:1px solid rgba(201,168,76,.25);box-shadow:0 4px 12px rgba(0,0,0,.2)}
+    .lobby-btn-secondary:hover{border-color:rgba(201,168,76,.5);background:rgba(201,168,76,.06);
+      box-shadow:0 6px 20px rgba(0,0,0,.3);transform:translateY(-1px)}
+    .lobby-btn-secondary:disabled{opacity:.4;cursor:not-allowed;transform:none}
+    .lobby-btn-full{grid-column:1/-1;font-size:1.1rem;padding:18px 24px;letter-spacing:.1em}
+    .lobby-btn-back{font-family:'Cinzel',serif;font-size:.75rem;font-weight:600;color:var(--inkd);
+      background:none;border:none;cursor:pointer;padding:8px;transition:color .2s;margin-top:8px}
+    .lobby-btn-back:hover{color:var(--gold)}
+
+    .lobby-code-input{font-family:'Cinzel',serif;font-size:1.8rem;font-weight:900;text-align:center;
+      letter-spacing:.4em;padding:16px;background:rgba(0,0,0,.4);border:1px solid rgba(201,168,76,.2);
+      color:var(--goldb);border-radius:6px;outline:none;width:100%;transition:all .3s}
+    .lobby-code-input:focus{border-color:var(--gold);box-shadow:0 0 24px rgba(201,168,76,.12)}
+    .lobby-code-input::placeholder{color:rgba(154,142,122,.3);letter-spacing:.3em;font-size:1.2rem}
+
+    .lobby-footer{text-align:center;margin-top:28px;
+      opacity:0;transition:opacity .6s 1.6s}
+    .lobby-footer.show{opacity:1}
+    .lobby-footer-text{font-family:'Cinzel',serif;font-size:.65rem;color:rgba(154,142,122,.4);letter-spacing:.15em;text-transform:uppercase}
+    .lobby-footer-icons{display:flex;justify-content:center;gap:18px;margin-top:10px;font-size:1.1rem;
+      color:rgba(201,168,76,.15)}
+
+    /* ── Feature chips ── */
+    .lobby-features{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-top:12px;
+      opacity:0;transition:opacity .6s 1.5s}
+    .lobby-features.show{opacity:1}
+    .feat-chip{font-family:'Cinzel',serif;font-size:.58rem;font-weight:600;color:rgba(201,168,76,.35);
+      letter-spacing:.08em;text-transform:uppercase;padding:3px 10px;
+      border:1px solid rgba(201,168,76,.1);border-radius:20px}
+
+    @media(max-width:600px){
+      .lobby-title{font-size:1.8rem}
+      .lobby-content{padding:16px}
+      .lobby-panel{padding:20px 16px}
+      .crest-d20{width:90px;height:90px}
+    }
+  `;
+
+  // SVG D20 icosahedron shape
+  const D20Crest = () => (
+    <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="d20gold" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#e8c84c"/>
+          <stop offset="50%" stopColor="#c9a84c"/>
+          <stop offset="100%" stopColor="#8a7234"/>
+        </linearGradient>
+        <linearGradient id="d20face" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="rgba(201,168,76,.12)"/>
+          <stop offset="100%" stopColor="rgba(201,168,76,.03)"/>
+        </linearGradient>
+        <filter id="d20glow">
+          <feGaussianBlur stdDeviation="2" result="blur"/>
+          <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+        </filter>
+      </defs>
+      {/* Outer ring */}
+      <circle cx="100" cy="100" r="95" fill="none" stroke="url(#d20gold)" strokeWidth=".5" opacity=".3"/>
+      <circle cx="100" cy="100" r="88" fill="none" stroke="url(#d20gold)" strokeWidth=".3" opacity=".15"/>
+      {/* D20 shape */}
+      <g filter="url(#d20glow)">
+        <polygon points="100,18 175,65 175,135 100,182 25,135 25,65" fill="url(#d20face)" stroke="url(#d20gold)" strokeWidth="1.2" strokeLinejoin="round"/>
+        {/* Inner triangle faces */}
+        <line x1="100" y1="18" x2="25" y2="135" stroke="url(#d20gold)" strokeWidth=".6" opacity=".4"/>
+        <line x1="100" y1="18" x2="175" y2="135" stroke="url(#d20gold)" strokeWidth=".6" opacity=".4"/>
+        <line x1="25" y1="65" x2="175" y2="135" stroke="url(#d20gold)" strokeWidth=".6" opacity=".3"/>
+        <line x1="175" y1="65" x2="25" y2="135" stroke="url(#d20gold)" strokeWidth=".6" opacity=".3"/>
+        <line x1="100" y1="182" x2="25" y2="65" stroke="url(#d20gold)" strokeWidth=".6" opacity=".4"/>
+        <line x1="100" y1="182" x2="175" y2="65" stroke="url(#d20gold)" strokeWidth=".6" opacity=".4"/>
+        {/* Center number */}
+        <text x="100" y="112" textAnchor="middle" fontFamily="Cinzel" fontSize="36" fontWeight="900" fill="url(#d20gold)" opacity=".85">20</text>
+      </g>
+      {/* Corner ornaments */}
+      {[0,60,120,180,240,300].map(angle => {
+        const rad = angle * Math.PI / 180;
+        const x = 100 + 82 * Math.cos(rad - Math.PI/2);
+        const y = 100 + 82 * Math.sin(rad - Math.PI/2);
+        return <circle key={angle} cx={x} cy={y} r="2" fill="var(--gold)" opacity=".5"/>;
+      })}
+    </svg>
+  );
+
+  return <>
+    <style>{lobbyCSS}</style>
+    <div className="lobby-root">
+      {/* Layered background */}
+      <div className="lobby-bg"/>
+      <div className="lobby-vignette"/>
+      <div className="lobby-noise"/>
+
+      {/* Floating embers */}
+      <div className="lobby-particles">
+        {particles.map(p => (
+          <div key={p.id} className="ember" style={{left:`${p.x}%`,bottom:'-5%',width:`${p.s}px`,height:`${p.s}px`,'--dur':`${p.d}s`,'--del':`${p.del}s`}}/>
+        ))}
+        {floatingRunes.map(r => (
+          <div key={r.id} className="rune-float" style={{left:`${r.x}%`,bottom:'-5%','--dur':`${r.d}s`,'--del':`${r.del}s`,'--sz':`${r.sz}px`}}>{r.r}</div>
+        ))}
+      </div>
+
+      <div className="lobby-content">
+        {/* Crest */}
+        <div className="lobby-crest">
+          <div className={`crest-d20 ${loaded?"show":""}`}><D20Crest/></div>
+          <div className={`lobby-title ${loaded?"show":""}`}>Dungeons<br/>&amp; Dragons</div>
+          <div className={`lobby-sub ${loaded?"show":""}`}>5th Edition Virtual Tabletop</div>
+
+          <div className={`lobby-divider ${loaded?"show":""}`}>
+            <div className="ld-line"/><div className="ld-gem"/><div className="ld-line"/>
+          </div>
+        </div>
+
+        {/* Main Panel */}
+        <div className={`lobby-panel ${loaded?"show":""}`}>
+          <div style={{display:"flex",flexDirection:"column",gap:18}}>
+            {/* Name */}
+            <div>
+              <span className="lobby-label">Adventurer's Name</span>
+              <input className="lobby-input" type="text" value={name} onChange={e=>setName(e.target.value)} placeholder="What shall we call you?"/>
+            </div>
+
+            {/* Role */}
+            <div>
+              <span className="lobby-label">Choose Your Role</span>
+              <div className="role-grid">
+                <div className={`role-card ${role==="player"?"active":""}`} onClick={()=>setRole("player")}>
+                  <span className="role-icon">🛡️</span>
+                  <div className="role-name">Player</div>
+                  <div className="role-desc">Embark on the adventure</div>
+                </div>
+                <div className={`role-card ${role==="dm"?"active":""}`} onClick={()=>setRole("dm")}>
+                  <span className="role-icon">🎭</span>
+                  <div className="role-name">Dungeon Master</div>
+                  <div className="role-desc">Weave the tale</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Divider with ornament */}
+            <div style={{display:"flex",alignItems:"center",gap:12,margin:"4px 0"}}>
+              <div style={{flex:1,height:1,background:"linear-gradient(90deg,transparent,rgba(201,168,76,.2),transparent)"}}/>
+              <span style={{color:"rgba(201,168,76,.25)",fontSize:".7rem",fontFamily:"Cinzel"}}>✦</span>
+              <div style={{flex:1,height:1,background:"linear-gradient(90deg,transparent,rgba(201,168,76,.2),transparent)"}}/>
+            </div>
+
+            {/* Actions */}
+            {!mode && (
+              <div className="lobby-actions" style={{animation:"fu .4s ease-out"}}>
+                <button className="lobby-btn lobby-btn-primary" onClick={()=>setMode("create")} disabled={!name}>
+                  Create Room
+                </button>
+                <button className="lobby-btn lobby-btn-secondary" onClick={()=>setMode("join")} disabled={!name}>
+                  Join Room
+                </button>
+              </div>
+            )}
+
+            {mode==="create" && (
+              <div style={{animation:"fu .3s ease-out",textAlign:"center"}}>
+                <div style={{color:"var(--inkd)",fontSize:".85rem",marginBottom:14}}>
+                  A room code will be generated for your party to join
+                </div>
+                <button className="lobby-btn lobby-btn-primary lobby-btn-full"
+                  onClick={()=>onJoin({name,role,rc:Math.random().toString(36).substr(2,6).toUpperCase(),host:true})}>
+                  ⚔️ Forge New Campaign
+                </button>
+                <button className="lobby-btn-back" onClick={()=>setMode(null)}>← Choose differently</button>
+              </div>
+            )}
+
+            {mode==="join" && (
+              <div style={{animation:"fu .3s ease-out",display:"flex",flexDirection:"column",gap:14}}>
+                <div>
+                  <span className="lobby-label">Room Code</span>
+                  <input className="lobby-code-input" type="text" value={rc}
+                    onChange={e=>setRC(e.target.value.toUpperCase())} placeholder="• • • • • •" maxLength={6}/>
+                </div>
+                <button className="lobby-btn lobby-btn-primary lobby-btn-full"
+                  onClick={()=>onJoin({name,role,rc:rc.toUpperCase(),host:false})} disabled={rc.length<4}>
+                  Enter the Realm
+                </button>
+                <button className="lobby-btn-back" onClick={()=>setMode(null)}>← Choose differently</button>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Feature chips */}
+        <div className={`lobby-features ${loaded?"show":""}`}>
+          {["SRD Rules","Character Builder","Battle Maps","Dice Roller","DM Tools","Combat Tracker"].map(f=>
+            <span key={f} className="feat-chip">{f}</span>
+          )}
+        </div>
+
+        {/* Footer */}
+        <div className={`lobby-footer ${loaded?"show":""}`}>
+          <div className="lobby-footer-icons">
+            <span title="Fighter">⚔️</span><span title="Wizard">🧙</span><span title="Rogue">🗡️</span>
+            <span title="Cleric">✝️</span><span title="Ranger">🏹</span><span title="Bard">🎵</span>
+          </div>
+          <div className="lobby-footer-text" style={{marginTop:10}}>
+            D&D 5e SRD &bull; Open Game License &bull; Not affiliated with Wizards of the Coast
+          </div>
+        </div>
+      </div>
+    </div>
+  </>;
+}
+
+// ═══════════════════════════════════════════════════════════
+// MAIN APP
+// ═══════════════════════════════════════════════════════════
+export default function App() {
+  const [sess,setSess]=useState(null);const [page,setPage]=useState("campaign");
+  const [chars,setChars]=useState([]);const [aCh,setACh]=useState(0);
+  const [mons,setMons]=useState([]);const [camp,setCamp]=useState(null);
+  const [msgs,setMsgs]=useState([]);const [creating,setCreating]=useState(false);
+
+  const addMsg=useCallback((t,tx,extra={})=>setMsgs(p=>[...p,{t,tx,s:sess?.name,...extra,ts:Date.now()}]),[sess]);
+  const ctx=useMemo(()=>({sess,addMsg,pn:sess?.name||"Player"}),[sess,addMsg]);
+
+  if(!sess) return <Lobby onJoin={setSess}/>;
+  const isDM=sess.role==="dm";
+  const nav=isDM?[{k:"campaign",l:"Campaign",i:"📜"},{k:"characters",l:"Characters",i:"🛡️"},{k:"combat",l:"Combat",i:"⚔️"},{k:"map",l:"Map",i:"🗺️"},{k:"dm",l:"DM Tools",i:"🎭"},{k:"spells",l:"Spells",i:"✨"},{k:"dice",l:"Dice",i:"🎲"}]
+    :[{k:"campaign",l:"Campaign",i:"📜"},{k:"characters",l:"Character",i:"🛡️"},{k:"combat",l:"Combat",i:"⚔️"},{k:"map",l:"Map",i:"🗺️"},{k:"spells",l:"Spells",i:"✨"},{k:"dice",l:"Dice",i:"🎲"}];
+
+  return <AppCtx.Provider value={ctx}><style>{CSS}</style><div className="abg">
+    <div className="nav"><div className="fr gs">
+      <span style={{fontFamily:"Cinzel Decorative",fontWeight:700,color:"var(--gold)",fontSize:".95rem"}}>⚔️ D&D 5e</span>
+      <span className="bdg bdg-g">{sess.rc}</span><span className="td2 tx">{sess.name} • {isDM?"DM":"Player"}</span>
+    </div><div className="fr gs" style={{flexWrap:"wrap"}}>
+      {nav.map(n=><button key={n.k} className={`nb ${page===n.k?"a":""}`} onClick={()=>setPage(n.k)}>{n.i} {n.l}</button>)}
+    </div><button className="btn bs bd" onClick={()=>setSess(null)}>Leave</button></div>
+
+    <div className="container" style={{maxWidth:1360,margin:"0 auto",padding:"16px 14px 40px"}}>
+      <div className="lay" style={{display:"grid",gridTemplateColumns:"1fr 320px",gap:16}}>
+        <div>
+          {page==="campaign"&&!camp&&<CampSel onSel={c=>{setCamp(c);addMsg("system",`📜 Campaign: ${c.n}`);}}/>}
+          {page==="campaign"&&camp&&<div className="pnl afu"><h2>{camp.n}</h2><span className="bdg bdg-g">{camp.lv}</span><div className="dv"/><div className="ts">{camp.d}</div><div className="dv"/>
+            <div style={{padding:14,background:"rgba(0,0,0,.15)",borderRadius:4,borderLeft:"3px solid var(--gold)",fontStyle:"italic"}}>{camp.h}</div>
+            <button className="btn bs ml" onClick={()=>setCamp(null)}>Change</button></div>}
+
+          {page==="characters"&&!creating&&<div className="afu">
+            <div className="fb mb"><h2>Characters</h2><button className="btn bp" onClick={()=>setCreating(true)}>+ New</button></div>
+            {chars.length>0?<div>{chars.length>1&&<div className="fr mb">{chars.map((c,i)=><button key={c.id} className={`btn bs ${aCh===i?"bp":""}`} onClick={()=>setACh(i)}>{c.name||`Char ${i+1}`}</button>)}</div>}
+              <CharSheet ch={chars[aCh]} onUp={u=>setChars(p=>p.map((c,i)=>i===aCh?u:c))}/></div>
+            :<div className="pnl tc" style={{padding:50}}>
+              <div style={{fontSize:"2.5rem",marginBottom:12}}>🛡️</div><h3>No Characters</h3>
+              <div className="td2 mt mb">Create your first character.</div>
+              <button className="btn bp bl" onClick={()=>setCreating(true)}>⚔️ Create Character</button></div>}
+          </div>}
+          {page==="characters"&&creating&&<CharCreate onDone={ch=>{setChars(p=>[...p,ch]);setACh(chars.length);setCreating(false);addMsg("system",`🛡️ ${ch.name} the ${ch.race} ${ch.cls} joins!`);}}/>}
+
+          {page==="combat"&&<Combat chars={chars} mons={mons}/>}
+          {page==="map"&&<BattleMap chars={chars} mons={mons}/>}
+          {page==="dm"&&isDM&&<DMTools mons={mons} setMons={setMons} camp={camp}/>}
+          {page==="spells"&&<SpellRef/>}
+          {page==="dice"&&<div style={{maxWidth:480,margin:"0 auto"}}><DiceRoller/></div>}
+        </div>
+        <div className="sb" style={{position:"sticky",top:56,height:"calc(100vh - 72px)"}}><Chat msgs={msgs}/></div>
+      </div>
+    </div>
+  </div></AppCtx.Provider>;
+}
