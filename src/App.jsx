@@ -1042,46 +1042,243 @@ function SpellCard({sp}) {
   </div>;
 }
 
-function Combat({chars,mons,onUp}) {
-  const [cmbs,setCmbs]=useState([]);const [turn,setTurn]=useState(0);const [rnd,setRnd]=useState(1);const [live,setLive]=useState(false);
-  const {addMsg}=useContext(AppCtx);
+function Combat({chars, mons, syncAction, isDM, combatState}) {
+  const {addMsg, pn} = useContext(AppCtx);
+  const playerName = pn || "Player";
 
-  const rollAll=useCallback(()=>{const e=[];
-    chars.forEach(c=>e.push({...c,init:rd(20)+aMod(c.stats?.DEX||10),isMon:false,actA:false,actB:false}));
-    mons.forEach(m=>e.push({...m,id:m.id||uid(),init:rd(20)+aMod(m.d||10),isMon:true,curHp:m.hp,actA:false,actB:false}));
-    e.sort((a,b)=>b.init-a.init);setCmbs(e);setTurn(0);setRnd(1);setLive(true);
-    addMsg("system",`⚔️ Combat! ${e.length} combatants. Round 1.`);
-  },[chars,mons,addMsg]);
+  // Combat state from synced App state
+  const {combatants=[], turn=0, round=1, live=false} = combatState || {};
 
-  const next=useCallback(()=>{const n=(turn+1)%cmbs.length;if(n===0){setRnd(r=>r+1);addMsg("system",`Round ${rnd+1}!`);}
-    setTurn(n);setCmbs(p=>p.map((c,i)=>i===n?{...c,actA:false,actB:false}:c));addMsg("system",`➡️ ${cmbs[n]?.name||cmbs[n]?.n}'s turn`);
-  },[turn,cmbs,rnd,addMsg]);
+  const updateCombat = useCallback((updates) => {
+    syncAction({type:'COMBAT_UPDATE', payload: {...combatState, ...updates}});
+  }, [combatState, syncAction]);
+
+  const rollAll = useCallback(() => {
+    const e = [];
+    chars.forEach(c => e.push({
+      ...c, init: rd(20) + aMod(c.stats?.DEX || 10), isMon: false,
+      actA: false, actB: false, actR: false
+    }));
+    mons.forEach(m => e.push({
+      n: m.n, ac: m.ac, hp: m.hp, curHp: m.curHp ?? m.hp, id: m.id || uid(),
+      d: m.d, s: m.s, co: m.co, atk: m.atk, tr: m.tr, cr: m.cr, xp: m.xp,
+      init: rd(20) + aMod(m.d || 10), isMon: true,
+      actA: false, actB: false, actR: false
+    }));
+    e.sort((a, b) => b.init - a.init);
+    updateCombat({combatants: e, turn: 0, round: 1, live: true});
+    addMsg("system", `⚔️ Combat begins! ${e.length} combatants. Roll for initiative!`);
+    e.forEach(c => {
+      addMsg("roll", `${c.name || c.n}: Initiative ${c.init}`);
+    });
+  }, [chars, mons, addMsg, updateCombat]);
+
+  const nextTurn = useCallback(() => {
+    if (!combatants.length) return;
+    const n = (turn + 1) % combatants.length;
+    const newRound = n === 0 ? round + 1 : round;
+    if (n === 0) addMsg("system", `📜 Round ${newRound}!`);
+    const updated = combatants.map((c, i) =>
+      i === n ? {...c, actA: false, actB: false, actR: false} : c
+    );
+    updateCombat({combatants: updated, turn: n, round: newRound});
+    addMsg("system", `➡️ ${updated[n]?.name || updated[n]?.n}'s turn`);
+  }, [turn, combatants, round, addMsg, updateCombat]);
+
+  const endCombat = useCallback(() => {
+    updateCombat({combatants: [], turn: 0, round: 1, live: false});
+    addMsg("system", "🏁 Combat ended.");
+  }, [addMsg, updateCombat]);
+
+  const updateCombatant = useCallback((idx, changes) => {
+    const updated = combatants.map((c, i) => i === idx ? {...c, ...changes} : c);
+    updateCombat({combatants: updated});
+  }, [combatants, updateCombat]);
+
+  const rollAttack = useCallback((attackerIdx, attackData) => {
+    const attacker = combatants[attackerIdx];
+    const aName = attacker.name || attacker.n;
+    const roll = rd(20);
+    const total = roll + (attackData.b || 0);
+    const isNat20 = roll === 20;
+    const isNat1 = roll === 1;
+
+    let msg = `${aName} attacks with ${attackData.n}: 🎲 ${roll}`;
+    if (attackData.b) msg += ` ${ms(attackData.b)}`;
+    msg += ` = ${total}`;
+    if (isNat20) msg += " ✨ CRITICAL HIT!";
+    if (isNat1) msg += " 💀 CRITICAL MISS!";
+    addMsg("roll", msg);
+
+    // Roll damage too
+    if (!isNat1) {
+      const dmgMatch = attackData.dm?.match(/(\d+)d(\d+)([+-]\d+)?/);
+      if (dmgMatch) {
+        const [, count, sides, modStr2] = dmgMatch;
+        const mod2 = parseInt(modStr2) || 0;
+        let dmgRolls = rdN(parseInt(count), parseInt(sides));
+        if (isNat20) dmgRolls = [...dmgRolls, ...rdN(parseInt(count), parseInt(sides))]; // double dice on crit
+        const dmgTotal = dmgRolls.reduce((a, b) => a + b, 0) + mod2;
+        addMsg("roll", `  ⚔️ Damage: [${dmgRolls.join(",")}]${mod2 ? ms(mod2) : ""} = ${dmgTotal} ${attackData.dm.replace(/\d+d\d+[+-]?\d*\s*/, '')}${isNat20 ? " (CRIT!)" : ""}`);
+      }
+    }
+  }, [combatants, addMsg]);
+
+  const rollSave = useCallback((idx, ability) => {
+    const c = combatants[idx];
+    const cName = c.name || c.n;
+    const score = c.stats?.[ability] || c[ability.toLowerCase()] || c[{STR:'s',DEX:'d',CON:'co',INT:'i',WIS:'w',CHA:'ch'}[ability]] || 10;
+    const mod = aMod(score);
+    const roll = rd(20);
+    addMsg("roll", `${cName} ${ability} Save: 🎲 ${roll} ${ms(mod)} = ${roll + mod}`);
+  }, [combatants, addMsg]);
+
+  const dealDamage = useCallback((idx, amount) => {
+    if (!amount || amount <= 0) return;
+    const c = combatants[idx];
+    const cName = c.name || c.n;
+    const curHp = c.isMon ? (c.curHp ?? c.hp) : c.hp;
+    const newHp = Math.max(0, curHp - amount);
+    if (c.isMon) {
+      updateCombatant(idx, {curHp: newHp});
+    } else {
+      updateCombatant(idx, {hp: newHp});
+      // Also sync character HP back
+      if (c.id) syncAction({type:'UPDATE_CHAR', payload: {...c, hp: newHp, isMon: undefined, init: undefined, actA: undefined, actB: undefined, actR: undefined}});
+    }
+    addMsg("system", `💥 ${cName} takes ${amount} damage! (${newHp} HP remaining)`);
+    if (newHp === 0) addMsg("system", `💀 ${cName} drops to 0 HP!`);
+  }, [combatants, updateCombatant, addMsg, syncAction]);
+
+  const healTarget = useCallback((idx, amount) => {
+    if (!amount || amount <= 0) return;
+    const c = combatants[idx];
+    const cName = c.name || c.n;
+    const maxHp = c.isMon ? c.hp : c.mhp;
+    const curHp = c.isMon ? (c.curHp ?? c.hp) : c.hp;
+    const newHp = Math.min(maxHp, curHp + amount);
+    if (c.isMon) {
+      updateCombatant(idx, {curHp: newHp});
+    } else {
+      updateCombatant(idx, {hp: newHp});
+      if (c.id) syncAction({type:'UPDATE_CHAR', payload: {...c, hp: newHp, isMon: undefined, init: undefined, actA: undefined, actB: undefined, actR: undefined}});
+    }
+    addMsg("system", `💚 ${cName} heals ${amount} HP! (${newHp} HP)`);
+  }, [combatants, updateCombatant, addMsg, syncAction]);
+
+  const removeCombatant = useCallback((idx) => {
+    const c = combatants[idx];
+    const updated = combatants.filter((_, i) => i !== idx);
+    const newTurn = idx < turn ? turn - 1 : (idx === turn && turn >= updated.length ? 0 : turn);
+    updateCombat({combatants: updated, turn: newTurn});
+    addMsg("system", `❌ ${c.name || c.n} removed from combat.`);
+  }, [combatants, turn, updateCombat, addMsg]);
 
   return <div className="pnl">
-    <div className="ph"><h3>⚔️ Combat</h3><div className="fr gs">
-      {!live?<button className="btn bp bs" onClick={rollAll} disabled={!chars.length&&!mons.length}>Roll Initiative</button>
-      :<><span className="bdg bdg-r">Round {rnd}</span><button className="btn bs" onClick={next}>Next →</button>
-        <button className="btn bs bd" onClick={()=>{setLive(false);setCmbs([]);addMsg("system","Combat ended.");}}>End</button></>}
+    <div className="ph"><h3>⚔️ Combat Tracker</h3><div className="fr gs">
+      {!live ? (
+        <button className="btn bp bs" onClick={rollAll} disabled={!chars.length && !mons.length}>
+          🎲 Roll Initiative ({chars.length} PCs, {mons.length} monsters)
+        </button>
+      ) : (<>
+        <span className="bdg bdg-r">Round {round}</span>
+        <button className="btn bs" onClick={nextTurn}>Next Turn →</button>
+        <button className="btn bs bd" onClick={endCombat}>End Combat</button>
+      </>)}
     </div></div>
-    {live&&cmbs.length>0?<div className="fc">{cmbs.map((c,i)=>{const act=i===turn;const hp=c.isMon?(c.curHp??c.hp):c.hp;const mx=c.isMon?c.hp:c.mhp;const pct=mx>0?Math.max(0,(hp/mx)*100):0;
-      return <div key={c.id||i} className={`ii ${act?"act":""}`}>
-        <div className="io">{c.init}</div>
-        <div style={{flex:1}}><div className="fb">
-          <span style={{fontFamily:"Cinzel",fontWeight:600,color:c.isMon?"var(--redb)":"var(--ink)",fontSize:".9rem"}}>{c.isMon?"👹":"🛡️"} {c.name||c.n}</span>
-          <span className="tx td2">AC {c.ac}</span></div>
-          <div className="hpbg" style={{height:7,marginTop:3}}><div className={`hpf ${pct>50?"hpg":pct>25?"hpy":"hpr"}`} style={{width:`${pct}%`}}/></div>
-          <div className="tx td2">{hp}/{mx} HP</div></div>
-        {act&&<div className="fr gs">
-          <span className={`bdg ${c.actA?"bdg-g":""}`} style={{cursor:"pointer",opacity:c.actA?.5:1}}
-            onClick={()=>setCmbs(p=>p.map((x,j)=>j===i?{...x,actA:true}:x))}>Action</span>
-          <span className={`bdg ${c.actB?"bdg-g":""}`} style={{cursor:"pointer",opacity:c.actB?.5:1}}
-            onClick={()=>setCmbs(p=>p.map((x,j)=>j===i?{...x,actB:true}:x))}>Bonus</span></div>}
-        {c.isMon&&<div className="fr gs">
-          <button className="btn bs bd" style={{padding:"1px 6px",fontSize:".65rem"}} onClick={()=>{const d=parseInt(prompt(`Dmg to ${c.n}:`));if(d>0)setCmbs(p=>p.map((x,j)=>j===i?{...x,curHp:Math.max(0,(x.curHp??x.hp)-d)}:x));}}>−</button>
-          <button className="btn bs" style={{padding:"1px 6px",fontSize:".65rem",borderColor:"var(--nat)",color:"#4a9a4a"}} onClick={()=>{const h=parseInt(prompt(`Heal ${c.n}:`));if(h>0)setCmbs(p=>p.map((x,j)=>j===i?{...x,curHp:Math.min(x.hp,(x.curHp??x.hp)+h)}:x));}}>+</button>
+
+    {live && combatants.length > 0 ? <div className="fc" style={{gap:2}}>
+      {combatants.map((c, i) => {
+        const act = i === turn;
+        const hp = c.isMon ? (c.curHp ?? c.hp) : c.hp;
+        const mx = c.isMon ? c.hp : c.mhp;
+        const pct = mx > 0 ? Math.max(0, (hp / mx) * 100) : 0;
+        const isDead = hp <= 0;
+        const cName = c.name || c.n;
+
+        return <div key={c.id || i} className={`ii ${act ? "act" : ""}`}
+          style={{opacity: isDead ? 0.4 : 1, borderLeft: act ? "3px solid var(--gold)" : "3px solid transparent", paddingLeft: 8}}>
+          <div className="io">{c.init}</div>
+          <div style={{flex:1}}>
+            <div className="fb">
+              <span style={{fontFamily:"Cinzel",fontWeight:600,color:c.isMon?"var(--redb)":"var(--ink)",fontSize:".9rem"}}>
+                {c.isMon ? "👹" : "🛡️"} {cName} {isDead ? "💀" : ""}
+              </span>
+              <span className="tx td2">AC {c.ac}</span>
+            </div>
+            <div className="hpbg" style={{height:8,marginTop:3}}>
+              <div className={`hpf ${pct>50?"hpg":pct>25?"hpy":"hpr"}`} style={{width:`${pct}%`}}/>
+            </div>
+            <div className="tx td2">{hp}/{mx} HP</div>
+
+            {/* Active turn panel */}
+            {act && !isDead && <div className="mm" style={{padding:"8px 0"}}>
+              {/* Action economy */}
+              <div className="fr gs mb" style={{marginBottom:6}}>
+                <span className={`bdg ${c.actA?"bdg-g":"bdg-r"}`} style={{cursor:"pointer"}}
+                  onClick={()=>updateCombatant(i,{actA:!c.actA})}>{c.actA?"✓":"○"} Action</span>
+                <span className={`bdg ${c.actB?"bdg-g":"bdg-r"}`} style={{cursor:"pointer"}}
+                  onClick={()=>updateCombatant(i,{actB:!c.actB})}>{c.actB?"✓":"○"} Bonus</span>
+                <span className={`bdg ${c.actR?"bdg-g":"bdg-r"}`} style={{cursor:"pointer"}}
+                  onClick={()=>updateCombatant(i,{actR:!c.actR})}>{c.actR?"✓":"○"} Reaction</span>
+              </div>
+
+              {/* Attack buttons */}
+              {c.atk && c.atk.length > 0 && <div className="fr gs" style={{marginBottom:6}}>
+                {c.atk.map((atk, ai) => (
+                  <button key={ai} className="btn bs" onClick={() => rollAttack(i, atk)}
+                    title={`+${atk.b} to hit, ${atk.dm}${atk.r ? `, range ${atk.r}` : ''}`}>
+                    ⚔️ {atk.n} (+{atk.b})
+                  </button>
+                ))}
+              </div>}
+
+              {/* Quick actions */}
+              <div className="fr gs">
+                <button className="btn bs" onClick={()=>{const r=rd(20),m=aMod(c.stats?.DEX||c.d||10);addMsg("roll",`${cName} rolls d20: ${r} ${ms(m)} = ${r+m}`);}}>🎲 d20</button>
+                {["STR","DEX","CON","INT","WIS","CHA"].map(ab=>(
+                  <button key={ab} className="btn bs" style={{padding:"2px 6px",fontSize:".6rem"}} onClick={()=>rollSave(i,ab)}>{ab} Save</button>
+                ))}
+              </div>
+            </div>}
+          </div>
+
+          {/* HP controls — always visible */}
+          <div className="fc gs" style={{alignItems:"center",minWidth:70}}>
+            <div className="fr gs">
+              <button className="btn bs bd" style={{padding:"2px 8px",fontSize:".7rem"}} onClick={()=>{
+                const d=prompt(`Damage to ${cName}:`);if(d&&parseInt(d)>0) dealDamage(i,parseInt(d));
+              }}>−HP</button>
+              <button className="btn bs" style={{padding:"2px 8px",fontSize:".7rem",borderColor:"var(--nat)",color:"#4a9a4a"}} onClick={()=>{
+                const h=prompt(`Heal ${cName}:`);if(h&&parseInt(h)>0) healTarget(i,parseInt(h));
+              }}>+HP</button>
+            </div>
+            {isDM && <button className="btn bs bg tx" style={{padding:"1px 4px",fontSize:".55rem"}} onClick={()=>removeCombatant(i)}>Remove</button>}
+          </div>
+        </div>;
+      })}
+    </div> : !live ? (
+      <div style={{padding:30}}>
+        <div className="tc td2 mb">
+          {chars.length === 0 && mons.length === 0
+            ? "Create characters and spawn monsters before starting combat."
+            : `Ready: ${chars.length} character${chars.length!==1?"s":""}, ${mons.length} monster${mons.length!==1?"s":""}`}
+        </div>
+        {chars.length > 0 && <div className="mb">
+          <label>Party</label>
+          <div className="fc gs mt">{chars.map(c => <div key={c.id} className="fr ts" style={{padding:"2px 6px"}}>
+            🛡️ <b>{c.name}</b> <span className="td2">— {c.race} {c.cls}, AC {c.ac}, {c.hp}/{c.mhp} HP, Init {ms(aMod(c.stats?.DEX||10))}</span>
+          </div>)}</div>
         </div>}
-      </div>;})}</div>
-    :<div className="tc td2" style={{padding:36}}>Add characters & monsters, then roll initiative.</div>}
+        {mons.length > 0 && <div>
+          <label>Monsters</label>
+          <div className="fc gs mt">{mons.map((m,i) => <div key={m.id||i} className="fr ts" style={{padding:"2px 6px"}}>
+            👹 <b>{m.n}</b> <span className="td2">— CR {m.cr}, AC {m.ac}, {m.hp} HP</span>
+            {m.atk && <span className="td2">| {m.atk.map(a=>`${a.n} +${a.b}`).join(", ")}</span>}
+          </div>)}</div>
+        </div>}
+      </div>
+    ) : null}
   </div>;
 }
 
@@ -1699,14 +1896,15 @@ export default function App() {
   const [mons,setMons]=useState([]);const [camp,setCamp]=useState(null);
   const [msgs,setMsgs]=useState([]);const [creating,setCreating]=useState(false);
   const [sceneData,setSceneData]=useState({sceneIdx:0,journal:[],choiceMade:false,waitingForDM:false,playerActions:[]});
+  const [combatState,setCombatState]=useState({combatants:[],turn:0,round:1,live:false});
   const stateVerRef = useRef(0); // version counter to detect changes
 
   const mp = useMultiplayer(sess);
 
   // Build the game state object (for sync)
   const getGameState = useCallback(() => ({
-    chars, mons, camp, msgs, sceneData, v: stateVerRef.current
-  }), [chars, mons, camp, msgs, sceneData]);
+    chars, mons, camp, msgs, sceneData, combatState, v: stateVerRef.current
+  }), [chars, mons, camp, msgs, sceneData, combatState]);
 
   // Apply received game state (players only)
   const applyGameState = useCallback((state) => {
@@ -1716,6 +1914,7 @@ export default function App() {
     if (state.camp !== undefined) setCamp(state.camp);
     if (state.msgs) setMsgs(state.msgs);
     if (state.sceneData) setSceneData(state.sceneData);
+    if (state.combatState) setCombatState(state.combatState);
   }, []);
 
   // Host: listen for player actions
@@ -1751,6 +1950,9 @@ export default function App() {
         case 'SCENE_UPDATE':
           setSceneData(action.payload);
           break;
+        case 'COMBAT_UPDATE':
+          setCombatState(action.payload);
+          break;
       }
     });
   }, [sess, mp]);
@@ -1769,7 +1971,7 @@ export default function App() {
       mp.broadcastState(getGameState());
     }, 50); // small debounce
     return () => clearTimeout(timer);
-  }, [chars, mons, camp, msgs, sceneData, sess, mp, getGameState]);
+  }, [chars, mons, camp, msgs, sceneData, combatState, sess, mp, getGameState]);
 
   // ── Synced action helpers ──
   // These either apply locally (host) or send to host (player)
@@ -1800,6 +2002,9 @@ export default function App() {
           break;
         case 'SCENE_UPDATE':
           setSceneData(action.payload);
+          break;
+        case 'COMBAT_UPDATE':
+          setCombatState(action.payload);
           break;
       }
     } else {
@@ -1871,7 +2076,7 @@ export default function App() {
             addMsg("system",`🛡️ ${ch.name} the ${ch.race} ${ch.cls} joins!`);
           }}/>}
 
-          {page==="combat"&&<Combat chars={chars} mons={mons}/>}
+          {page==="combat"&&<Combat chars={chars} mons={mons} syncAction={syncAction} isDM={isDM} combatState={combatState}/>}
           {page==="map"&&<BattleMap chars={chars} mons={mons}/>}
           {page==="dm"&&isDM&&<DMTools mons={mons} setMons={newMons=>{
             if(typeof newMons==='function'){setMons(p=>{const next=newMons(p);syncAction({type:'SET_MONSTERS',payload:next});return next;});}
