@@ -1210,20 +1210,20 @@ function Lobby({onJoin}) {
     @keyframes crest-pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.15);opacity:.6}}
 
     .lobby-title{font-family:'Cinzel Decorative',serif;font-size:2.6rem;font-weight:900;line-height:1.1;
-      color:var(--gold);letter-spacing:.04em;
+      color:#c9a84c;letter-spacing:.04em;
       text-shadow:0 0 30px rgba(201,168,76,.25),0 2px 0 rgba(0,0,0,.5);
       opacity:0;transform:translateY(16px);transition:all .8s ease-out .6s}
     .lobby-title.show{opacity:1;transform:translateY(0)}
     .lobby-sub{font-family:'Cinzel',serif;font-size:.95rem;font-weight:600;letter-spacing:.2em;text-transform:uppercase;
-      color:var(--goldd);margin-top:6px;
+      color:#8a7234;margin-top:6px;
       opacity:0;transform:translateY(10px);transition:all .7s ease-out .9s}
     .lobby-sub.show{opacity:1;transform:translateY(0)}
 
     .lobby-divider{display:flex;align-items:center;gap:16px;margin:20px auto;max-width:340;
       opacity:0;transition:opacity .6s 1.1s}
     .lobby-divider.show{opacity:1}
-    .lobby-divider .ld-line{flex:1;height:1px;background:linear-gradient(90deg,transparent,var(--goldd),transparent)}
-    .lobby-divider .ld-gem{width:8px;height:8px;background:var(--gold);transform:rotate(45deg);box-shadow:0 0 10px rgba(201,168,76,.4);flex-shrink:0}
+    .lobby-divider .ld-line{flex:1;height:1px;background:linear-gradient(90deg,transparent,#8a7234,transparent)}
+    .lobby-divider .ld-gem{width:8px;height:8px;background:#c9a84c;transform:rotate(45deg);box-shadow:0 0 10px rgba(201,168,76,.4);flex-shrink:0}
 
     /* ── Form Panel ── */
     .lobby-panel{
@@ -1239,12 +1239,12 @@ function Lobby({onJoin}) {
       background:radial-gradient(ellipse at 50% 0%,rgba(201,168,76,.03),transparent 60%)}
 
     .lobby-input{font-family:'Crimson Text',serif;font-size:1.05rem;background:rgba(0,0,0,.35);
-      border:1px solid rgba(201,168,76,.15);color:var(--ink);padding:12px 16px;border-radius:6px;
+      border:1px solid rgba(201,168,76,.15);color:#e8dcc8;padding:12px 16px;border-radius:6px;
       outline:none;transition:all .3s;width:100%}
     .lobby-input:focus{border-color:rgba(201,168,76,.5);box-shadow:0 0 16px rgba(201,168,76,.08);background:rgba(0,0,0,.45)}
     .lobby-input::placeholder{color:rgba(154,142,122,.5)}
 
-    .lobby-label{font-family:'Cinzel',serif;font-size:.7rem;font-weight:600;color:var(--goldd);
+    .lobby-label{font-family:'Cinzel',serif;font-size:.7rem;font-weight:600;color:#8a7234;
       text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px;display:block}
 
     /* ── Role Selector ── */
@@ -1252,17 +1252,17 @@ function Lobby({onJoin}) {
     .role-card{position:relative;padding:16px 12px;border:1px solid rgba(201,168,76,.15);border-radius:6px;
       background:rgba(0,0,0,.25);cursor:pointer;transition:all .3s;text-align:center;overflow:hidden}
     .role-card:hover{border-color:rgba(201,168,76,.35);background:rgba(201,168,76,.04)}
-    .role-card.active{border-color:var(--gold);background:rgba(201,168,76,.08);
+    .role-card.active{border-color:#c9a84c;background:rgba(201,168,76,.08);
       box-shadow:0 0 20px rgba(201,168,76,.1),inset 0 0 20px rgba(201,168,76,.03)}
     .role-card.active::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;
-      background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+      background:linear-gradient(90deg,transparent,#c9a84c,transparent)}
     .role-icon{font-size:2rem;margin-bottom:6px;display:block;
       filter:drop-shadow(0 2px 8px rgba(0,0,0,.4));transition:transform .3s}
     .role-card:hover .role-icon{transform:scale(1.1)}
     .role-card.active .role-icon{transform:scale(1.15);filter:drop-shadow(0 0 12px rgba(201,168,76,.3))}
-    .role-name{font-family:'Cinzel',serif;font-size:.85rem;font-weight:700;color:var(--ink);letter-spacing:.06em}
-    .role-desc{font-size:.72rem;color:var(--inkd);margin-top:2px}
-    .role-card.active .role-name{color:var(--gold)}
+    .role-name{font-family:'Cinzel',serif;font-size:.85rem;font-weight:700;color:#e8dcc8;letter-spacing:.06em}
+    .role-desc{font-size:.72rem;color:#9a8e7a;margin-top:2px}
+    .role-card.active .role-name{color:#c9a84c}
 
     /* ── Action Buttons ── */
     .lobby-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:20px}
@@ -1274,24 +1274,24 @@ function Lobby({onJoin}) {
     .lobby-btn:hover::before{opacity:1}
     .lobby-btn:active{transform:scale(.97)}
     .lobby-btn-primary{background:linear-gradient(180deg,#d4b04e,#9a7a34);color:#0a0908;
-      border:1px solid var(--gold);box-shadow:0 4px 20px rgba(201,168,76,.25),inset 0 1px 0 rgba(255,255,255,.15)}
+      border:1px solid #c9a84c;box-shadow:0 4px 20px rgba(201,168,76,.25),inset 0 1px 0 rgba(255,255,255,.15)}
     .lobby-btn-primary:hover{background:linear-gradient(180deg,#e8c84c,#b8943e);
       box-shadow:0 6px 30px rgba(201,168,76,.35),inset 0 1px 0 rgba(255,255,255,.2);transform:translateY(-1px)}
     .lobby-btn-primary:disabled{opacity:.4;cursor:not-allowed;transform:none;box-shadow:none}
-    .lobby-btn-secondary{background:rgba(0,0,0,.3);color:var(--gold);
+    .lobby-btn-secondary{background:rgba(0,0,0,.3);color:#c9a84c;
       border:1px solid rgba(201,168,76,.25);box-shadow:0 4px 12px rgba(0,0,0,.2)}
     .lobby-btn-secondary:hover{border-color:rgba(201,168,76,.5);background:rgba(201,168,76,.06);
       box-shadow:0 6px 20px rgba(0,0,0,.3);transform:translateY(-1px)}
     .lobby-btn-secondary:disabled{opacity:.4;cursor:not-allowed;transform:none}
     .lobby-btn-full{grid-column:1/-1;font-size:1.1rem;padding:18px 24px;letter-spacing:.1em}
-    .lobby-btn-back{font-family:'Cinzel',serif;font-size:.75rem;font-weight:600;color:var(--inkd);
+    .lobby-btn-back{font-family:'Cinzel',serif;font-size:.75rem;font-weight:600;color:#9a8e7a;
       background:none;border:none;cursor:pointer;padding:8px;transition:color .2s;margin-top:8px}
-    .lobby-btn-back:hover{color:var(--gold)}
+    .lobby-btn-back:hover{color:#c9a84c}
 
     .lobby-code-input{font-family:'Cinzel',serif;font-size:1.8rem;font-weight:900;text-align:center;
       letter-spacing:.4em;padding:16px;background:rgba(0,0,0,.4);border:1px solid rgba(201,168,76,.2);
-      color:var(--goldb);border-radius:6px;outline:none;width:100%;transition:all .3s}
-    .lobby-code-input:focus{border-color:var(--gold);box-shadow:0 0 24px rgba(201,168,76,.12)}
+      color:#e8c84c;border-radius:6px;outline:none;width:100%;transition:all .3s}
+    .lobby-code-input:focus{border-color:#c9a84c;box-shadow:0 0 24px rgba(201,168,76,.12)}
     .lobby-code-input::placeholder{color:rgba(154,142,122,.3);letter-spacing:.3em;font-size:1.2rem}
 
     .lobby-footer{text-align:center;margin-top:28px;
@@ -1356,7 +1356,7 @@ function Lobby({onJoin}) {
         const rad = angle * Math.PI / 180;
         const x = 100 + 82 * Math.cos(rad - Math.PI/2);
         const y = 100 + 82 * Math.sin(rad - Math.PI/2);
-        return <circle key={angle} cx={x} cy={y} r="2" fill="var(--gold)" opacity=".5"/>;
+        return <circle key={angle} cx={x} cy={y} r="2" fill="#c9a84c" opacity=".5"/>;
       })}
     </svg>
   );
@@ -1438,7 +1438,7 @@ function Lobby({onJoin}) {
 
             {mode==="create" && (
               <div style={{animation:"fu .3s ease-out",textAlign:"center"}}>
-                <div style={{color:"var(--inkd)",fontSize:".85rem",marginBottom:14}}>
+                <div style={{color:"#9a8e7a",fontSize:".85rem",marginBottom:14}}>
                   A room code will be generated for your party to join
                 </div>
                 <button className="lobby-btn lobby-btn-primary lobby-btn-full"
