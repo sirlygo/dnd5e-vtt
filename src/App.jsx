@@ -1124,15 +1124,264 @@ function Lobby({onJoin}) {
 }
 
 // ═══════════════════════════════════════════════════════════
-// MAIN APP
+// MULTIPLAYER SYNC via PeerJS (WebRTC P2P)
+// Host = source of truth. Players send actions, host broadcasts state.
+// ═══════════════════════════════════════════════════════════
+function useMultiplayer(sess) {
+  const peerRef = useRef(null);
+  const connsRef = useRef([]); // host: list of connections to players
+  const hostConnRef = useRef(null); // player: connection to host
+  const [connected, setConnected] = useState(false);
+  const [players, setPlayers] = useState([]);
+  const [error, setError] = useState(null);
+  const onStateRef = useRef(null); // callback when state received from host
+  const onActionRef = useRef(null); // callback when action received from player (host only)
+
+  useEffect(() => {
+    if (!sess) return;
+    // Dynamic import peerjs
+    let destroyed = false;
+    import('peerjs').then(({ default: Peer }) => {
+      if (destroyed) return;
+      const peerId = sess.host
+        ? `dnd5e-${sess.rc}` // host uses deterministic ID
+        : `dnd5e-${sess.rc}-${uid()}`; // players use random suffix
+
+      const peer = new Peer(peerId, {
+        debug: 0,
+        config: {
+          iceServers: [
+            { urls: 'stun:stun.l.google.com:19302' },
+            { urls: 'stun:stun1.l.google.com:19302' }
+          ]
+        }
+      });
+      peerRef.current = peer;
+
+      peer.on('open', (id) => {
+        console.log('[Peer] Open:', id);
+        if (sess.host) {
+          // Host is ready, listen for connections
+          setConnected(true);
+          setPlayers([{ name: sess.name, role: sess.role }]);
+        } else {
+          // Player connects to host
+          const conn = peer.connect(`dnd5e-${sess.rc}`, { reliable: true });
+          hostConnRef.current = conn;
+
+          conn.on('open', () => {
+            console.log('[Peer] Connected to host');
+            setConnected(true);
+            // Send join message
+            conn.send({ type: 'JOIN', payload: { name: sess.name, role: sess.role } });
+          });
+
+          conn.on('data', (data) => {
+            if (data.type === 'STATE' && onStateRef.current) {
+              onStateRef.current(data.payload);
+            }
+            if (data.type === 'PLAYERS') {
+              setPlayers(data.payload);
+            }
+          });
+
+          conn.on('close', () => { setConnected(false); setError('Disconnected from host'); });
+          conn.on('error', (err) => setError(`Connection error: ${err.message}`));
+        }
+      });
+
+      if (sess.host) {
+        peer.on('connection', (conn) => {
+          console.log('[Host] Player connecting...');
+          conn.on('open', () => {
+            connsRef.current = [...connsRef.current, conn];
+            console.log('[Host] Player connected, total:', connsRef.current.length);
+          });
+
+          conn.on('data', (data) => {
+            if (data.type === 'JOIN') {
+              setPlayers(prev => {
+                const next = [...prev.filter(p => p.name !== data.payload.name), data.payload];
+                // Broadcast updated player list
+                broadcast({ type: 'PLAYERS', payload: next });
+                return next;
+              });
+            }
+            if (data.type === 'ACTION' && onActionRef.current) {
+              onActionRef.current(data.payload);
+            }
+          });
+
+          conn.on('close', () => {
+            connsRef.current = connsRef.current.filter(c => c !== conn);
+            console.log('[Host] Player disconnected, remaining:', connsRef.current.length);
+          });
+        });
+      }
+
+      peer.on('error', (err) => {
+        console.error('[Peer] Error:', err);
+        if (err.type === 'peer-unavailable') {
+          setError('Room not found. Check the code or ask the host to create the room first.');
+        } else if (err.type === 'unavailable-id') {
+          setError('Room code already in use. Try a different code.');
+        } else {
+          setError(`Connection error: ${err.type}`);
+        }
+      });
+    });
+
+    return () => {
+      destroyed = true;
+      connsRef.current.forEach(c => c.close());
+      connsRef.current = [];
+      if (hostConnRef.current) hostConnRef.current.close();
+      if (peerRef.current) peerRef.current.destroy();
+    };
+  }, [sess]);
+
+  const broadcast = useCallback((data) => {
+    connsRef.current.forEach(conn => {
+      if (conn.open) {
+        try { conn.send(data); } catch (e) { console.warn('Send error:', e); }
+      }
+    });
+  }, []);
+
+  const broadcastState = useCallback((state) => {
+    broadcast({ type: 'STATE', payload: state });
+  }, [broadcast]);
+
+  const sendAction = useCallback((action) => {
+    // Player sends action to host
+    if (hostConnRef.current && hostConnRef.current.open) {
+      hostConnRef.current.send({ type: 'ACTION', payload: action });
+    }
+  }, []);
+
+  return {
+    connected, players, error, broadcastState, sendAction, broadcast,
+    onState: (fn) => { onStateRef.current = fn; },
+    onAction: (fn) => { onActionRef.current = fn; },
+    isHost: sess?.host || false,
+    peerCount: connsRef.current.length
+  };
+}
+
+// ═══════════════════════════════════════════════════════════
+// MAIN APP — with multiplayer sync
 // ═══════════════════════════════════════════════════════════
 export default function App() {
   const [sess,setSess]=useState(null);const [page,setPage]=useState("campaign");
   const [chars,setChars]=useState([]);const [aCh,setACh]=useState(0);
   const [mons,setMons]=useState([]);const [camp,setCamp]=useState(null);
   const [msgs,setMsgs]=useState([]);const [creating,setCreating]=useState(false);
+  const stateVerRef = useRef(0); // version counter to detect changes
 
-  const addMsg=useCallback((t,tx,extra={})=>setMsgs(p=>[...p,{t,tx,s:sess?.name,...extra,ts:Date.now()}]),[sess]);
+  const mp = useMultiplayer(sess);
+
+  // Build the game state object (for sync)
+  const getGameState = useCallback(() => ({
+    chars, mons, camp, msgs, v: stateVerRef.current
+  }), [chars, mons, camp, msgs]);
+
+  // Apply received game state (players only)
+  const applyGameState = useCallback((state) => {
+    if (!state) return;
+    if (state.chars) setChars(state.chars);
+    if (state.mons !== undefined) setMons(state.mons);
+    if (state.camp !== undefined) setCamp(state.camp);
+    if (state.msgs) setMsgs(state.msgs);
+  }, []);
+
+  // Host: listen for player actions
+  useEffect(() => {
+    if (!sess?.host) return;
+    mp.onAction((action) => {
+      console.log('[Host] Action:', action.type);
+      switch (action.type) {
+        case 'ADD_CHAR':
+          setChars(p => [...p, action.payload]);
+          setMsgs(p => [...p, {t:"system",tx:`🛡️ ${action.payload.name} the ${action.payload.race} ${action.payload.cls} joins!`,s:"System",ts:Date.now()}]);
+          break;
+        case 'UPDATE_CHAR':
+          setChars(p => p.map(c => c.id === action.payload.id ? action.payload : c));
+          break;
+        case 'CHAT':
+          setMsgs(p => [...p, action.payload]);
+          break;
+        case 'SET_CAMPAIGN':
+          setCamp(action.payload);
+          setMsgs(p => [...p, {t:"system",tx:`📜 Campaign: ${action.payload.n}`,s:"System",ts:Date.now()}]);
+          break;
+        case 'ADD_MONSTER':
+          setMons(p => [...p, action.payload]);
+          break;
+        case 'REMOVE_MONSTER':
+          setMons(p => p.filter((_, i) => i !== action.payload));
+          break;
+        case 'SET_MONSTERS':
+          setMons(action.payload);
+          break;
+      }
+    });
+  }, [sess, mp]);
+
+  // Player: listen for state from host
+  useEffect(() => {
+    if (sess?.host) return;
+    mp.onState(applyGameState);
+  }, [sess, mp, applyGameState]);
+
+  // Host: broadcast state whenever it changes
+  useEffect(() => {
+    if (!sess?.host || !mp.connected) return;
+    stateVerRef.current++;
+    const timer = setTimeout(() => {
+      mp.broadcastState(getGameState());
+    }, 50); // small debounce
+    return () => clearTimeout(timer);
+  }, [chars, mons, camp, msgs, sess, mp, getGameState]);
+
+  // ── Synced action helpers ──
+  // These either apply locally (host) or send to host (player)
+  const syncAction = useCallback((action) => {
+    if (sess?.host) {
+      // Host applies directly
+      switch (action.type) {
+        case 'ADD_CHAR':
+          setChars(p => [...p, action.payload]);
+          break;
+        case 'UPDATE_CHAR':
+          setChars(p => p.map(c => c.id === action.payload.id ? action.payload : c));
+          break;
+        case 'CHAT':
+          setMsgs(p => [...p, action.payload]);
+          break;
+        case 'SET_CAMPAIGN':
+          setCamp(action.payload);
+          break;
+        case 'ADD_MONSTER':
+          setMons(p => [...p, action.payload]);
+          break;
+        case 'REMOVE_MONSTER':
+          setMons(p => p.filter((_, i) => i !== action.payload));
+          break;
+        case 'SET_MONSTERS':
+          setMons(action.payload);
+          break;
+      }
+    } else {
+      // Player sends to host
+      mp.sendAction(action);
+    }
+  }, [sess, mp]);
+
+  const addMsg=useCallback((t,tx,extra={})=>{
+    const msg = {t,tx,s:sess?.name,...extra,ts:Date.now()};
+    syncAction({type:'CHAT', payload: msg});
+  },[sess,syncAction]);
+
   const ctx=useMemo(()=>({sess,addMsg,pn:sess?.name||"Player"}),[sess,addMsg]);
 
   if(!sess) return <Lobby onJoin={setSess}/>;
@@ -1144,32 +1393,57 @@ export default function App() {
     <div className="nav"><div className="fr gs">
       <span style={{fontFamily:"Cinzel Decorative",fontWeight:700,color:"var(--gold)",fontSize:".95rem"}}>⚔️ D&D 5e</span>
       <span className="bdg bdg-g">{sess.rc}</span><span className="td2 tx">{sess.name} • {isDM?"DM":"Player"}</span>
+      {/* Connection status */}
+      <span className="bdg" style={{
+        background: mp.connected ? 'rgba(58,138,74,.15)' : 'rgba(139,26,26,.15)',
+        color: mp.connected ? '#4a9a4a' : 'var(--redb)',
+        border: `1px solid ${mp.connected ? 'rgba(58,138,74,.3)' : 'rgba(139,26,26,.3)'}`
+      }}>
+        {mp.connected ? `● ${mp.players.length} online` : '○ connecting...'}
+      </span>
     </div><div className="fr gs" style={{flexWrap:"wrap"}}>
       {nav.map(n=><button key={n.k} className={`nb ${page===n.k?"a":""}`} onClick={()=>setPage(n.k)}>{n.i} {n.l}</button>)}
     </div><button className="btn bs bd" onClick={()=>setSess(null)}>Leave</button></div>
 
+    {/* Connection error banner */}
+    {mp.error && <div style={{background:'rgba(139,26,26,.2)',borderBottom:'1px solid rgba(139,26,26,.3)',padding:'8px 16px',textAlign:'center',fontSize:'.85rem',color:'var(--redb)'}}>
+      ⚠️ {mp.error}
+    </div>}
+
     <div className="container" style={{maxWidth:1360,margin:"0 auto",padding:"16px 14px 40px"}}>
       <div className="lay" style={{display:"grid",gridTemplateColumns:"1fr 320px",gap:16}}>
         <div>
-          {page==="campaign"&&!camp&&<CampSel onSel={c=>{setCamp(c);addMsg("system",`📜 Campaign: ${c.n}`);}}/>}
+          {page==="campaign"&&!camp&&<CampSel onSel={c=>{
+            syncAction({type:'SET_CAMPAIGN', payload: c});
+            addMsg("system",`📜 Campaign: ${c.n}`);
+          }}/>}
           {page==="campaign"&&camp&&<div className="pnl afu"><h2>{camp.n}</h2><span className="bdg bdg-g">{camp.lv}</span><div className="dv"/><div className="ts">{camp.d}</div><div className="dv"/>
             <div style={{padding:14,background:"rgba(0,0,0,.15)",borderRadius:4,borderLeft:"3px solid var(--gold)",fontStyle:"italic"}}>{camp.h}</div>
-            <button className="btn bs ml" onClick={()=>setCamp(null)}>Change</button></div>}
+            {isDM&&<button className="btn bs ml" onClick={()=>syncAction({type:'SET_CAMPAIGN',payload:null})}>Change</button>}</div>}
 
           {page==="characters"&&!creating&&<div className="afu">
-            <div className="fb mb"><h2>Characters</h2><button className="btn bp" onClick={()=>setCreating(true)}>+ New</button></div>
+            <div className="fb mb"><h2>Characters ({chars.length})</h2><button className="btn bp" onClick={()=>setCreating(true)}>+ New</button></div>
             {chars.length>0?<div>{chars.length>1&&<div className="fr mb">{chars.map((c,i)=><button key={c.id} className={`btn bs ${aCh===i?"bp":""}`} onClick={()=>setACh(i)}>{c.name||`Char ${i+1}`}</button>)}</div>}
-              <CharSheet ch={chars[aCh]} onUp={u=>setChars(p=>p.map((c,i)=>i===aCh?u:c))}/></div>
+              <CharSheet ch={chars[aCh]} onUp={u=>{
+                syncAction({type:'UPDATE_CHAR', payload: u});
+              }}/></div>
             :<div className="pnl tc" style={{padding:50}}>
               <div style={{fontSize:"2.5rem",marginBottom:12}}>🛡️</div><h3>No Characters</h3>
               <div className="td2 mt mb">Create your first character.</div>
               <button className="btn bp bl" onClick={()=>setCreating(true)}>⚔️ Create Character</button></div>}
           </div>}
-          {page==="characters"&&creating&&<CharCreate onDone={ch=>{setChars(p=>[...p,ch]);setACh(chars.length);setCreating(false);addMsg("system",`🛡️ ${ch.name} the ${ch.race} ${ch.cls} joins!`);}}/>}
+          {page==="characters"&&creating&&<CharCreate onDone={ch=>{
+            syncAction({type:'ADD_CHAR', payload: ch});
+            setACh(chars.length);setCreating(false);
+            addMsg("system",`🛡️ ${ch.name} the ${ch.race} ${ch.cls} joins!`);
+          }}/>}
 
           {page==="combat"&&<Combat chars={chars} mons={mons}/>}
           {page==="map"&&<BattleMap chars={chars} mons={mons}/>}
-          {page==="dm"&&isDM&&<DMTools mons={mons} setMons={setMons} camp={camp}/>}
+          {page==="dm"&&isDM&&<DMTools mons={mons} setMons={newMons=>{
+            if(typeof newMons==='function'){setMons(p=>{const next=newMons(p);syncAction({type:'SET_MONSTERS',payload:next});return next;});}
+            else syncAction({type:'SET_MONSTERS',payload:newMons});
+          }} camp={camp}/>}
           {page==="spells"&&<SpellRef/>}
           {page==="dice"&&<div style={{maxWidth:480,margin:"0 auto"}}><DiceRoller/></div>}
         </div>
