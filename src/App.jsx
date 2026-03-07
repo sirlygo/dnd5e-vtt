@@ -165,33 +165,33 @@ const ITEMS = [
 const CAMPAIGNS = [
   {n:"Lost Mine of Phandelver",lv:"1-5",d:"Classic starter adventure. Explore the Sword Coast, investigate a missing dwarven mine, face the Black Spider.",h:"You were hired by Gundren Rockseeker to escort a wagon of supplies to Phandalin. But Gundren and his bodyguard have gone missing...",
     scenes:[
-      {t:"The Road to Phandalin",narr:"You have been traveling south along the High Road from Neverwinter for about half a day when you come upon a pair of dead horses sprawled across the path. Black-feathered arrows pepper their sides. The saddlebags have been looted, and nearby lies an empty leather map case. A trail of broken twigs and disturbed leaves leads into the thick woods to the north.",
+      {t:"The Road to Phandalin",map:{t:"road",r:[{x:0,y:6,w:30,h:6}],c:[],f:[{x:3,y:8,t:"🐴",l:"Dead Horse"},{x:5,y:8,t:"🐴",l:"Dead Horse"},{x:4,y:6,t:"📦",l:"Looted Wagon"},{x:12,y:4,t:"🌲"},{x:13,y:3,t:"🌲"},{x:14,y:5,t:"🌲"},{x:11,y:3,t:"🌲"},{x:15,y:3,t:"🌲"},{x:16,y:4,t:"🌲"},{x:12,y:10,t:"🌲"},{x:14,y:11,t:"🌲"},{x:13,y:12,t:"🌲"},{x:11,y:11,t:"🌲"},{x:8,y:3,t:"🌲"},{x:9,y:4,t:"🌲"},{x:7,y:2,t:"🌲"},{x:18,y:4,t:"🌲"},{x:19,y:3,t:"🌲"},{x:20,y:5,t:"🌲"},{x:8,y:11,t:"🌲"},{x:9,y:12,t:"🌲"},{x:7,y:10,t:"🌲"},{x:18,y:11,t:"🌲"},{x:19,y:12,t:"🌲"},{x:20,y:10,t:"🌲"}],pc:{x:1,y:8},mn:{x:14,y:7},nm:"Triboar Trail"},narr:"You have been traveling south along the High Road from Neverwinter for about half a day when you come upon a pair of dead horses sprawled across the path. Black-feathered arrows pepper their sides. The saddlebags have been looted, and nearby lies an empty leather map case. A trail of broken twigs and disturbed leaves leads into the thick woods to the north.",
         choices:["Investigate the dead horses","Follow the trail into the woods","Continue past to Phandalin","Search the surrounding area"],
         encounter:{monsters:["Goblin","Goblin","Goblin","Goblin"],trigger:"trail"},
         notes:"Goblin Ambush. 4 goblins hide in the woods. DC 10 Perception to spot them before they attack."},
-      {t:"Goblin Trail",narr:"The trail leads through dense, dark forest. After about 15 minutes of walking, you spot a small cave entrance partially hidden by a thicket. A shallow stream flows from the cave mouth. Goblin tracks are everywhere in the mud.",
+      {t:"Goblin Trail",map:{t:"cave",r:[{x:1,y:6,w:4,h:4},{x:8,y:4,w:6,h:6},{x:18,y:3,w:6,h:8},{x:20,y:12,w:4,h:4}],c:[[5,8,8,8],[14,7,18,7],[22,11,22,12]],f:[{x:2,y:10,t:"💧",l:"Stream"},{x:3,y:10,t:"💧"},{x:9,y:10,t:"💧"},{x:10,y:10,t:"💧"},{x:6,y:8,t:"⚠️",l:"Snare Trap"},{x:19,y:5,t:"🔥",l:"Campfire"},{x:21,y:13,t:"⛓️",l:"Sildar (prisoner)"}],pc:{x:1,y:8},mn:{x:10,y:6},nm:"Cragmaw Hideout Entrance"},narr:"The trail leads through dense, dark forest. After about 15 minutes of walking, you spot a small cave entrance partially hidden by a thicket. A shallow stream flows from the cave mouth. Goblin tracks are everywhere in the mud.",
         choices:["Enter the cave carefully","Set up an ambush outside","Scout around the cave","Send a scout ahead stealthily"],
         encounter:{monsters:["Goblin","Goblin","Goblin","Wolf","Wolf"],trigger:"cave"},
         notes:"Cragmaw Hideout. Traps: snare at entrance (DC 12 Perception), flood trap in stream passage."},
-      {t:"Cragmaw Hideout",narr:"Inside the cave, the stream runs along a low-ceilinged passage. You hear goblin voices echoing from deeper within. In a side chamber, you find Sildar Hallwinter — Gundren's bodyguard — bound and beaten but alive. He gasps: 'They took Gundren to Cragmaw Castle... a place called Wave Echo Cave... the Black Spider wants it...'",
+      {t:"Cragmaw Hideout",map:{t:"cave",r:[{x:1,y:1,w:5,h:5},{x:9,y:1,w:7,h:4},{x:1,y:8,w:6,h:5},{x:10,y:7,w:6,h:6},{x:19,y:2,w:5,h:5},{x:19,y:9,w:5,h:5}],c:[[6,3,9,3],[6,10,10,10],[16,4,19,4],[16,10,19,10]],f:[{x:3,y:2,t:"💧",l:"Pool"},{x:11,y:2,t:"📦",l:"Supplies"},{x:20,y:4,t:"👑",l:"Klarg (Bugbear)"},{x:2,y:10,t:"⛓️",l:"Sildar"},{x:21,y:11,t:"🔥",l:"Fire Pit"},{x:12,y:9,t:"🪨",l:"Stalagmite"},{x:14,y:8,t:"🪨"}],pc:{x:1,y:3},mn:{x:20,y:3},nm:"Cragmaw Hideout Interior"},narr:"Inside the cave, the stream runs along a low-ceilinged passage. You hear goblin voices echoing from deeper within. In a side chamber, you find Sildar Hallwinter — Gundren's bodyguard — bound and beaten but alive. He gasps: 'They took Gundren to Cragmaw Castle... a place called Wave Echo Cave... the Black Spider wants it...'",
         choices:["Free Sildar and press deeper","Free Sildar and retreat to Phandalin","Interrogate the goblins","Search for loot before moving on"],
         notes:"Sildar has 1 HP. Healing him earns his gratitude and info about Cragmaw Castle."},
-      {t:"Arrival in Phandalin",narr:"Phandalin is a frontier town of simple stone buildings and wooden storefronts. The townsfolk eye you warily — they've been terrorized by a gang of ruffians called the Redbrands, led by a mysterious figure called Glasstaff. Sister Garaele at the shrine, Linene at the Lionshield Coster, and Toblen at the Stonehill Inn all have problems that need solving.",
+      {t:"Arrival in Phandalin",map:{t:"town",r:[{x:1,y:1,w:6,h:4},{x:9,y:1,w:5,h:4},{x:16,y:1,w:6,h:4},{x:1,y:8,w:5,h:4},{x:8,y:7,w:7,h:5},{x:18,y:8,w:5,h:4},{x:3,y:14,w:5,h:3},{x:11,y:14,w:6,h:3},{x:20,y:14,w:3,h:3}],c:[[7,3,9,3],[14,3,16,3],[5,5,5,8],[15,9,18,9],[6,12,8,12],[15,12,18,12],[8,15,11,15],[17,15,20,15]],f:[{x:3,y:2,t:"🏠",l:"Stonehill Inn"},{x:11,y:2,t:"⛪",l:"Shrine of Luck"},{x:18,y:2,t:"🏪",l:"Lionshield Coster"},{x:3,y:9,t:"🏚️",l:"Sleeping Giant"},{x:11,y:9,t:"🏛️",l:"Townmaster Hall"},{x:19,y:9,t:"⛏️",l:"Miner Exchange"},{x:5,y:15,t:"🏚️",l:"Tresendar Manor"},{x:13,y:15,t:"🏠",l:"Edermath Orchard"},{x:21,y:15,t:"🛒",l:"Barthen Provisions"}],pc:{x:7,y:5},mn:{x:3,y:9},nm:"Town of Phandalin"},narr:"Phandalin is a frontier town of simple stone buildings and wooden storefronts. The townsfolk eye you warily — they've been terrorized by a gang of ruffians called the Redbrands, led by a mysterious figure called Glasstaff. Sister Garaele at the shrine, Linene at the Lionshield Coster, and Toblen at the Stonehill Inn all have problems that need solving.",
         choices:["Visit the Stonehill Inn for rumors","Confront the Redbrands at the Sleeping Giant","Speak with Sister Garaele","Explore the Tresendar Manor ruins"],
         notes:"Multiple quest hooks here. Let players explore freely. Redbrands patrol the town."},
-      {t:"Tresendar Manor - Redbrand Hideout",narr:"Beneath the ruins of Tresendar Manor lies a hidden dungeon. The Redbrands use it as their base. A secret entrance leads into cellars where you hear rough laughter and the clink of dice. The air smells of stale ale and unwashed brigands.",
+      {t:"Tresendar Manor - Redbrand Hideout",map:{t:"dungeon",r:[{x:1,y:1,w:5,h:4},{x:8,y:1,w:5,h:4},{x:16,y:1,w:7,h:5},{x:1,y:7,w:6,h:5},{x:10,y:7,w:5,h:4},{x:18,y:8,w:5,h:5},{x:2,y:14,w:7,h:3},{x:12,y:13,w:5,h:4},{x:20,y:14,w:3,h:3}],c:[[6,3,8,3],[13,3,16,3],[5,5,5,7],[13,5,13,7],[15,9,18,9],[7,9,10,9],[7,12,7,14],[17,15,20,15]],f:[{x:2,y:2,t:"📦",l:"Storage"},{x:10,y:2,t:"⚗️",l:"Lab"},{x:18,y:3,t:"🧙",l:"Glasstaff Office"},{x:3,y:9,t:"⛓️",l:"Prison Cells"},{x:11,y:8,t:"⚔️",l:"Armory"},{x:20,y:10,t:"👁️",l:"Secret Room"},{x:4,y:15,t:"🪦",l:"Crypt"},{x:14,y:14,t:"🕳️",l:"Crevasse"},{x:21,y:15,t:"📜",l:"Maps"}],pc:{x:1,y:3},mn:{x:18,y:3},nm:"Redbrand Hideout"},narr:"Beneath the ruins of Tresendar Manor lies a hidden dungeon. The Redbrands use it as their base. A secret entrance leads into cellars where you hear rough laughter and the clink of dice. The air smells of stale ale and unwashed brigands.",
         choices:["Storm the front entrance","Use the secret tunnel","Try to bluff your way in","Scout and plan a strategy"],
         encounter:{monsters:["Bandit","Bandit","Bandit","Bandit"],trigger:"enter"},
         notes:"Glasstaff is Iarno Albrek, a wizard. He has Gundren's map to Wave Echo Cave."},
-      {t:"Cragmaw Castle",narr:"After days of travel through the wilderness, you reach Cragmaw Castle — a crumbling ruin occupied by a tribe of goblins and their bugbear king, King Grol. Gundren Rockseeker is held somewhere inside. The castle has multiple entry points: a collapsed wall to the south, a main gate, and arrow slits in the towers.",
+      {t:"Cragmaw Castle",map:{t:"castle",r:[{x:2,y:1,w:8,h:5},{x:13,y:1,w:9,h:5},{x:1,y:8,w:6,h:5},{x:9,y:7,w:6,h:6},{x:18,y:7,w:5,h:6},{x:4,y:15,w:7,h:3},{x:14,y:14,w:8,h:4}],c:[[10,3,13,3],[6,5,6,8],[15,5,15,7],[14,10,18,10],[7,13,9,13],[11,13,14,16]],f:[{x:5,y:3,t:"🚪",l:"Main Gate"},{x:15,y:3,t:"🏰",l:"Tower"},{x:20,y:3,t:"🏰",l:"Tower"},{x:3,y:10,t:"🛏️",l:"Barracks"},{x:11,y:9,t:"👑",l:"King Grol"},{x:19,y:9,t:"⛓️",l:"Gundren"},{x:7,y:16,t:"🍖",l:"Kitchen"},{x:17,y:16,t:"🏚️",l:"Collapsed Section"},{x:22,y:3,t:"🪨",l:"Rubble"}],pc:{x:5,y:5},mn:{x:11,y:9},nm:"Cragmaw Castle"},narr:"After days of travel through the wilderness, you reach Cragmaw Castle — a crumbling ruin occupied by a tribe of goblins and their bugbear king, King Grol. Gundren Rockseeker is held somewhere inside. The castle has multiple entry points: a collapsed wall to the south, a main gate, and arrow slits in the towers.",
         choices:["Assault the main gate","Sneak through the collapsed wall","Climb to the arrow slits","Try to negotiate with the goblins"],
         encounter:{monsters:["Goblin","Goblin","Goblin","Goblin","Orc","Orc"],trigger:"enter"},
         notes:"King Grol has Gundren and the map. Doppelganger disguised as a female drow is here."},
-      {t:"Wave Echo Cave",narr:"The entrance to Wave Echo Cave is a narrow tunnel that opens into vast natural caverns. The rhythmic boom of waves crashing against subterranean rocks echoes through the darkness. Ancient dwarven and gnomish mining equipment lies scattered about. Somewhere in these depths, the Black Spider seeks the legendary Forge of Spells.",
+      {t:"Wave Echo Cave",map:{t:"cave",r:[{x:1,y:1,w:5,h:4},{x:8,y:1,w:7,h:5},{x:18,y:1,w:5,h:4},{x:1,y:7,w:4,h:5},{x:7,y:8,w:6,h:4},{x:16,y:7,w:7,h:6},{x:2,y:14,w:6,h:3},{x:10,y:13,w:5,h:4},{x:18,y:14,w:5,h:3}],c:[[6,3,8,3],[15,3,18,3],[4,5,4,7],[13,10,16,10],[5,12,7,12],[8,15,10,15],[15,15,18,15]],f:[{x:3,y:2,t:"💧",l:"Underground Pool"},{x:10,y:3,t:"⛏️",l:"Mine Shaft"},{x:20,y:2,t:"💀",l:"Skeleton"},{x:2,y:9,t:"💀"},{x:9,y:9,t:"🔥",l:"Forge of Spells"},{x:18,y:9,t:"🕸️",l:"Web-filled"},{x:4,y:15,t:"💎",l:"Ore Vein"},{x:12,y:14,t:"⚗️",l:"Old Workshop"},{x:20,y:15,t:"🌊",l:"Echo Chamber"}],pc:{x:1,y:3},mn:{x:18,y:9},nm:"Wave Echo Cave"},narr:"The entrance to Wave Echo Cave is a narrow tunnel that opens into vast natural caverns. The rhythmic boom of waves crashing against subterranean rocks echoes through the darkness. Ancient dwarven and gnomish mining equipment lies scattered about. Somewhere in these depths, the Black Spider seeks the legendary Forge of Spells.",
         choices:["Follow the main passage","Explore the northern tunnels","Head toward the booming sounds","Proceed stealthily and scout ahead"],
         encounter:{monsters:["Skeleton","Skeleton","Skeleton","Zombie","Zombie"],trigger:"explore"},
         notes:"Final dungeon. Multiple encounters. Black Spider (drow mage) is in the Temple of Dumathoin."},
-      {t:"The Black Spider",narr:"In the heart of the cave, you find the Temple of Dumathoin — and the Black Spider himself, a drow named Nezznar. He stands before the legendary Forge of Spells, a magical brazier of green flame. 'You are too late,' he hisses. 'The power of the Phandelver Pact will be mine!' His giant spider companions skitter forward from the shadows.",
+      {t:"The Black Spider",map:{t:"dungeon",r:[{x:5,y:1,w:14,h:6},{x:1,y:9,w:7,h:5},{x:10,y:8,w:8,h:6},{x:20,y:9,w:3,h:5}],c:[[8,7,12,8],[7,11,10,11],[18,11,20,11]],f:[{x:10,y:3,t:"🔥",l:"Forge of Spells"},{x:12,y:3,t:"🔥"},{x:14,y:3,t:"⚗️",l:"Brazier"},{x:8,y:2,t:"🪨",l:"Pillar"},{x:16,y:2,t:"🪨",l:"Pillar"},{x:8,y:5,t:"🪨"},{x:16,y:5,t:"🪨"},{x:3,y:11,t:"💀",l:"Bones"},{x:5,y:10,t:"🕸️",l:"Webs"},{x:13,y:10,t:"🕷️",l:"Spider Nest"},{x:15,y:11,t:"🕷️"},{x:21,y:11,t:"📜",l:"Nezznar Papers"}],pc:{x:5,y:4},mn:{x:14,y:10},nm:"Temple of Dumathoin"},narr:"In the heart of the cave, you find the Temple of Dumathoin — and the Black Spider himself, a drow named Nezznar. He stands before the legendary Forge of Spells, a magical brazier of green flame. 'You are too late,' he hisses. 'The power of the Phandelver Pact will be mine!' His giant spider companions skitter forward from the shadows.",
         choices:["Attack immediately","Try to negotiate or deceive","Attempt to disable the Forge","Split up to flank"],
         encounter:{monsters:["Giant Spider","Giant Spider"],trigger:"always"},
         notes:"Nezznar: AC 15, HP 27, drow mage stat block. Victory completes the campaign!"}
@@ -199,105 +199,105 @@ const CAMPAIGNS = [
   },
   {n:"Curse of Strahd",lv:"1-10",d:"Gothic horror in Barovia. Face vampire lord Strahd von Zarovich in his haunted castle.",h:"Mysterious mists surround you, pulling you into a dark land ruled by an ancient vampire...",
     scenes:[
-      {t:"Death House",narr:"The mists part to reveal a village of dark, leaning buildings. Two small children stand in the street — Rose and Thorn Durst. 'Please,' Rose says, 'there's a monster in our basement. Our parents are trapped!' The Durst Manor looms behind them, its windows like hollow eyes.",
+      {t:"Death House",map:{t:"dungeon",r:[{x:1,y:1,w:6,h:4},{x:9,y:1,w:6,h:4},{x:17,y:1,w:6,h:4},{x:1,y:7,w:5,h:5},{x:8,y:7,w:7,h:6},{x:18,y:7,w:5,h:6},{x:3,y:14,w:8,h:3},{x:14,y:14,w:8,h:3}],c:[[7,3,9,3],[15,3,17,3],[5,5,5,7],[15,5,15,7],[6,10,8,10],[15,10,18,10],[8,13,8,14],[18,13,18,14]],f:[{x:3,y:2,t:"🚪",l:"Entrance"},{x:11,y:2,t:"🖼️",l:"Portrait Gallery"},{x:19,y:2,t:"🎹",l:"Music Room"},{x:3,y:9,t:"📚",l:"Library"},{x:11,y:10,t:"🪦",l:"Altar"},{x:20,y:9,t:"⛓️",l:"Dungeon"},{x:6,y:15,t:"💀",l:"Crypt"},{x:17,y:15,t:"👹",l:"Shambling Mound"}],pc:{x:3,y:2},mn:{x:11,y:10},nm:"Death House"},narr:"The mists part to reveal a village of dark, leaning buildings. Two small children stand in the street — Rose and Thorn Durst. 'Please,' Rose says, 'there's a monster in our basement. Our parents are trapped!' The Durst Manor looms behind them, its windows like hollow eyes.",
         choices:["Enter Durst Manor with the children","Investigate the village first","Refuse and look for another way","Check if the children are trustworthy"],
         notes:"Death House is a trap. The children are ghosts. The house is a mimic-like deathtrap dungeon."},
-      {t:"Village of Barovia",narr:"The village is a place of despair. A constant fog hangs over everything. You hear weeping from a townhouse — Mad Mary mourns her daughter Ireena's plight. At the Blood of the Vine tavern, Ismark the Lesser tells you his sister Ireena Kolyana has been bitten twice by the vampire Strahd. He begs you to escort her to safety in Vallaki.",
+      {t:"Village of Barovia",map:{t:"town",r:[{x:2,y:1,w:5,h:4},{x:9,y:1,w:7,h:4},{x:19,y:1,w:4,h:4},{x:1,y:7,w:6,h:4},{x:10,y:7,w:5,h:5},{x:18,y:8,w:5,h:4},{x:3,y:13,w:6,h:4},{x:12,y:14,w:6,h:3},{x:20,y:13,w:3,h:4}],c:[[7,3,9,3],[16,3,19,3],[5,5,5,7],[15,9,18,9],[7,11,10,11],[9,13,12,14],[18,15,20,15]],f:[{x:4,y:2,t:"🏠",l:"Blood of the Vine"},{x:12,y:2,t:"🏚️",l:"Burgomaster Manor"},{x:20,y:2,t:"⛪",l:"Church"},{x:3,y:9,t:"🏠",l:"Mad Mary House"},{x:12,y:9,t:"🪦",l:"Cemetery"},{x:19,y:9,t:"🏚️",l:"Abandoned Shop"},{x:5,y:15,t:"🌫️",l:"Misty Gate"},{x:14,y:15,t:"🛒",l:"Market"},{x:21,y:15,t:"🏚️",l:"Ruin"}],pc:{x:7,y:3},mn:{x:12,y:2},nm:"Village of Barovia"},narr:"The village is a place of despair. A constant fog hangs over everything. You hear weeping from a townhouse — Mad Mary mourns her daughter Ireena's plight. At the Blood of the Vine tavern, Ismark the Lesser tells you his sister Ireena Kolyana has been bitten twice by the vampire Strahd. He begs you to escort her to safety in Vallaki.",
         choices:["Agree to help Ireena","Visit the Burgomaster's mansion","Go to the church to find the priest","Investigate the village for supplies"],
         notes:"Ireena Kolyana is the reincarnation of Tatyana, Strahd's obsession."},
-      {t:"Castle Ravenloft - The Invitation",narr:"A black carriage arrives unbidden. Inside is a letter sealed with a wax bat: 'I, Strahd von Zarovich, invite you to dine at my castle. Come. I insist.' The horses snort impatiently. In the distance, lightning illuminates the towering spires of Castle Ravenloft.",
+      {t:"Castle Ravenloft - The Invitation",map:{t:"road",r:[{x:0,y:5,w:24,h:8}],c:[],f:[{x:2,y:8,t:"🌲"},{x:3,y:6,t:"🌲"},{x:4,y:10,t:"🌲"},{x:5,y:5,t:"🌲"},{x:6,y:11,t:"🌲"},{x:8,y:6,t:"🌲"},{x:9,y:11,t:"🌲"},{x:10,y:5,t:"🌲"},{x:14,y:6,t:"🌲"},{x:15,y:11,t:"🌲"},{x:16,y:5,t:"🌲"},{x:18,y:11,t:"🌲"},{x:19,y:6,t:"🌲"},{x:20,y:5,t:"🌲"},{x:21,y:10,t:"🌲"},{x:11,y:8,t:"🐺",l:"Wolf"},{x:12,y:9,t:"🐺"},{x:13,y:7,t:"🐺"},{x:14,y:9,t:"🐺"},{x:22,y:8,t:"🏰",l:"Castle Gate"}],pc:{x:2,y:8},mn:{x:12,y:8},nm:"Road to Castle Ravenloft"},narr:"A black carriage arrives unbidden. Inside is a letter sealed with a wax bat: 'I, Strahd von Zarovich, invite you to dine at my castle. Come. I insist.' The horses snort impatiently. In the distance, lightning illuminates the towering spires of Castle Ravenloft.",
         choices:["Accept and ride to the castle","Refuse and continue to Vallaki","Attempt to ambush the carriage","Send a decoy while the party flanks"],
         encounter:{monsters:["Wolf","Wolf","Wolf","Wolf"],trigger:"refuse"},
         notes:"Strahd is toying with the party. He cannot be defeated yet without the Sunsword and Holy Symbol."},
-      {t:"Vallaki - Town of Festivals",narr:"Vallaki is larger than Barovia, but no less oppressed. Baron Vallakovich rules with forced merriment — mandatory weekly festivals 'for the happiness of the people.' The innkeeper Urwin Martikov whispers of a resistance, the wereravens of the Keepers of the Feather. Dark secrets lurk behind every door.",
+      {t:"Vallaki - Town of Festivals",map:{t:"town",r:[{x:1,y:1,w:7,h:4},{x:10,y:1,w:7,h:4},{x:19,y:1,w:4,h:4},{x:1,y:7,w:5,h:5},{x:8,y:7,w:7,h:5},{x:17,y:7,w:6,h:5},{x:2,y:14,w:6,h:3},{x:10,y:14,w:5,h:3},{x:18,y:14,w:5,h:3}],c:[[8,3,10,3],[17,3,19,3],[5,5,5,7],[15,9,17,9],[6,12,8,12],[13,12,15,12],[8,15,10,15],[15,15,18,15]],f:[{x:3,y:2,t:"🏠",l:"Blue Water Inn"},{x:13,y:2,t:"⛪",l:"St. Andral Church"},{x:20,y:2,t:"🏰",l:"Baron Estate"},{x:3,y:9,t:"🎪",l:"Festival Ground"},{x:11,y:9,t:"🏪",l:"Coffin Maker"},{x:19,y:9,t:"🏚️",l:"Wachterhaus"},{x:4,y:15,t:"🏕️",l:"Vistani Camp"},{x:12,y:15,t:"🛒",l:"Stockyard"},{x:20,y:15,t:"🚪",l:"Town Gate"}],pc:{x:20,y:15},mn:{x:13,y:2},nm:"Vallaki"},narr:"Vallaki is larger than Barovia, but no less oppressed. Baron Vallakovich rules with forced merriment — mandatory weekly festivals 'for the happiness of the people.' The innkeeper Urwin Martikov whispers of a resistance, the wereravens of the Keepers of the Feather. Dark secrets lurk behind every door.",
         choices:["Attend the Baron's festival","Contact the Keepers of the Feather","Visit the Vistani camp outside town","Investigate St. Andral's Church"],
         notes:"Multiple factions in play. Strahd's spies are everywhere."},
-      {t:"The Amber Temple",narr:"High in the mountains, the ancient Amber Temple holds dark vestiges — imprisoned evil entities that offer dark gifts in exchange for corruption. The temple is guarded by deadly traps and undead. Within its amber sarcophagi lie the secrets of Strahd's power... and perhaps the key to his destruction.",
+      {t:"The Amber Temple",map:{t:"dungeon",r:[{x:2,y:1,w:8,h:5},{x:13,y:1,w:9,h:5},{x:1,y:8,w:6,h:5},{x:9,y:8,w:6,h:5},{x:18,y:7,w:5,h:6},{x:3,y:15,w:7,h:3},{x:13,y:14,w:9,h:4}],c:[[10,3,13,3],[5,6,5,8],[14,6,14,8],[15,10,18,10],[7,13,9,13],[10,15,13,15]],f:[{x:5,y:3,t:"🟧",l:"Amber Sarcophagus"},{x:7,y:3,t:"🟧",l:"Amber Sarcophagus"},{x:16,y:3,t:"🟧",l:"Amber Sarcophagus"},{x:19,y:3,t:"🟧",l:"Amber Sarcophagus"},{x:3,y:10,t:"💀",l:"Undead Guards"},{x:11,y:10,t:"🔥",l:"Dark Flame"},{x:20,y:10,t:"📚",l:"Forbidden Library"},{x:6,y:16,t:"⚗️",l:"Ritual Chamber"},{x:17,y:16,t:"👁️",l:"Vestige Chamber"}],pc:{x:6,y:1},mn:{x:11,y:10},nm:"Amber Temple"},narr:"High in the mountains, the ancient Amber Temple holds dark vestiges — imprisoned evil entities that offer dark gifts in exchange for corruption. The temple is guarded by deadly traps and undead. Within its amber sarcophagi lie the secrets of Strahd's power... and perhaps the key to his destruction.",
         choices:["Explore cautiously room by room","Seek the secret of Strahd's pact","Accept a dark gift for power","Destroy the amber sarcophagi"],
         encounter:{monsters:["Skeleton","Skeleton","Skeleton","Skeleton","Skeleton","Skeleton"],trigger:"explore"},
         notes:"Dark gifts offer power at a terrible cost. Key location for endgame."},
-      {t:"Castle Ravenloft - Final Confrontation",narr:"Armed with artifacts and knowledge, you return to Castle Ravenloft for the final battle. The castle is a maze of gothic horror — crypts, torture chambers, and Strahd's own throne room. Somewhere in these halls, the vampire lord waits, supremely confident in his domain.",
+      {t:"Castle Ravenloft - Final Confrontation",map:{t:"castle",r:[{x:3,y:1,w:10,h:5},{x:16,y:1,w:7,h:5},{x:1,y:8,w:7,h:5},{x:10,y:7,w:7,h:6},{x:20,y:8,w:3,h:5},{x:5,y:15,w:14,h:3}],c:[[8,6,10,7],[13,4,16,4],[7,13,10,13],[17,10,20,10],[12,13,12,15]],f:[{x:6,y:3,t:"🪨",l:"Pillar"},{x:10,y:3,t:"🪨",l:"Pillar"},{x:8,y:2,t:"👑",l:"Strahd Throne"},{x:18,y:3,t:"⚰️",l:"Coffin"},{x:20,y:3,t:"🩸",l:"Blood Pool"},{x:3,y:10,t:"🪟",l:"Stained Glass"},{x:13,y:10,t:"⚔️",l:"Armory"},{x:21,y:10,t:"🔑",l:"Treasury"},{x:10,y:16,t:"🔥",l:"Grand Fireplace"},{x:14,y:16,t:"🎹",l:"Pipe Organ"}],pc:{x:5,y:15},mn:{x:8,y:2},nm:"Castle Ravenloft Throne Room"},narr:"Armed with artifacts and knowledge, you return to Castle Ravenloft for the final battle. The castle is a maze of gothic horror — crypts, torture chambers, and Strahd's own throne room. Somewhere in these halls, the vampire lord waits, supremely confident in his domain.",
         choices:["Storm the main gates","Enter through the crypts below","Scale the walls to the tower","Use the secret passage from the catacombs"],
         encounter:{monsters:["Wolf","Wolf","Zombie","Zombie","Skeleton","Skeleton"],trigger:"enter"},
         notes:"Strahd: AC 16, HP 144. He fights tactically, retreating through walls. Use Sunsword + Holy Symbol."}
     ]
   },
   {n:"Storm King's Thunder",lv:"1-11",d:"Giants threaten civilization. Travel the Sword Coast to uncover why the ordning has shattered.",h:"Giants have emerged from their strongholds to threaten civilization as never before...",scenes:[
-    {t:"Attack on Nightstone",narr:"You arrive at the settlement of Nightstone to find it under attack! Giant boulders have smashed through rooftops, and the town's namesake — a mysterious black obelisk — has been stolen. Goblins and worgs now loot the abandoned buildings. Villagers cower in nearby caves.",choices:["Drive out the goblins","Search for survivors","Investigate the stolen obelisk","Fortify the town's defenses"],encounter:{monsters:["Goblin","Goblin","Goblin","Goblin","Wolf","Wolf"],trigger:"goblins"},notes:"Cloud giants stole the Nightstone. Goblins arrived after."},
-    {t:"The Ordning is Broken",narr:"You learn that the ancient hierarchy of giants — the ordning — has been shattered by the god Annam. Now all giant-kind competes for supremacy, terrorizing the small folk. Hill giants raid farms. Frost giants plunder ships. Fire giants forge weapons of war. Stone giants emerge from their caves in confusion. Only by finding the Storm King's missing daughter can order be restored.",choices:["Seek out the hill giant stronghold","Investigate frost giant raids","Travel to the fire giant forge","Look for allies among civilized folk"],notes:"Players choose which giant threat to pursue. Multiple paths."},
-    {t:"Eye of the All-Father",narr:"The ancient oracle temple of Annam lies in the frozen Spine of the World mountains. Inside, a massive crystal ball called the Eye of the All-Father can reveal the location of Hekaton — the missing Storm King. But the temple is not unguarded, and the journey through the frozen wastes is perilous.",choices:["Brave the mountain pass","Seek a guide from the Uthgardt tribes","Fly if you have airship access","Tunnel through the Underdark"],encounter:{monsters:["Wolf","Wolf","Orc","Orc"],trigger:"mountain"},notes:"Key turning point. The oracle reveals Hekaton is imprisoned."},
-    {t:"Maelstrom - Court of the Storm Giants",narr:"Beneath the Trackless Sea lies Maelstrom, the undersea citadel of the storm giants. Princess Serissa rules in her father's absence, but her advisors plot treachery. You must navigate storm giant politics, prove your worth, and discover who kidnapped King Hekaton before civil war tears the ordning apart forever.",choices:["Present evidence to Serissa","Investigate the treacherous advisors","Challenge the conspirators directly","Seek Hekaton's prison location"],notes:"Political intrigue. Multiple NPCs with agendas. Final act begins here."}
+    {t:"Attack on Nightstone",map:{t:"town",r:[{x:2,y:1,w:5,h:4},{x:9,y:1,w:6,h:5},{x:18,y:1,w:5,h:4},{x:1,y:8,w:6,h:4},{x:9,y:8,w:5,h:4},{x:17,y:7,w:6,h:5},{x:3,y:14,w:7,h:3},{x:13,y:14,w:5,h:3}],c:[[7,3,9,3],[15,3,18,3],[5,5,5,8],[14,9,17,9],[7,12,9,12],[10,14,13,14]],f:[{x:4,y:2,t:"🏠",l:"Inn"},{x:12,y:3,t:"🏛️",l:"Temple"},{x:19,y:2,t:"🏚️",l:"Ruined House"},{x:3,y:9,t:"🪨",l:"Boulder"},{x:11,y:9,t:"🪨",l:"Boulder"},{x:19,y:9,t:"🏪",l:"Trading Post"},{x:6,y:15,t:"🕳️",l:"Empty Obelisk Pit"},{x:15,y:15,t:"🚪",l:"Gate"}],pc:{x:15,y:15},mn:{x:4,y:9},nm:"Nightstone Village"},narr:"You arrive at the settlement of Nightstone to find it under attack! Giant boulders have smashed through rooftops, and the town's namesake — a mysterious black obelisk — has been stolen. Goblins and worgs now loot the abandoned buildings. Villagers cower in nearby caves.",choices:["Drive out the goblins","Search for survivors","Investigate the stolen obelisk","Fortify the town's defenses"],encounter:{monsters:["Goblin","Goblin","Goblin","Goblin","Wolf","Wolf"],trigger:"goblins"},notes:"Cloud giants stole the Nightstone. Goblins arrived after."},
+    {t:"The Ordning is Broken",map:{t:"road",r:[{x:0,y:5,w:24,h:8}],c:[],f:[{x:3,y:7,t:"🏔️",l:"Mountains"},{x:6,y:6,t:"🏔️"},{x:8,y:8,t:"🌲"},{x:10,y:6,t:"🌲"},{x:12,y:7,t:"🏰",l:"Giant Ruins"},{x:15,y:9,t:"🪨"},{x:18,y:6,t:"🌲"},{x:20,y:8,t:"🏔️"},{x:22,y:7,t:"⚡",l:"Storm"}],pc:{x:2,y:8},mn:{x:12,y:7},nm:"Sword Coast Road"},narr:"You learn that the ancient hierarchy of giants — the ordning — has been shattered by the god Annam. Now all giant-kind competes for supremacy, terrorizing the small folk. Hill giants raid farms. Frost giants plunder ships. Fire giants forge weapons of war. Stone giants emerge from their caves in confusion. Only by finding the Storm King's missing daughter can order be restored.",choices:["Seek out the hill giant stronghold","Investigate frost giant raids","Travel to the fire giant forge","Look for allies among civilized folk"],notes:"Players choose which giant threat to pursue. Multiple paths."},
+    {t:"Eye of the All-Father",map:{t:"cave",r:[{x:2,y:1,w:8,h:6},{x:14,y:2,w:8,h:5},{x:1,y:9,w:6,h:5},{x:9,y:9,w:6,h:5},{x:18,y:9,w:5,h:6}],c:[[10,4,14,4],[5,7,5,9],[15,11,18,11],[7,12,9,12]],f:[{x:6,y:3,t:"👁️",l:"The Eye"},{x:8,y:4,t:"🪨",l:"Giant Throne"},{x:17,y:4,t:"❄️",l:"Ice Wall"},{x:3,y:11,t:"🪨",l:"Rune Stone"},{x:12,y:11,t:"🔥",l:"Sacred Fire"},{x:20,y:12,t:"💀",l:"Guardian"}],pc:{x:2,y:4},mn:{x:20,y:12},nm:"Temple of the All-Father"},narr:"The ancient oracle temple of Annam lies in the frozen Spine of the World mountains. Inside, a massive crystal ball called the Eye of the All-Father can reveal the location of Hekaton — the missing Storm King. But the temple is not unguarded, and the journey through the frozen wastes is perilous.",choices:["Brave the mountain pass","Seek a guide from the Uthgardt tribes","Fly if you have airship access","Tunnel through the Underdark"],encounter:{monsters:["Wolf","Wolf","Orc","Orc"],trigger:"mountain"},notes:"Key turning point. The oracle reveals Hekaton is imprisoned."},
+    {t:"Maelstrom - Court of the Storm Giants",map:{t:"castle",r:[{x:3,y:1,w:10,h:5},{x:16,y:1,w:7,h:5},{x:1,y:8,w:7,h:5},{x:10,y:8,w:6,h:5},{x:19,y:8,w:4,h:5},{x:5,y:15,w:14,h:3}],c:[[8,6,12,8],[13,4,16,4],[7,13,10,13],[16,10,19,10],[12,13,12,15]],f:[{x:8,y:3,t:"👑",l:"Serissa Throne"},{x:18,y:3,t:"⚡",l:"Storm Orb"},{x:3,y:10,t:"🌊",l:"Tide Pool"},{x:13,y:10,t:"⚔️",l:"War Room"},{x:20,y:10,t:"📜",l:"Archives"},{x:10,y:16,t:"🚪",l:"Great Gate"}],pc:{x:10,y:16},mn:{x:8,y:3},nm:"Maelstrom Throne Hall"},narr:"Beneath the Trackless Sea lies Maelstrom, the undersea citadel of the storm giants. Princess Serissa rules in her father's absence, but her advisors plot treachery. You must navigate storm giant politics, prove your worth, and discover who kidnapped King Hekaton before civil war tears the ordning apart forever.",choices:["Present evidence to Serissa","Investigate the treacherous advisors","Challenge the conspirators directly","Seek Hekaton's prison location"],notes:"Political intrigue. Multiple NPCs with agendas. Final act begins here."}
   ]},
   {n:"Tomb of Annihilation",lv:"1-11",d:"Death curse plagues the world. Journey into the jungles of Chult.",h:"A death curse has befallen the land — those raised from the dead are wasting away...",scenes:[
-    {t:"Port Nyanzaru",narr:"The port city of Nyanzaru is a vibrant, chaotic trading hub on the northern coast of Chult. Dinosaurs serve as beasts of burden, merchant princes compete for power, and explorers gather before plunging into the deadly jungle. Your mission: find the Soulmonger — an artifact causing a death curse that is killing everyone who has ever been raised from the dead.",choices:["Hire a jungle guide","Visit the merchant princes","Buy supplies at the market","Gather rumors at the taverns"],notes:"Players need a guide. Several available, each with different knowledge."},
-    {t:"Into the Jungle",narr:"The jungle of Chult is one of the most dangerous places in all Faerûn. Undead rise from the ground. Dinosaurs crash through the canopy. Yuan-ti lurk in hidden temples. And the jungle itself seems to fight you — disease, insects, quicksand, and heat threaten your every step. Somewhere deep within lies Omu, the Forbidden City.",choices:["Follow the River Soshenstar south","Head west toward the Heart of Ubtao","Seek the ruins of Orolunga for guidance","Push directly south into the deep jungle"],encounter:{monsters:["Zombie","Zombie","Zombie","Zombie"],trigger:"jungle"},notes:"Hex crawl. Random encounters daily. Diseases: Shivering Sickness, Sight Rot, etc."},
-    {t:"Omu, the Forbidden City",narr:"After weeks of jungle travel, you finally reach the sunken city of Omu, overgrown with vegetation and crawling with yuan-ti. Nine shrines dedicated to the Trickster Gods of Omu lie scattered across the ruins. Each holds a puzzle cube needed to enter the true tomb. The yuan-ti are also searching for the cubes.",choices:["Explore the shrines systematically","Spy on the yuan-ti camp","Search for the tomb entrance first","Ally with or deceive the yuan-ti"],notes:"9 puzzle cubes needed. Each shrine has traps and puzzles."},
-    {t:"The Tomb of the Nine Gods",narr:"Beneath Omu lies the Tomb of the Nine Gods — a deathtrap dungeon created by the archlich Acererak. Five levels of fiendish traps, puzzles, and monsters guard the Soulmonger at its heart. The tomb is designed to kill — every step could be your last.",choices:["Proceed carefully, checking for traps","Rush through to reach the Soulmonger","Split up to cover more ground","Use divination to scout ahead"],encounter:{monsters:["Skeleton","Skeleton","Zombie","Zombie"],trigger:"enter"},notes:"The deadliest dungeon in 5e. Acererak waits at the bottom."}
+    {t:"Port Nyanzaru",map:{t:"town",r:[{x:1,y:1,w:7,h:4},{x:10,y:1,w:7,h:4},{x:19,y:1,w:4,h:4},{x:1,y:7,w:5,h:5},{x:8,y:7,w:7,h:5},{x:18,y:7,w:5,h:5},{x:2,y:14,w:9,h:3},{x:14,y:14,w:8,h:3}],c:[[8,3,10,3],[17,3,19,3],[5,5,5,7],[15,9,18,9],[6,12,8,12],[11,14,14,14]],f:[{x:4,y:2,t:"🚢",l:"Harbor"},{x:13,y:2,t:"🏛️",l:"Merchant Prince"},{x:20,y:2,t:"🏪",l:"Market"},{x:3,y:9,t:"🦎",l:"Dino Pens"},{x:11,y:9,t:"🍺",l:"Thundering Lizard"},{x:20,y:9,t:"🛒",l:"Bazaar"},{x:6,y:15,t:"🌴",l:"Docks"},{x:17,y:15,t:"🚪",l:"Jungle Gate"}],pc:{x:4,y:2},mn:{x:17,y:15},nm:"Port Nyanzaru"},narr:"The port city of Nyanzaru is a vibrant, chaotic trading hub on the northern coast of Chult. Dinosaurs serve as beasts of burden, merchant princes compete for power, and explorers gather before plunging into the deadly jungle. Your mission: find the Soulmonger — an artifact causing a death curse that is killing everyone who has ever been raised from the dead.",choices:["Hire a jungle guide","Visit the merchant princes","Buy supplies at the market","Gather rumors at the taverns"],notes:"Players need a guide. Several available, each with different knowledge."},
+    {t:"Into the Jungle",map:{t:"forest",r:[{x:0,y:0,w:24,h:18}],c:[],f:[{x:3,y:3,t:"🌴"},{x:5,y:5,t:"🌴"},{x:7,y:2,t:"🌴"},{x:9,y:7,t:"🌴"},{x:11,y:4,t:"🌴"},{x:13,y:8,t:"🌴"},{x:15,y:3,t:"🌴"},{x:17,y:6,t:"🌴"},{x:19,y:4,t:"🌴"},{x:21,y:7,t:"🌴"},{x:4,y:10,t:"🌴"},{x:8,y:12,t:"🌴"},{x:12,y:11,t:"🌴"},{x:16,y:13,t:"🌴"},{x:20,y:11,t:"🌴"},{x:6,y:14,t:"🌴"},{x:14,y:15,t:"🌴"},{x:10,y:9,t:"💧",l:"River"},{x:11,y:9,t:"💧"},{x:12,y:9,t:"💧"},{x:13,y:9,t:"💧"},{x:14,y:9,t:"💧"},{x:7,y:8,t:"🏚️",l:"Ruins"},{x:18,y:14,t:"⚠️",l:"Quicksand"}],pc:{x:2,y:9},mn:{x:7,y:8},nm:"Chult Jungle"},narr:"The jungle of Chult is one of the most dangerous places in all Faerûn. Undead rise from the ground. Dinosaurs crash through the canopy. Yuan-ti lurk in hidden temples. And the jungle itself seems to fight you — disease, insects, quicksand, and heat threaten your every step. Somewhere deep within lies Omu, the Forbidden City.",choices:["Follow the River Soshenstar south","Head west toward the Heart of Ubtao","Seek the ruins of Orolunga for guidance","Push directly south into the deep jungle"],encounter:{monsters:["Zombie","Zombie","Zombie","Zombie"],trigger:"jungle"},notes:"Hex crawl. Random encounters daily. Diseases: Shivering Sickness, Sight Rot, etc."},
+    {t:"Omu, the Forbidden City",map:{t:"dungeon",r:[{x:1,y:1,w:4,h:3},{x:7,y:1,w:4,h:3},{x:13,y:1,w:4,h:3},{x:19,y:1,w:4,h:3},{x:1,y:6,w:4,h:3},{x:7,y:6,w:4,h:3},{x:13,y:6,w:4,h:3},{x:19,y:6,w:4,h:3},{x:8,y:11,w:8,h:5}],c:[[5,2,7,2],[11,2,13,2],[17,2,19,2],[5,7,7,7],[11,7,13,7],[17,7,19,7],[3,4,3,6],[9,4,9,6],[15,4,15,6],[21,4,21,6],[10,9,10,11],[14,9,14,11]],f:[{x:2,y:2,t:"🏛️",l:"Shrine 1"},{x:8,y:2,t:"🏛️",l:"Shrine 2"},{x:14,y:2,t:"🏛️",l:"Shrine 3"},{x:20,y:2,t:"🏛️",l:"Shrine 4"},{x:2,y:7,t:"🏛️",l:"Shrine 5"},{x:8,y:7,t:"🏛️",l:"Shrine 6"},{x:14,y:7,t:"🏛️",l:"Shrine 7"},{x:20,y:7,t:"🏛️",l:"Shrine 8"},{x:12,y:13,t:"🕳️",l:"Tomb Entrance"}],pc:{x:10,y:11},mn:{x:12,y:13},nm:"Omu - Forbidden City"},narr:"After weeks of jungle travel, you finally reach the sunken city of Omu, overgrown with vegetation and crawling with yuan-ti. Nine shrines dedicated to the Trickster Gods of Omu lie scattered across the ruins. Each holds a puzzle cube needed to enter the true tomb. The yuan-ti are also searching for the cubes.",choices:["Explore the shrines systematically","Spy on the yuan-ti camp","Search for the tomb entrance first","Ally with or deceive the yuan-ti"],notes:"9 puzzle cubes needed. Each shrine has traps and puzzles."},
+    {t:"The Tomb of the Nine Gods",map:{t:"dungeon",r:[{x:2,y:1,w:9,h:4},{x:14,y:1,w:8,h:4},{x:1,y:7,w:6,h:5},{x:9,y:7,w:6,h:5},{x:18,y:7,w:5,h:5},{x:3,y:14,w:8,h:3},{x:14,y:14,w:8,h:3}],c:[[11,3,14,3],[6,5,6,7],[15,5,15,7],[7,9,9,9],[15,10,18,10],[8,12,8,14],[18,12,18,14]],f:[{x:6,y:2,t:"⚠️",l:"Trap"},{x:9,y:2,t:"⚠️",l:"Trap"},{x:17,y:2,t:"💀",l:"Skeleton"},{x:3,y:9,t:"🧩",l:"Puzzle Room"},{x:12,y:9,t:"⚗️",l:"Alchemy Lab"},{x:20,y:9,t:"🕳️",l:"Pit Trap"},{x:6,y:15,t:"💀",l:"Acererak"},{x:18,y:15,t:"💎",l:"Soulmonger"}],pc:{x:6,y:1},mn:{x:6,y:15},nm:"Tomb of the Nine Gods"},narr:"Beneath Omu lies the Tomb of the Nine Gods — a deathtrap dungeon created by the archlich Acererak. Five levels of fiendish traps, puzzles, and monsters guard the Soulmonger at its heart. The tomb is designed to kill — every step could be your last.",choices:["Proceed carefully, checking for traps","Rush through to reach the Soulmonger","Split up to cover more ground","Use divination to scout ahead"],encounter:{monsters:["Skeleton","Skeleton","Zombie","Zombie"],trigger:"enter"},notes:"The deadliest dungeon in 5e. Acererak waits at the bottom."}
   ]},
   {n:"Waterdeep: Dragon Heist",lv:"1-5",d:"Urban adventure. Race to find 500,000 gold dragons hidden beneath Waterdeep.",h:"Treasure lies beneath Waterdeep, and villains compete to claim it...",scenes:[
-    {t:"A Friend in Need",narr:"You're enjoying drinks at the Yawning Portal tavern when a fight breaks out. A battered man named Volothamp Geddarm stumbles in and begs for help — his friend Floon Blagmaar has been kidnapped by the Zhentarim. 'I'll pay you ten dragons each!' he cries, as a troll climbs out of the famous well in the tavern's center.",choices:["Help Volo immediately","Deal with the troll first","Demand more payment","Ask for more details about Floon"],encounter:{monsters:["Bandit","Bandit","Bandit"],trigger:"search"},notes:"Intro session. Troll is handled by Durnan the innkeeper. Floon is in the Zhentarim warehouse."},
-    {t:"Trollskull Manor",narr:"As reward for rescuing Floon, Volo gives you the deed to Trollskull Manor — a rundown tavern in the North Ward. It needs repairs, but it's yours. As you settle in, you notice your new neighborhood is full of interesting characters: a detective, a tiger-owning noble, and a mysterious bookshop owner. Then a fireball explodes in the street outside.",choices:["Investigate the fireball","Renovate the tavern first","Talk to the neighbors","Report to the City Watch"],notes:"The fireball is the inciting incident. A gnome was carrying the Stone of Golorr when assassinated."},
-    {t:"The Stone of Golorr",narr:"The investigation leads you through Waterdeep's criminal underworld. The Stone of Golorr — an artifact that knows the location of Lord Neverember's hidden vault of 500,000 gold dragons — is being hunted by multiple factions: the Zhentarim, the Xanathar Guild, the Cassalanters, and Jarlaxle Baenre's Bregan D'aerthe. You must find it first.",choices:["Follow the Zhentarim leads","Infiltrate the Xanathar Guild","Attend the Cassalanter gala","Seek out Jarlaxle's agents"],notes:"Faction-heavy chapter. Multiple villains depending on season chosen by DM."},
-    {t:"The Vault of Dragons",narr:"With the Stone of Golorr in hand, you've learned the vault's location deep beneath Waterdeep. But you're not the only ones who know. The main villain's forces are converging on the entrance. You must navigate ancient dwarven tunnels, bypass magical wards, and reach the gold before your enemies do.",choices:["Race to the vault entrance","Set a trap for the villains","Seek help from the City Watch","Find an alternate entrance"],encounter:{monsters:["Bandit","Bandit","Bandit","Bandit"],trigger:"vault"},notes:"Final dungeon. Half a million gold pieces. But taking it has political consequences."}
+    {t:"A Friend in Need",map:{t:"town",r:[{x:2,y:2,w:10,h:8},{x:15,y:3,w:7,h:6}],c:[[12,6,15,6]],f:[{x:6,y:5,t:"🍺",l:"Bar"},{x:8,y:4,t:"🕳️",l:"The Well"},{x:4,y:7,t:"🪑",l:"Tables"},{x:10,y:7,t:"🪑"},{x:7,y:3,t:"🏠",l:"Yawning Portal"},{x:18,y:5,t:"🚪",l:"Back Room"},{x:17,y:7,t:"📦",l:"Storage"}],pc:{x:4,y:5},mn:{x:17,y:5},nm:"Yawning Portal Tavern"},narr:"You're enjoying drinks at the Yawning Portal tavern when a fight breaks out. A battered man named Volothamp Geddarm stumbles in and begs for help — his friend Floon Blagmaar has been kidnapped by the Zhentarim. 'I'll pay you ten dragons each!' he cries, as a troll climbs out of the famous well in the tavern's center.",choices:["Help Volo immediately","Deal with the troll first","Demand more payment","Ask for more details about Floon"],encounter:{monsters:["Bandit","Bandit","Bandit"],trigger:"search"},notes:"Intro session. Troll is handled by Durnan the innkeeper. Floon is in the Zhentarim warehouse."},
+    {t:"Trollskull Manor",map:{t:"town",r:[{x:2,y:1,w:8,h:5},{x:13,y:1,w:9,h:5},{x:1,y:8,w:6,h:5},{x:9,y:8,w:6,h:5},{x:18,y:8,w:5,h:5}],c:[[10,3,13,3],[5,6,5,8],[15,10,18,10],[7,13,9,13]],f:[{x:5,y:3,t:"🏠",l:"Trollskull Manor"},{x:16,y:3,t:"🏪",l:"Shops"},{x:3,y:10,t:"🏠",l:"Neighbor"},{x:12,y:10,t:"💥",l:"Fireball Site"},{x:20,y:10,t:"🏠",l:"Book Shop"}],pc:{x:5,y:3},mn:{x:12,y:10},nm:"Trollskull Alley"},narr:"As reward for rescuing Floon, Volo gives you the deed to Trollskull Manor — a rundown tavern in the North Ward. It needs repairs, but it's yours. As you settle in, you notice your new neighborhood is full of interesting characters: a detective, a tiger-owning noble, and a mysterious bookshop owner. Then a fireball explodes in the street outside.",choices:["Investigate the fireball","Renovate the tavern first","Talk to the neighbors","Report to the City Watch"],notes:"The fireball is the inciting incident. A gnome was carrying the Stone of Golorr when assassinated."},
+    {t:"The Stone of Golorr",map:{t:"town",r:[{x:1,y:2,w:5,h:4},{x:8,y:1,w:7,h:5},{x:18,y:2,w:5,h:4},{x:1,y:9,w:6,h:4},{x:10,y:9,w:5,h:4},{x:18,y:9,w:5,h:4},{x:4,y:15,w:8,h:2},{x:15,y:15,w:7,h:2}],c:[[6,4,8,4],[15,4,18,4],[5,6,5,9],[15,11,18,11],[7,13,10,13],[12,15,15,15]],f:[{x:3,y:4,t:"🏚️",l:"Zhent Hideout"},{x:11,y:3,t:"🏛️",l:"Courthouse"},{x:20,y:3,t:"🎭",l:"Theater"},{x:3,y:10,t:"🏪",l:"Fence"},{x:12,y:10,t:"🕵️",l:"Detective"},{x:20,y:10,t:"🏠",l:"Safe House"},{x:7,y:16,t:"🌉",l:"Bridge"},{x:18,y:16,t:"⚓",l:"Dock"}],pc:{x:11,y:3},mn:{x:3,y:4},nm:"Waterdeep Streets"},narr:"The investigation leads you through Waterdeep's criminal underworld. The Stone of Golorr — an artifact that knows the location of Lord Neverember's hidden vault of 500,000 gold dragons — is being hunted by multiple factions: the Zhentarim, the Xanathar Guild, the Cassalanters, and Jarlaxle Baenre's Bregan D'aerthe. You must find it first.",choices:["Follow the Zhentarim leads","Infiltrate the Xanathar Guild","Attend the Cassalanter gala","Seek out Jarlaxle's agents"],notes:"Faction-heavy chapter. Multiple villains depending on season chosen by DM."},
+    {t:"The Vault of Dragons",map:{t:"dungeon",r:[{x:2,y:1,w:8,h:5},{x:14,y:1,w:8,h:5},{x:1,y:8,w:6,h:5},{x:9,y:8,w:6,h:5},{x:18,y:8,w:5,h:5},{x:5,y:15,w:14,h:3}],c:[[10,3,14,3],[5,6,5,8],[15,10,18,10],[7,13,9,13],[15,13,15,15]],f:[{x:5,y:3,t:"🚪",l:"Entry"},{x:17,y:3,t:"⚠️",l:"Ward"},{x:3,y:10,t:"🪨",l:"Pillar"},{x:12,y:10,t:"🔐",l:"Lock"},{x:20,y:10,t:"⚠️",l:"Trap"},{x:10,y:16,t:"💰",l:"500k Gold!"}],pc:{x:5,y:3},mn:{x:10,y:16},nm:"Vault of Dragons"},narr:"With the Stone of Golorr in hand, you've learned the vault's location deep beneath Waterdeep. But you're not the only ones who know. The main villain's forces are converging on the entrance. You must navigate ancient dwarven tunnels, bypass magical wards, and reach the gold before your enemies do.",choices:["Race to the vault entrance","Set a trap for the villains","Seek help from the City Watch","Find an alternate entrance"],encounter:{monsters:["Bandit","Bandit","Bandit","Bandit"],trigger:"vault"},notes:"Final dungeon. Half a million gold pieces. But taking it has political consequences."}
   ]},
   {n:"Descent into Avernus",lv:"1-13",d:"Descend into the Nine Hells to save Elturel.",h:"The holy city of Elturel has been dragged to the first layer of the Nine Hells...",scenes:[
-    {t:"Baldur's Gate",narr:"The city of Baldur's Gate is in crisis. Refugees flood in from Elturel, which has vanished without a trace. The Flaming Fist mercenaries maintain brutal order while a cult called the Dead Three spreads murder through the streets. You've been recruited to investigate — and what you find points to something far worse than mortal villainy.",choices:["Investigate the Dead Three murders","Help the refugees","Seek audience with Duke Ravengard","Explore the city's underworld"],encounter:{monsters:["Bandit","Bandit","Bandit","Skeleton"],trigger:"dungeon"},notes:"Urban chapter. Dead Three dungeon under the bathhouse."},
-    {t:"The Fall of Elturel",narr:"You discover the terrible truth: Elturel didn't just vanish — it was dragged into Avernus, the first layer of the Nine Hells, by an infernal contract. Its people are trapped, tormented by devils. The only way to save them is to go to Hell yourself. A portal awaits.",choices:["Enter the portal to Avernus","Seek more information first","Gather allies for the journey","Pray for divine guidance"],notes:"Point of no return. Once in Avernus, the campaign tone shifts dramatically."},
-    {t:"The Wastelands of Avernus",narr:"Avernus is a blasted hellscape of rust-red earth, rivers of blood, and eternal war between devils and demons. Infernal war machines roar across the plains. You can see Elturel in the distance, suspended by chains of infernal iron above the River Styx. To free it, you must find the contract that binds it — and that means dealing with archdevils.",choices:["Seek Mad Maggie for a war machine","Hunt for the Bleeding Citadel","Track down the devil Bel","Follow rumors of the Sword of Zariel"],encounter:{monsters:["Zombie","Zombie","Zombie","Skeleton","Skeleton"],trigger:"wasteland"},notes:"Sandbox in Hell. Infernal war machines are key. Multiple paths to the Sword."},
-    {t:"Zariel's Redemption",narr:"You've found the Sword of Zariel — a holy weapon containing the spark of the fallen angel's former goodness. Now you face the ultimate choice: confront Zariel, archdevil ruler of Avernus, in her flying fortress. You can try to redeem her with the sword, restoring her angelic nature — or destroy her. Either way, Elturel's fate hangs in the balance.",choices:["Storm Zariel's fortress","Attempt to negotiate with Zariel","Use the Sword to redeem her","Seek another way to break the contract"],notes:"Final confrontation. Zariel: AC 21, HP 580. Redemption is possible but difficult."}
+    {t:"Baldur's Gate",map:{t:"town",r:[{x:1,y:1,w:7,h:4},{x:10,y:1,w:7,h:4},{x:19,y:1,w:4,h:4},{x:1,y:7,w:5,h:5},{x:8,y:7,w:7,h:5},{x:18,y:7,w:5,h:5},{x:3,y:14,w:8,h:3},{x:14,y:14,w:8,h:3}],c:[[8,3,10,3],[17,3,19,3],[5,5,5,7],[15,9,18,9],[6,12,8,12],[11,14,14,14]],f:[{x:4,y:2,t:"🏛️",l:"Parliament"},{x:13,y:2,t:"⛪",l:"Temple"},{x:20,y:2,t:"🏰",l:"Citadel"},{x:3,y:9,t:"🏚️",l:"Bathhouse"},{x:11,y:9,t:"🏪",l:"Market"},{x:20,y:9,t:"🍺",l:"Tavern"},{x:6,y:15,t:"🚪",l:"Gate"},{x:18,y:15,t:"⚓",l:"Harbor"}],pc:{x:18,y:15},mn:{x:3,y:9},nm:"Baldur's Gate"},narr:"The city of Baldur's Gate is in crisis. Refugees flood in from Elturel, which has vanished without a trace. The Flaming Fist mercenaries maintain brutal order while a cult called the Dead Three spreads murder through the streets. You've been recruited to investigate — and what you find points to something far worse than mortal villainy.",choices:["Investigate the Dead Three murders","Help the refugees","Seek audience with Duke Ravengard","Explore the city's underworld"],encounter:{monsters:["Bandit","Bandit","Bandit","Skeleton"],trigger:"dungeon"},notes:"Urban chapter. Dead Three dungeon under the bathhouse."},
+    {t:"The Fall of Elturel",map:{t:"road",r:[{x:0,y:4,w:24,h:10}],c:[],f:[{x:5,y:8,t:"🔥",l:"Portal"},{x:7,y:7,t:"🔥"},{x:6,y:9,t:"🔥"},{x:12,y:7,t:"🏚️",l:"Ruins"},{x:15,y:9,t:"🏚️"},{x:19,y:8,t:"🏰",l:"Elturel (falling)"},{x:3,y:6,t:"🌫️"},{x:3,y:10,t:"🌫️"},{x:21,y:6,t:"🌫️"},{x:21,y:10,t:"🌫️"}],pc:{x:3,y:8},mn:{x:5,y:8},nm:"Gateway to Avernus"},narr:"You discover the terrible truth: Elturel didn't just vanish — it was dragged into Avernus, the first layer of the Nine Hells, by an infernal contract. Its people are trapped, tormented by devils. The only way to save them is to go to Hell yourself. A portal awaits.",choices:["Enter the portal to Avernus","Seek more information first","Gather allies for the journey","Pray for divine guidance"],notes:"Point of no return. Once in Avernus, the campaign tone shifts dramatically."},
+    {t:"The Wastelands of Avernus",map:{t:"road",r:[{x:0,y:3,w:24,h:12}],c:[],f:[{x:3,y:8,t:"🔥"},{x:6,y:6,t:"🔥"},{x:8,y:10,t:"🩸",l:"Blood River"},{x:9,y:10,t:"🩸"},{x:10,y:10,t:"🩸"},{x:11,y:10,t:"🩸"},{x:14,y:7,t:"🏚️",l:"War Machine"},{x:18,y:8,t:"💀",l:"Bone Field"},{x:21,y:6,t:"🏰",l:"Fortress"},{x:5,y:5,t:"🪨"},{x:12,y:5,t:"🪨"},{x:16,y:12,t:"🪨"},{x:20,y:11,t:"🔥"}],pc:{x:2,y:8},mn:{x:14,y:7},nm:"Avernus Wasteland"},narr:"Avernus is a blasted hellscape of rust-red earth, rivers of blood, and eternal war between devils and demons. Infernal war machines roar across the plains. You can see Elturel in the distance, suspended by chains of infernal iron above the River Styx. To free it, you must find the contract that binds it — and that means dealing with archdevils.",choices:["Seek Mad Maggie for a war machine","Hunt for the Bleeding Citadel","Track down the devil Bel","Follow rumors of the Sword of Zariel"],encounter:{monsters:["Zombie","Zombie","Zombie","Skeleton","Skeleton"],trigger:"wasteland"},notes:"Sandbox in Hell. Infernal war machines are key. Multiple paths to the Sword."},
+    {t:"Zariel's Redemption",map:{t:"castle",r:[{x:4,y:1,w:16,h:6},{x:2,y:9,w:8,h:6},{x:14,y:9,w:8,h:6},{x:8,y:15,w:8,h:3}],c:[[8,7,8,9],[16,7,16,9],[12,14,12,15]],f:[{x:12,y:3,t:"👑",l:"Zariel Throne"},{x:8,y:3,t:"🔥",l:"Hellfire"},{x:16,y:3,t:"🔥"},{x:6,y:4,t:"🪨",l:"Pillar"},{x:18,y:4,t:"🪨"},{x:5,y:12,t:"⚔️",l:"Armory"},{x:18,y:12,t:"⚔️",l:"Armory"},{x:12,y:16,t:"⚡",l:"Sword of Zariel"}],pc:{x:12,y:16},mn:{x:12,y:3},nm:"Zariel's Flying Fortress"},narr:"You've found the Sword of Zariel — a holy weapon containing the spark of the fallen angel's former goodness. Now you face the ultimate choice: confront Zariel, archdevil ruler of Avernus, in her flying fortress. You can try to redeem her with the sword, restoring her angelic nature — or destroy her. Either way, Elturel's fate hangs in the balance.",choices:["Storm Zariel's fortress","Attempt to negotiate with Zariel","Use the Sword to redeem her","Seek another way to break the contract"],notes:"Final confrontation. Zariel: AC 21, HP 580. Redemption is possible but difficult."}
   ]},
   {n:"Rime of the Frostmaiden",lv:"1-12",d:"Survive the eternal winter of Icewind Dale.",h:"Icewind Dale is trapped in perpetual winter by the Frostmaiden. The sun never rises...",scenes:[
-    {t:"Ten-Towns",narr:"Icewind Dale is dying. Auril the Frostmaiden has cursed the land with perpetual night — the sun hasn't risen in over two years. The ten towns around the frozen lakes struggle to survive, making desperate sacrifices to appease the goddess. Warmth is scarce. Hope is scarcer. But you've come here for reasons of your own.",choices:["Help the town of Bryn Shander","Investigate sacrifices in Targos","Search for missing persons in Bremen","Seek work at the Northlook tavern"],notes:"Open-world start. Multiple quest hooks across ten towns. Cold weather survival rules."},
-    {t:"The Chardalyn Menace",narr:"A sinister force stirs beneath the ice. Chardalyn — a magical crystal corrupted by demonic influence — has been found throughout Icewind Dale. Someone is collecting it, forging it into something terrible. Meanwhile, a duergar named Xardorok Sunblight plots in his fortress beneath the mountains, building a weapon that could destroy Ten-Towns entirely.",choices:["Investigate the chardalyn source","Infiltrate Sunblight's fortress","Warn Ten-Towns of the threat","Search for allies among the goliaths"],encounter:{monsters:["Goblin","Goblin","Goblin","Goblin","Kobold","Kobold"],trigger:"patrol"},notes:"Duergar are building a chardalyn dragon. Time pressure begins."},
-    {t:"The Chardalyn Dragon",narr:"Xardorok has unleashed his creation — a massive chardalyn dragon that soars over Ten-Towns, breathing its destructive force upon the settlements one by one. You must find a way to stop it before all ten towns are destroyed. Every hour counts as the dragon moves from town to town.",choices:["Chase the dragon directly","Rally town defenses","Assault Sunblight's fortress to find a weakness","Seek Auril's intervention"],encounter:{monsters:["Kobold","Kobold","Goblin","Goblin","Orc","Orc"],trigger:"always"},notes:"Timed event. Dragon hits towns in order. Players can't save them all."},
-    {t:"The Caves of Hunger",narr:"To end the eternal winter, you must confront Auril herself. The path leads through the Caves of Hunger — a frozen dungeon within the Reghed Glacier. Ancient secrets lie buried in the ice, including a crashed Netherese city called Ythryn. But first, you must survive the glacier's deadly guardians.",choices:["Navigate the ice caves carefully","Use fire magic to melt a path","Search for the entrance to Ythryn","Prepare for confrontation with Auril"],encounter:{monsters:["Skeleton","Skeleton","Zombie","Zombie","Wolf","Wolf"],trigger:"caves"},notes:"Penultimate dungeon. Leads to Ythryn and the final confrontation with Auril."}
+    {t:"Ten-Towns",map:{t:"town",r:[{x:1,y:1,w:4,h:3},{x:7,y:1,w:4,h:3},{x:13,y:1,w:4,h:3},{x:19,y:1,w:4,h:3},{x:1,y:6,w:4,h:3},{x:7,y:6,w:4,h:3},{x:13,y:6,w:4,h:3},{x:19,y:6,w:4,h:3},{x:4,y:11,w:7,h:3},{x:14,y:11,w:7,h:3}],c:[[5,2,7,2],[11,2,13,2],[17,2,19,2],[5,7,7,7],[11,7,13,7],[17,7,19,7],[3,4,3,6],[9,4,9,6],[15,4,15,6],[21,4,21,6],[7,9,7,11],[17,9,17,11]],f:[{x:2,y:2,t:"🏠",l:"Bryn Shander"},{x:8,y:2,t:"🏠",l:"Targos"},{x:14,y:2,t:"🏠",l:"Bremen"},{x:20,y:2,t:"🏠",l:"Lonelywood"},{x:2,y:7,t:"🏠",l:"Easthaven"},{x:8,y:7,t:"🏠",l:"Caer-Dineval"},{x:14,y:7,t:"🏠",l:"Good Mead"},{x:20,y:7,t:"🏠",l:"Dougan Hole"},{x:7,y:12,t:"🏠",l:"Caer-Konig"},{x:17,y:12,t:"🏠",l:"Termalaine"}],pc:{x:2,y:2},mn:{x:14,y:7},nm:"Ten-Towns of Icewind Dale"},narr:"Icewind Dale is dying. Auril the Frostmaiden has cursed the land with perpetual night — the sun hasn't risen in over two years. The ten towns around the frozen lakes struggle to survive, making desperate sacrifices to appease the goddess. Warmth is scarce. Hope is scarcer. But you've come here for reasons of your own.",choices:["Help the town of Bryn Shander","Investigate sacrifices in Targos","Search for missing persons in Bremen","Seek work at the Northlook tavern"],notes:"Open-world start. Multiple quest hooks across ten towns. Cold weather survival rules."},
+    {t:"The Chardalyn Menace",map:{t:"cave",r:[{x:2,y:1,w:7,h:5},{x:12,y:1,w:8,h:5},{x:1,y:8,w:6,h:5},{x:9,y:8,w:6,h:5},{x:18,y:8,w:5,h:5}],c:[[9,3,12,3],[5,6,5,8],[15,10,18,10],[7,13,9,13]],f:[{x:5,y:3,t:"💎",l:"Chardalyn"},{x:15,y:3,t:"⚒️",l:"Forge"},{x:3,y:10,t:"💎",l:"Crystal"},{x:12,y:10,t:"🔥",l:"Furnace"},{x:20,y:10,t:"⛓️",l:"Prison"}],pc:{x:2,y:3},mn:{x:15,y:3},nm:"Sunblight Fortress"},narr:"A sinister force stirs beneath the ice. Chardalyn — a magical crystal corrupted by demonic influence — has been found throughout Icewind Dale. Someone is collecting it, forging it into something terrible. Meanwhile, a duergar named Xardorok Sunblight plots in his fortress beneath the mountains, building a weapon that could destroy Ten-Towns entirely.",choices:["Investigate the chardalyn source","Infiltrate Sunblight's fortress","Warn Ten-Towns of the threat","Search for allies among the goliaths"],encounter:{monsters:["Goblin","Goblin","Goblin","Goblin","Kobold","Kobold"],trigger:"patrol"},notes:"Duergar are building a chardalyn dragon. Time pressure begins."},
+    {t:"The Chardalyn Dragon",map:{t:"town",r:[{x:1,y:2,w:7,h:5},{x:10,y:1,w:6,h:5},{x:18,y:2,w:5,h:5},{x:2,y:10,w:8,h:5},{x:14,y:10,w:8,h:5}],c:[[8,4,10,4],[16,4,18,4],[5,7,5,10],[18,7,18,10],[10,12,14,12]],f:[{x:4,y:4,t:"🏚️",l:"Burning Town"},{x:12,y:3,t:"🔥",l:"Fire"},{x:20,y:4,t:"🏚️",l:"Rubble"},{x:6,y:12,t:"🏠",l:"Shelter"},{x:18,y:12,t:"🏠",l:"Last Stand"},{x:12,y:0,t:"🐉",l:"Dragon Above"}],pc:{x:6,y:12},mn:{x:12,y:3},nm:"Ten-Towns Under Attack"},narr:"Xardorok has unleashed his creation — a massive chardalyn dragon that soars over Ten-Towns, breathing its destructive force upon the settlements one by one. You must find a way to stop it before all ten towns are destroyed. Every hour counts as the dragon moves from town to town.",choices:["Chase the dragon directly","Rally town defenses","Assault Sunblight's fortress to find a weakness","Seek Auril's intervention"],encounter:{monsters:["Kobold","Kobold","Goblin","Goblin","Orc","Orc"],trigger:"always"},notes:"Timed event. Dragon hits towns in order. Players can't save them all."},
+    {t:"The Caves of Hunger",map:{t:"cave",r:[{x:1,y:1,w:6,h:4},{x:10,y:1,w:7,h:4},{x:20,y:1,w:3,h:4},{x:1,y:7,w:5,h:5},{x:8,y:7,w:7,h:6},{x:18,y:7,w:5,h:5},{x:4,y:14,w:8,h:3},{x:15,y:14,w:7,h:3}],c:[[7,3,10,3],[17,3,20,3],[5,5,5,7],[15,10,18,10],[6,12,8,12],[12,14,15,14]],f:[{x:3,y:2,t:"❄️",l:"Ice Wall"},{x:13,y:2,t:"❄️"},{x:21,y:2,t:"❄️"},{x:3,y:9,t:"💀",l:"Frozen Dead"},{x:11,y:10,t:"🏛️",l:"Ythryn Entrance"},{x:20,y:9,t:"❄️",l:"Glacier"},{x:7,y:15,t:"🌬️",l:"Wind Tunnel"},{x:18,y:15,t:"👁️",l:"Auril's Domain"}],pc:{x:3,y:2},mn:{x:18,y:15},nm:"Caves of Hunger"},narr:"To end the eternal winter, you must confront Auril herself. The path leads through the Caves of Hunger — a frozen dungeon within the Reghed Glacier. Ancient secrets lie buried in the ice, including a crashed Netherese city called Ythryn. But first, you must survive the glacier's deadly guardians.",choices:["Navigate the ice caves carefully","Use fire magic to melt a path","Search for the entrance to Ythryn","Prepare for confrontation with Auril"],encounter:{monsters:["Skeleton","Skeleton","Zombie","Zombie","Wolf","Wolf"],trigger:"caves"},notes:"Penultimate dungeon. Leads to Ythryn and the final confrontation with Auril."}
   ]},
   {n:"Ghosts of Saltmarsh",lv:"1-12",d:"Nautical adventures around coastal Saltmarsh.",h:"The sleepy fishing town sits on the edge of something sinister...",scenes:[
-    {t:"The Sinister Secret of Saltmarsh",narr:"The coastal town of Saltmarsh has a haunted house on the cliff — or so everyone says. Strange lights have been seen in the windows at night. The town council wants you to investigate. Inside, you find it's not ghosts but something far more mundane and dangerous: smugglers using the 'haunted' reputation as cover.",choices:["Investigate the haunted house at night","Ask townspeople about the lights","Scout the cliffs from the sea","Go in through the front door"],encounter:{monsters:["Bandit","Bandit","Bandit","Bandit"],trigger:"enter"},notes:"Classic dungeon. Smugglers in the basement. Ship in the sea caves below."},
-    {t:"Danger at Dunwater",narr:"The smugglers' weapons were being sold to lizardfolk in the nearby marshes. The town council fears an attack and sends you to the lizardfolk lair. But things aren't what they seem — the lizardfolk are arming against a genuine threat: sahuagin sea devils massing for an assault on the entire coast.",choices:["Approach the lizardfolk peacefully","Sneak into their lair to spy","Demand answers with a show of force","Seek the sahuagin threat yourself"],notes:"Diplomacy adventure. Fighting the lizardfolk is possible but counterproductive."},
-    {t:"Salvage Operation",narr:"A merchant named Aubreck hires you to retrieve cargo from the Emperor of the Waves — a ship that sank near a mysterious island. When you reach the wreck, you discover it's been claimed by giant insects and worse. The island itself seems to be alive with danger, and a terrifying druid lurks at its heart.",choices:["Dive to the wreck immediately","Explore the island first","Hire a boat to circle the island","Search for other survivors"],encounter:{monsters:["Giant Spider","Giant Spider","Giant Spider"],trigger:"wreck"},notes:"Ocean/island adventure. Ship exploration and survival."},
-    {t:"The Final Enemy",narr:"The sahuagin fortress lies beneath the waves. With your lizardfolk and merfolk allies, you must infiltrate the stronghold, gather intelligence on the sea devils' forces, and if possible, strike at their leaders before their invasion fleet launches. The underwater lair is vast, dark, and teeming with enemies.",choices:["Lead the allied assault","Infiltrate as a small strike team","Create a diversion at the front","Sabotage their war machines from within"],encounter:{monsters:["Orc","Orc","Orc","Orc","Orc"],trigger:"fortress"},notes:"Underwater dungeon. Water breathing required. Intelligence gathering mission."}
+    {t:"The Sinister Secret of Saltmarsh",map:{t:"dungeon",r:[{x:2,y:1,w:7,h:4},{x:12,y:1,w:8,h:5},{x:1,y:7,w:5,h:5},{x:8,y:7,w:7,h:5},{x:18,y:7,w:5,h:6}],c:[[9,3,12,3],[5,5,5,7],[15,9,18,9],[6,12,8,12]],f:[{x:5,y:2,t:"🏚️",l:"Haunted Room"},{x:15,y:3,t:"📦",l:"Smuggler Goods"},{x:3,y:9,t:"🕸️",l:"Webs"},{x:11,y:9,t:"🚪",l:"Secret Door"},{x:20,y:10,t:"⚓",l:"Sea Cave"}],pc:{x:5,y:2},mn:{x:15,y:3},nm:"Haunted House"},narr:"The coastal town of Saltmarsh has a haunted house on the cliff — or so everyone says. Strange lights have been seen in the windows at night. The town council wants you to investigate. Inside, you find it's not ghosts but something far more mundane and dangerous: smugglers using the 'haunted' reputation as cover.",choices:["Investigate the haunted house at night","Ask townspeople about the lights","Scout the cliffs from the sea","Go in through the front door"],encounter:{monsters:["Bandit","Bandit","Bandit","Bandit"],trigger:"enter"},notes:"Classic dungeon. Smugglers in the basement. Ship in the sea caves below."},
+    {t:"Danger at Dunwater",map:{t:"cave",r:[{x:1,y:2,w:6,h:5},{x:9,y:1,w:7,h:6},{x:19,y:2,w:4,h:5},{x:2,y:9,w:5,h:5},{x:9,y:9,w:7,h:5},{x:19,y:9,w:4,h:5}],c:[[7,4,9,4],[16,4,19,4],[5,7,5,9],[16,11,19,11],[7,12,9,12]],f:[{x:3,y:4,t:"💧",l:"Marsh"},{x:12,y:3,t:"🦎",l:"Lizardfolk"},{x:20,y:4,t:"🐊",l:"Crocodile Pen"},{x:4,y:11,t:"⚔️",l:"Armory"},{x:12,y:11,t:"👑",l:"Chief"},{x:20,y:11,t:"📦",l:"Weapons"}],pc:{x:3,y:4},mn:{x:12,y:3},nm:"Lizardfolk Lair"},narr:"The smugglers' weapons were being sold to lizardfolk in the nearby marshes. The town council fears an attack and sends you to the lizardfolk lair. But things aren't what they seem — the lizardfolk are arming against a genuine threat: sahuagin sea devils massing for an assault on the entire coast.",choices:["Approach the lizardfolk peacefully","Sneak into their lair to spy","Demand answers with a show of force","Seek the sahuagin threat yourself"],notes:"Diplomacy adventure. Fighting the lizardfolk is possible but counterproductive."},
+    {t:"Salvage Operation",map:{t:"cave",r:[{x:2,y:2,w:10,h:6},{x:15,y:3,w:7,h:5},{x:3,y:10,w:8,h:5},{x:14,y:10,w:8,h:5}],c:[[12,5,15,5],[8,8,8,10],[18,8,18,10]],f:[{x:6,y:4,t:"🚢",l:"Ship Wreck"},{x:9,y:5,t:"💧",l:"Flooded"},{x:18,y:5,t:"🏝️",l:"Island"},{x:6,y:12,t:"🕷️",l:"Spider Nest"},{x:18,y:12,t:"🌿",l:"Druid Grove"}],pc:{x:3,y:4},mn:{x:18,y:5},nm:"Emperor of the Waves"},narr:"A merchant named Aubreck hires you to retrieve cargo from the Emperor of the Waves — a ship that sank near a mysterious island. When you reach the wreck, you discover it's been claimed by giant insects and worse. The island itself seems to be alive with danger, and a terrifying druid lurks at its heart.",choices:["Dive to the wreck immediately","Explore the island first","Hire a boat to circle the island","Search for other survivors"],encounter:{monsters:["Giant Spider","Giant Spider","Giant Spider"],trigger:"wreck"},notes:"Ocean/island adventure. Ship exploration and survival."},
+    {t:"The Final Enemy",map:{t:"cave",r:[{x:1,y:1,w:6,h:5},{x:9,y:1,w:7,h:5},{x:19,y:1,w:4,h:5},{x:1,y:8,w:5,h:5},{x:8,y:8,w:8,h:5},{x:19,y:8,w:4,h:5},{x:4,y:15,w:7,h:3},{x:14,y:15,w:8,h:3}],c:[[7,3,9,3],[16,3,19,3],[5,6,5,8],[16,10,19,10],[6,13,8,13],[11,15,14,15]],f:[{x:3,y:3,t:"💧",l:"Flooded"},{x:12,y:3,t:"🐟",l:"Sahuagin Guard"},{x:20,y:3,t:"⚔️",l:"Barracks"},{x:3,y:10,t:"🐟"},{x:12,y:10,t:"👑",l:"Baron"},{x:20,y:10,t:"📦",l:"War Plans"},{x:7,y:16,t:"🦈",l:"Shark Pens"},{x:18,y:16,t:"🏛️",l:"Temple"}],pc:{x:3,y:3},mn:{x:12,y:10},nm:"Sahuagin Fortress"},narr:"The sahuagin fortress lies beneath the waves. With your lizardfolk and merfolk allies, you must infiltrate the stronghold, gather intelligence on the sea devils' forces, and if possible, strike at their leaders before their invasion fleet launches. The underwater lair is vast, dark, and teeming with enemies.",choices:["Lead the allied assault","Infiltrate as a small strike team","Create a diversion at the front","Sabotage their war machines from within"],encounter:{monsters:["Orc","Orc","Orc","Orc","Orc"],trigger:"fortress"},notes:"Underwater dungeon. Water breathing required. Intelligence gathering mission."}
   ]},
   {n:"Tyranny of Dragons",lv:"1-15",d:"Stop the Cult of the Dragon from freeing Tiamat.",h:"The Cult of the Dragon leads an assault across the Sword Coast...",scenes:[
-    {t:"Greenest in Flames",narr:"The town of Greenest burns. A blue dragon circles overhead while cultists and kobolds loot and pillage. Governor Nighthill watches from the keep as his town is destroyed. Somewhere in the chaos, a half-dragon champion named Langdedrosa Cyanwrath challenges the town's defenders to single combat.",choices:["Rush to defend the keep","Rescue villagers from burning buildings","Confront the raiders directly","Scout the enemy forces"],encounter:{monsters:["Kobold","Kobold","Kobold","Kobold","Goblin","Goblin"],trigger:"town"},notes:"Opening battle. Episodic encounters throughout the night."},
-    {t:"The Hatchery",narr:"Tracking the raiders to their camp, you discover a cave complex being used as a dragon hatchery. Dozens of dragon eggs sit in warm sand. The cultists are breeding an army of dragons for their queen — Tiamat herself. Frulam Mondath, a cult leader, oversees the operation.",choices:["Destroy the eggs","Infiltrate disguised as cultists","Capture Frulam for interrogation","Map the cave and report back"],encounter:{monsters:["Kobold","Kobold","Kobold","Kobold","Kobold","Kobold"],trigger:"cave"},notes:"Stealth or combat. Destroying eggs angers the cult significantly."},
-    {t:"The Rise of Tiamat",narr:"The Cult of the Dragon's plan becomes clear: they are gathering five dragon masks, one for each of Tiamat's heads, to perform a ritual at the Well of Dragons that will summon the Dragon Queen from the Nine Hells. You must rally the factions of the Sword Coast — the Harpers, the Order of the Gauntlet, the Emerald Enclave, the Lords' Alliance, and even the Zhentarim — into a coalition against the cult.",choices:["Rally the Harpers","Seek the Order of the Gauntlet","Approach the Lords' Alliance","Infiltrate the cult's inner circle"],notes:"Political/faction chapter. Building a coalition against the cult."},
-    {t:"The Well of Dragons",narr:"The final battle. The coalition forces assault the Well of Dragons while the cult attempts to complete the summoning ritual. Inside the caldera, cultists chant as reality tears open. Tiamat's five heads begin to emerge from the portal. You must stop the ritual, defeat Severin the cult leader, and if Tiamat has partially manifested — face the Dragon Queen herself.",choices:["Lead the charge into the caldera","Sabotage the ritual from within","Target the cult leaders","Focus on closing the portal"],encounter:{monsters:["Kobold","Kobold","Goblin","Goblin","Orc","Orc","Bandit","Bandit"],trigger:"always"},notes:"Epic finale. Tiamat: AC 25, HP 615, five heads. Coalition strength affects difficulty."}
+    {t:"Greenest in Flames",map:{t:"town",r:[{x:2,y:2,w:8,h:5},{x:13,y:1,w:8,h:5},{x:1,y:9,w:6,h:5},{x:9,y:9,w:6,h:5},{x:18,y:9,w:5,h:5}],c:[[10,4,13,4],[5,7,5,9],[15,6,15,9],[7,14,9,14],[15,11,18,11]],f:[{x:5,y:4,t:"🏰",l:"Keep"},{x:16,y:3,t:"🔥",l:"Burning Mill"},{x:3,y:11,t:"🔥",l:"Burning House"},{x:12,y:11,t:"⛪",l:"Temple (besieged)"},{x:20,y:11,t:"🏚️",l:"Ruins"},{x:8,y:3,t:"🔥"},{x:19,y:3,t:"🔥"}],pc:{x:5,y:4},mn:{x:12,y:11},nm:"Town of Greenest"},narr:"The town of Greenest burns. A blue dragon circles overhead while cultists and kobolds loot and pillage. Governor Nighthill watches from the keep as his town is destroyed. Somewhere in the chaos, a half-dragon champion named Langdedrosa Cyanwrath challenges the town's defenders to single combat.",choices:["Rush to defend the keep","Rescue villagers from burning buildings","Confront the raiders directly","Scout the enemy forces"],encounter:{monsters:["Kobold","Kobold","Kobold","Kobold","Goblin","Goblin"],trigger:"town"},notes:"Opening battle. Episodic encounters throughout the night."},
+    {t:"The Hatchery",map:{t:"cave",r:[{x:1,y:1,w:6,h:5},{x:9,y:1,w:7,h:5},{x:19,y:1,w:4,h:5},{x:1,y:8,w:5,h:5},{x:8,y:8,w:8,h:5},{x:19,y:8,w:4,h:5},{x:4,y:15,w:7,h:3},{x:14,y:15,w:8,h:3}],c:[[7,3,9,3],[16,3,19,3],[5,6,5,8],[16,10,19,10],[6,13,8,13],[11,15,14,15]],f:[{x:3,y:3,t:"🥚",l:"Dragon Eggs"},{x:12,y:3,t:"🥚",l:"Eggs"},{x:20,y:3,t:"🥚"},{x:3,y:10,t:"⛺",l:"Cult Camp"},{x:12,y:10,t:"🔥",l:"Shrine"},{x:20,y:10,t:"📦",l:"Loot"},{x:7,y:16,t:"🐉",l:"Hatchlings"},{x:18,y:16,t:"👑",l:"Frulam"}],pc:{x:3,y:10},mn:{x:12,y:3},nm:"Dragon Hatchery"},narr:"Tracking the raiders to their camp, you discover a cave complex being used as a dragon hatchery. Dozens of dragon eggs sit in warm sand. The cultists are breeding an army of dragons for their queen — Tiamat herself. Frulam Mondath, a cult leader, oversees the operation.",choices:["Destroy the eggs","Infiltrate disguised as cultists","Capture Frulam for interrogation","Map the cave and report back"],encounter:{monsters:["Kobold","Kobold","Kobold","Kobold","Kobold","Kobold"],trigger:"cave"},notes:"Stealth or combat. Destroying eggs angers the cult significantly."},
+    {t:"The Rise of Tiamat",map:{t:"castle",r:[{x:3,y:1,w:9,h:5},{x:15,y:1,w:7,h:5},{x:1,y:8,w:7,h:5},{x:10,y:8,w:6,h:5},{x:19,y:8,w:4,h:5}],c:[[12,3,15,3],[6,6,6,8],[16,6,16,8],[7,10,10,10],[16,10,19,10]],f:[{x:7,y:3,t:"🏛️",l:"Council Hall"},{x:18,y:3,t:"📚",l:"Library"},{x:4,y:10,t:"⚔️",l:"War Room"},{x:13,y:10,t:"🗺️",l:"Strategy Map"},{x:20,y:10,t:"🏰",l:"Keep"}],pc:{x:7,y:3},mn:{x:13,y:10},nm:"Council of Waterdeep"},narr:"The Cult of the Dragon's plan becomes clear: they are gathering five dragon masks, one for each of Tiamat's heads, to perform a ritual at the Well of Dragons that will summon the Dragon Queen from the Nine Hells. You must rally the factions of the Sword Coast — the Harpers, the Order of the Gauntlet, the Emerald Enclave, the Lords' Alliance, and even the Zhentarim — into a coalition against the cult.",choices:["Rally the Harpers","Seek the Order of the Gauntlet","Approach the Lords' Alliance","Infiltrate the cult's inner circle"],notes:"Political/faction chapter. Building a coalition against the cult."},
+    {t:"The Well of Dragons",map:{t:"cave",r:[{x:3,y:1,w:18,h:7},{x:1,y:10,w:8,h:5},{x:11,y:10,w:6,h:5},{x:20,y:10,w:3,h:5}],c:[[6,8,6,10],[14,8,14,10],[21,8,21,10]],f:[{x:12,y:4,t:"🕳️",l:"The Well"},{x:10,y:3,t:"🔥",l:"Hellfire"},{x:14,y:3,t:"🔥"},{x:8,y:2,t:"🪨"},{x:16,y:2,t:"🪨"},{x:4,y:12,t:"⚔️",l:"Alliance Army"},{x:14,y:12,t:"🐉",l:"Portal (Tiamat)"},{x:21,y:12,t:"👑",l:"Severin"}],pc:{x:4,y:12},mn:{x:12,y:4},nm:"The Well of Dragons"},narr:"The final battle. The coalition forces assault the Well of Dragons while the cult attempts to complete the summoning ritual. Inside the caldera, cultists chant as reality tears open. Tiamat's five heads begin to emerge from the portal. You must stop the ritual, defeat Severin the cult leader, and if Tiamat has partially manifested — face the Dragon Queen herself.",choices:["Lead the charge into the caldera","Sabotage the ritual from within","Target the cult leaders","Focus on closing the portal"],encounter:{monsters:["Kobold","Kobold","Goblin","Goblin","Orc","Orc","Bandit","Bandit"],trigger:"always"},notes:"Epic finale. Tiamat: AC 25, HP 615, five heads. Coalition strength affects difficulty."}
   ]},
   {n:"Princes of the Apocalypse",lv:"1-15",d:"Four elemental cults threaten the Dessarin Valley. Stop them before they unleash devastation.",h:"Dark forces stir in the Dessarin Valley. Four cults devoted to elemental evil scheme to devastate the region...",scenes:[
-    {t:"Red Larch",narr:"The small town of Red Larch sits at a crossroads in the Dessarin Valley. Strange things have been happening: earthquakes, unusual weather, travelers gone missing. The elders seem nervous, hiding secrets. Beneath the town, ancient tunnels hold dark rituals and darker allegiances.",choices:["Investigate the missing travelers","Explore beneath Red Larch","Question the nervous elders","Patrol the surrounding roads"],encounter:{monsters:["Bandit","Bandit","Bandit"],trigger:"tunnels"},notes:"Starting town. Mystery leads to four elemental cults."},
-    {t:"The Haunted Keeps",narr:"Four ancient keeps in the Sumber Hills serve as surface outposts for the elemental cults: Feathergale Spire (air), Rivergard Keep (water), Sacred Stone Monastery (earth), and Scarlet Moon Hall (fire). Each cult guards a passage to deeper temples below. The cults compete with each other even as they threaten the region.",choices:["Infiltrate Feathergale Spire","Storm Rivergard Keep","Investigate Sacred Stone Monastery","Scout Scarlet Moon Hall"],encounter:{monsters:["Orc","Orc","Bandit","Bandit"],trigger:"keeps"},notes:"Four mini-dungeons. Can be done in any order."},
-    {t:"The Fane of the Eye",narr:"Deep beneath the Sumber Hills, the four elemental temples converge at the Fane of the Eye — an ancient drow temple now serving as the nexus of elemental evil. The cult prophets wield devastating elemental weapons. To end the threat, you must delve into the deepest nodes where the princes of elemental evil stir.",choices:["Assault the fire temple","Infiltrate the water temple","Brave the earth temple","Challenge the air temple"],encounter:{monsters:["Skeleton","Skeleton","Zombie","Zombie","Orc","Orc"],trigger:"fane"},notes:"Mega-dungeon. Four connected temples. Prophets must be defeated."}
+    {t:"Red Larch",map:{t:"town",r:[{x:2,y:1,w:6,h:4},{x:10,y:1,w:7,h:4},{x:19,y:1,w:4,h:4},{x:1,y:7,w:5,h:4},{x:8,y:7,w:7,h:5},{x:18,y:7,w:5,h:4}],c:[[8,3,10,3],[17,3,19,3],[5,5,5,7],[15,9,18,9],[6,11,8,11]],f:[{x:4,y:2,t:"🏠",l:"Swinging Sword"},{x:13,y:2,t:"🏪",l:"General Store"},{x:20,y:2,t:"⛏️",l:"Quarry"},{x:3,y:8,t:"⛪",l:"Shrine"},{x:11,y:9,t:"🏛️",l:"Town Hall"},{x:20,y:8,t:"🏚️",l:"Waelvur Wagons"},{x:11,y:12,t:"🕳️",l:"Sinkhole"}],pc:{x:4,y:2},mn:{x:11,y:12},nm:"Red Larch"},narr:"The small town of Red Larch sits at a crossroads in the Dessarin Valley. Strange things have been happening: earthquakes, unusual weather, travelers gone missing. The elders seem nervous, hiding secrets. Beneath the town, ancient tunnels hold dark rituals and darker allegiances.",choices:["Investigate the missing travelers","Explore beneath Red Larch","Question the nervous elders","Patrol the surrounding roads"],encounter:{monsters:["Bandit","Bandit","Bandit"],trigger:"tunnels"},notes:"Starting town. Mystery leads to four elemental cults."},
+    {t:"The Haunted Keeps",map:{t:"castle",r:[{x:2,y:1,w:4,h:4},{x:9,y:1,w:5,h:4},{x:17,y:1,w:5,h:4},{x:5,y:7,w:5,h:4},{x:14,y:7,w:5,h:4},{x:3,y:13,w:7,h:3},{x:14,y:13,w:8,h:3}],c:[[6,3,9,3],[14,3,17,3],[7,5,7,7],[16,5,16,7],[8,11,14,11],[8,13,8,13],[18,11,18,13]],f:[{x:3,y:2,t:"🌪️",l:"Feathergale Spire"},{x:11,y:2,t:"🌊",l:"Rivergard Keep"},{x:19,y:2,t:"🪨",l:"Sacred Stone"},{x:7,y:8,t:"🔥",l:"Scarlet Moon"},{x:16,y:8,t:"🕳️",l:"Passage Down"},{x:6,y:14,t:"⚔️",l:"Cultists"},{x:18,y:14,t:"⚔️",l:"Cultists"}],pc:{x:8,y:11},mn:{x:3,y:2},nm:"Sumber Hills Keeps"},narr:"Four ancient keeps in the Sumber Hills serve as surface outposts for the elemental cults: Feathergale Spire (air), Rivergard Keep (water), Sacred Stone Monastery (earth), and Scarlet Moon Hall (fire). Each cult guards a passage to deeper temples below. The cults compete with each other even as they threaten the region.",choices:["Infiltrate Feathergale Spire","Storm Rivergard Keep","Investigate Sacred Stone Monastery","Scout Scarlet Moon Hall"],encounter:{monsters:["Orc","Orc","Bandit","Bandit"],trigger:"keeps"},notes:"Four mini-dungeons. Can be done in any order."},
+    {t:"The Fane of the Eye",map:{t:"dungeon",r:[{x:2,y:1,w:6,h:4},{x:11,y:1,w:6,h:4},{x:20,y:1,w:3,h:4},{x:1,y:7,w:5,h:5},{x:8,y:7,w:8,h:5},{x:19,y:7,w:4,h:5},{x:4,y:14,w:7,h:3},{x:14,y:14,w:8,h:3}],c:[[8,3,11,3],[17,3,20,3],[5,5,5,7],[16,9,19,9],[6,12,8,12],[11,14,14,14]],f:[{x:4,y:2,t:"🌪️",l:"Air Temple"},{x:13,y:2,t:"🌊",l:"Water Temple"},{x:21,y:2,t:"🪨",l:"Earth Temple"},{x:3,y:9,t:"🔥",l:"Fire Temple"},{x:12,y:9,t:"👁️",l:"The Fane"},{x:21,y:9,t:"⚗️",l:"Elder Eye"},{x:7,y:15,t:"🕳️",l:"Node Access"},{x:18,y:15,t:"🕳️",l:"Node Access"}],pc:{x:12,y:9},mn:{x:3,y:9},nm:"Fane of the Eye"},narr:"Deep beneath the Sumber Hills, the four elemental temples converge at the Fane of the Eye — an ancient drow temple now serving as the nexus of elemental evil. The cult prophets wield devastating elemental weapons. To end the threat, you must delve into the deepest nodes where the princes of elemental evil stir.",choices:["Assault the fire temple","Infiltrate the water temple","Brave the earth temple","Challenge the air temple"],encounter:{monsters:["Skeleton","Skeleton","Zombie","Zombie","Orc","Orc"],trigger:"fane"},notes:"Mega-dungeon. Four connected temples. Prophets must be defeated."}
   ]},
   {n:"Out of the Abyss",lv:"1-15",d:"Escape the Underdark while demon lords wreak havoc throughout the subterranean realm.",h:"Imprisoned by the drow in the depths of the Underdark, you must find a way to escape while demons overrun the tunnels...",scenes:[
-    {t:"Prisoners of the Drow",narr:"You awaken in chains in Velkynvelve, a drow outpost in the Underdark. Your captors are cruel and capricious. Fellow prisoners include a deep gnome, a kuo-toa, a myconid, and other unlikely allies. Escape seems impossible — but when demonic tremors shake the outpost, opportunity arises in the chaos.",choices:["Plan a stealthy escape","Incite a prison riot","Wait for the right moment","Try to steal the keys"],encounter:{monsters:["Kobold","Kobold","Goblin","Goblin"],trigger:"escape"},notes:"Opening. Players start with no equipment. 10 NPC prisoners to manage."},
-    {t:"Into the Underdark",narr:"Free but deep underground, you must navigate the lightless tunnels of the Underdark toward the surface. The journey passes through Sloobludop (mad kuo-toa village), Gracklstugh (duergar city), Neverlight Grove (myconid haven corrupted by Zuggtmoy), and the Darklake. Demon lords stalk the darkness — Demogorgon, Orcus, Juiblex, and others have broken free.",choices:["Head toward Sloobludop","Seek Gracklstugh","Navigate the Darklake","Search for Neverlight Grove"],notes:"Hex-crawl survival in the Underdark. Random demon encounters."},
-    {t:"The City of Spiders",narr:"Reaching Menzoberranzan, the legendary drow city, is both dangerous and necessary. The drow are in chaos as demon lords threaten their domain. Unlikely alliances form as you seek the knowledge and allies needed to banish the demon lords back to the Abyss. The solution lies in a dark ritual that requires traveling to the very heart of madness.",choices:["Seek allies among the drow houses","Research the banishment ritual","Gather components for the ritual","Confront a demon lord directly"],encounter:{monsters:["Skeleton","Skeleton","Skeleton","Zombie","Zombie","Zombie"],trigger:"city"},notes:"Mid-campaign pivot. Players gain allies and a mission to banish demon lords."}
+    {t:"Prisoners of the Drow",map:{t:"cave",r:[{x:1,y:1,w:5,h:4},{x:8,y:1,w:6,h:4},{x:17,y:1,w:6,h:4},{x:1,y:7,w:4,h:5},{x:7,y:7,w:6,h:5},{x:16,y:7,w:7,h:5},{x:3,y:14,w:7,h:3},{x:13,y:14,w:8,h:3}],c:[[6,3,8,3],[14,3,17,3],[4,5,4,7],[13,9,16,9],[5,12,7,12],[10,14,13,14]],f:[{x:3,y:2,t:"⛓️",l:"Prison Pen"},{x:10,y:2,t:"⛓️",l:"Cells"},{x:19,y:2,t:"🕷️",l:"Spider Lair"},{x:2,y:9,t:"💧",l:"Waterfall"},{x:10,y:9,t:"🔥",l:"Guard Post"},{x:19,y:9,t:"🏠",l:"Elite Drow"},{x:6,y:15,t:"🕳️",l:"Escape Route"},{x:17,y:15,t:"⚔️",l:"Armory"}],pc:{x:3,y:2},mn:{x:10,y:9},nm:"Velkynvelve"},narr:"You awaken in chains in Velkynvelve, a drow outpost in the Underdark. Your captors are cruel and capricious. Fellow prisoners include a deep gnome, a kuo-toa, a myconid, and other unlikely allies. Escape seems impossible — but when demonic tremors shake the outpost, opportunity arises in the chaos.",choices:["Plan a stealthy escape","Incite a prison riot","Wait for the right moment","Try to steal the keys"],encounter:{monsters:["Kobold","Kobold","Goblin","Goblin"],trigger:"escape"},notes:"Opening. Players start with no equipment. 10 NPC prisoners to manage."},
+    {t:"Into the Underdark",map:{t:"cave",r:[{x:0,y:0,w:24,h:18}],c:[],f:[{x:3,y:3,t:"🪨"},{x:6,y:5,t:"🍄",l:"Mushroom Grove"},{x:9,y:2,t:"🪨"},{x:12,y:6,t:"💧",l:"Dark Lake"},{x:13,y:6,t:"💧"},{x:14,y:6,t:"💧"},{x:15,y:7,t:"💧"},{x:8,y:10,t:"🏠",l:"Sloobludop"},{x:16,y:4,t:"🏰",l:"Gracklstugh"},{x:20,y:8,t:"🍄",l:"Neverlight Grove"},{x:4,y:14,t:"🪨"},{x:10,y:13,t:"🕸️",l:"Web Tunnel"},{x:17,y:14,t:"🔥",l:"Lava Flow"},{x:22,y:3,t:"🪨"},{x:3,y:8,t:"🪨"},{x:19,y:12,t:"🪨"}],pc:{x:3,y:3},mn:{x:8,y:10},nm:"Underdark Tunnels"},narr:"Free but deep underground, you must navigate the lightless tunnels of the Underdark toward the surface. The journey passes through Sloobludop (mad kuo-toa village), Gracklstugh (duergar city), Neverlight Grove (myconid haven corrupted by Zuggtmoy), and the Darklake. Demon lords stalk the darkness — Demogorgon, Orcus, Juiblex, and others have broken free.",choices:["Head toward Sloobludop","Seek Gracklstugh","Navigate the Darklake","Search for Neverlight Grove"],notes:"Hex-crawl survival in the Underdark. Random demon encounters."},
+    {t:"The City of Spiders",map:{t:"dungeon",r:[{x:2,y:1,w:8,h:5},{x:14,y:1,w:8,h:5},{x:1,y:8,w:6,h:5},{x:9,y:8,w:6,h:5},{x:18,y:8,w:5,h:5},{x:5,y:15,w:14,h:3}],c:[[10,3,14,3],[5,6,5,8],[15,6,15,8],[7,10,9,10],[15,10,18,10],[10,13,10,15]],f:[{x:6,y:3,t:"🕸️",l:"House Baenre"},{x:18,y:3,t:"🕸️",l:"House Do Urden"},{x:3,y:10,t:"🏛️",l:"Bazaar"},{x:12,y:10,t:"🕷️",l:"Spider Temple"},{x:20,y:10,t:"⚔️",l:"Arena"},{x:10,y:16,t:"📚",l:"Sorcere"}],pc:{x:10,y:16},mn:{x:12,y:10},nm:"Menzoberranzan"},narr:"Reaching Menzoberranzan, the legendary drow city, is both dangerous and necessary. The drow are in chaos as demon lords threaten their domain. Unlikely alliances form as you seek the knowledge and allies needed to banish the demon lords back to the Abyss. The solution lies in a dark ritual that requires traveling to the very heart of madness.",choices:["Seek allies among the drow houses","Research the banishment ritual","Gather components for the ritual","Confront a demon lord directly"],encounter:{monsters:["Skeleton","Skeleton","Skeleton","Zombie","Zombie","Zombie"],trigger:"city"},notes:"Mid-campaign pivot. Players gain allies and a mission to banish demon lords."}
   ]},
   {n:"The Wild Beyond the Witchlight",lv:"1-8",d:"Journey into the Feywild to confront the Hourglass Coven.",h:"Something is wrong with the Witchlight Carnival...",scenes:[
-    {t:"The Witchlight Carnival",narr:"The Witchlight Carnival appears only once every eight years, and tonight is the night. Colorful tents, magical performers, and wondrous attractions await. But something is wrong — a shadow lurks beneath the merriment. Lost things and stolen memories. The carnival is a gateway to the Feywild, and a ticket to reclaiming what was taken from you.",choices:["Explore the carnival attractions","Seek out the carnival owners","Investigate the mystery of lost things","Find the portal to the Feywild"],notes:"Unique: entire adventure can be completed without combat. Exploration and roleplay focused."},
-    {t:"Hither",narr:"Through the portal lies Prismeer — a Feywild domain split into three splinters by the Hourglass Coven. Hither is a foggy swampland ruled by Bavlorna Blightstraw, a hag who hoards things she's stolen. Talking animals, lost children, and whimsical dangers fill this waterlogged realm.",choices:["Seek Bavlorna's cottage","Help the lost children","Befriend the talking animals","Navigate the swamp stealthily"],notes:"First Feywild splinter. Bavlorna is a green hag. Can be defeated through trickery."},
-    {t:"Thither",narr:"The second splinter is Thither — an ancient forest where time moves strangely. Granny Nightshade rules from a mountaintop theater, putting on plays with kidnapped performers. The trees whisper warnings, and a wayward prince needs your help to remember who he is.",choices:["Find Granny Nightshade's theater","Help the wayward prince","Explore the whispering woods","Seek the Will of the Feywild"],notes:"Second hag. More fairy-tale logic than combat."},
-    {t:"Yon and the Palace of Heart's Desire",narr:"Yon is a frozen mountainous realm ruled by Endelyn Moongrave — a hag who sees the future and manipulates fate. At the pinnacle stands the Palace of Heart's Desire, where all stolen things are kept. To restore Prismeer and free its people, you must confront all three hags and break their hold on this domain.",choices:["Climb to the Palace directly","Sabotage Endelyn's theater of fate","Unite the Feywild creatures","Challenge the Hourglass Coven together"],encounter:{monsters:["Goblin","Goblin","Goblin","Wolf","Wolf"],trigger:"palace"},notes:"Final act. Three hags can be fought or outwitted. Palace has many puzzles."}
+    {t:"The Witchlight Carnival",map:{t:"town",r:[{x:2,y:2,w:5,h:4},{x:9,y:1,w:6,h:5},{x:18,y:2,w:5,h:4},{x:1,y:8,w:6,h:4},{x:9,y:8,w:6,h:4},{x:18,y:8,w:5,h:4},{x:5,y:14,w:14,h:3}],c:[[7,4,9,4],[15,4,18,4],[5,6,5,8],[15,10,18,10],[7,12,9,12],[12,14,12,14]],f:[{x:4,y:3,t:"🎪",l:"Big Top"},{x:12,y:3,t:"🎡",l:"Ferris Wheel"},{x:20,y:3,t:"🎭",l:"Mystery Mine"},{x:3,y:9,t:"🎯",l:"Games"},{x:12,y:9,t:"🔮",l:"Fortune Teller"},{x:20,y:9,t:"🍬",l:"Candy Stand"},{x:10,y:15,t:"🌀",l:"Feywild Portal"}],pc:{x:5,y:14},mn:{x:10,y:15},nm:"Witchlight Carnival"},narr:"The Witchlight Carnival appears only once every eight years, and tonight is the night. Colorful tents, magical performers, and wondrous attractions await. But something is wrong — a shadow lurks beneath the merriment. Lost things and stolen memories. The carnival is a gateway to the Feywild, and a ticket to reclaiming what was taken from you.",choices:["Explore the carnival attractions","Seek out the carnival owners","Investigate the mystery of lost things","Find the portal to the Feywild"],notes:"Unique: entire adventure can be completed without combat. Exploration and roleplay focused."},
+    {t:"Hither",map:{t:"forest",r:[{x:0,y:0,w:24,h:18}],c:[],f:[{x:3,y:3,t:"💧",l:"Swamp"},{x:4,y:4,t:"💧"},{x:5,y:3,t:"💧"},{x:6,y:5,t:"💧"},{x:8,y:8,t:"🏚️",l:"Bavlorna Cottage"},{x:10,y:7,t:"💧"},{x:12,y:9,t:"💧"},{x:14,y:5,t:"🌿"},{x:16,y:8,t:"🌿"},{x:18,y:4,t:"🌿"},{x:20,y:7,t:"🌿"},{x:7,y:13,t:"🐸",l:"Bullywug"},{x:15,y:13,t:"🌳",l:"Ancient Tree"},{x:3,y:10,t:"🌿"},{x:19,y:12,t:"🌿"},{x:11,y:14,t:"💧"}],pc:{x:3,y:3},mn:{x:8,y:8},nm:"Hither - The Swamp"},narr:"Through the portal lies Prismeer — a Feywild domain split into three splinters by the Hourglass Coven. Hither is a foggy swampland ruled by Bavlorna Blightstraw, a hag who hoards things she's stolen. Talking animals, lost children, and whimsical dangers fill this waterlogged realm.",choices:["Seek Bavlorna's cottage","Help the lost children","Befriend the talking animals","Navigate the swamp stealthily"],notes:"First Feywild splinter. Bavlorna is a green hag. Can be defeated through trickery."},
+    {t:"Thither",map:{t:"forest",r:[{x:0,y:0,w:24,h:18}],c:[],f:[{x:3,y:3,t:"🌲"},{x:5,y:5,t:"🌲"},{x:7,y:2,t:"🌲"},{x:9,y:7,t:"🌲"},{x:11,y:4,t:"🌲"},{x:13,y:8,t:"🌲"},{x:15,y:3,t:"🌲"},{x:17,y:6,t:"🌲"},{x:19,y:4,t:"🌲"},{x:21,y:7,t:"🌲"},{x:4,y:10,t:"🌲"},{x:8,y:12,t:"🌲"},{x:12,y:11,t:"🌲"},{x:16,y:13,t:"🌲"},{x:20,y:11,t:"🌲"},{x:12,y:2,t:"🏔️",l:"Granny Theater"},{x:6,y:8,t:"🤴",l:"Wayward Prince"},{x:18,y:14,t:"🌳",l:"Elder Tree"}],pc:{x:3,y:10},mn:{x:12,y:2},nm:"Thither - Ancient Forest"},narr:"The second splinter is Thither — an ancient forest where time moves strangely. Granny Nightshade rules from a mountaintop theater, putting on plays with kidnapped performers. The trees whisper warnings, and a wayward prince needs your help to remember who he is.",choices:["Find Granny Nightshade's theater","Help the wayward prince","Explore the whispering woods","Seek the Will of the Feywild"],notes:"Second hag. More fairy-tale logic than combat."},
+    {t:"Yon and the Palace of Heart's Desire",map:{t:"castle",r:[{x:5,y:1,w:14,h:5},{x:2,y:8,w:8,h:5},{x:14,y:8,w:8,h:5},{x:7,y:15,w:10,h:3}],c:[[8,6,8,8],[16,6,16,8],[12,13,12,15]],f:[{x:12,y:3,t:"👑",l:"Throne"},{x:8,y:2,t:"❄️",l:"Ice"},{x:16,y:2,t:"❄️"},{x:5,y:10,t:"🎭",l:"Theater"},{x:18,y:10,t:"🔮",l:"Fate Loom"},{x:12,y:16,t:"💝",l:"Heart's Desire"}],pc:{x:12,y:16},mn:{x:12,y:3},nm:"Palace of Heart's Desire"},narr:"Yon is a frozen mountainous realm ruled by Endelyn Moongrave — a hag who sees the future and manipulates fate. At the pinnacle stands the Palace of Heart's Desire, where all stolen things are kept. To restore Prismeer and free its people, you must confront all three hags and break their hold on this domain.",choices:["Climb to the Palace directly","Sabotage Endelyn's theater of fate","Unite the Feywild creatures","Challenge the Hourglass Coven together"],encounter:{monsters:["Goblin","Goblin","Goblin","Wolf","Wolf"],trigger:"palace"},notes:"Final act. Three hags can be fought or outwitted. Palace has many puzzles."}
   ]},
   {n:"Keys from the Golden Vault",lv:"1-11",d:"Anthology of heist-themed adventures.",h:"A golden key arrives with an invitation to join the Golden Vault...",scenes:[
-    {t:"The Murkmire Heist",narr:"Your first job from the Golden Vault: infiltrate a carnival sideshow run by a corrupt collector and steal back a cursed gemstone before it drives the townsfolk mad. The carnival is full of distractions, guards, and unexpected obstacles. You'll need a plan — and the flexibility to improvise when it falls apart.",choices:["Scout the carnival layout","Create a distraction","Go in disguise","Break in after hours"],encounter:{monsters:["Bandit","Bandit","Bandit"],trigger:"caught"},notes:"Level 1 heist. Teaches heist mechanics. Multiple approaches."},
-    {t:"Prisoner 13",narr:"The Golden Vault needs you to infiltrate a prison — not to break someone out, but to retrieve a tattoo from a prisoner's back. The prisoner is a retired spy who encoded vital secrets in her body art. The prison is well-guarded, and the warden is both paranoid and corrupt.",choices:["Get arrested to go inside","Pose as inspectors","Bribe the guards","Tunnel in from below"],notes:"Level 4 heist. Social infiltration heavy."},
-    {t:"Masterpiece Imbroglio",narr:"A famous painting has been stolen from a museum and replaced with a forgery. The real painting is in the vault of a noble family's mansion during their annual gala. You must attend the party, locate the vault, steal back the painting, and escape without being noticed — all while navigating high-society intrigue.",choices:["Attend the gala as guests","Infiltrate as serving staff","Enter through the roof","Create a grand diversion"],notes:"Level 7 heist. Gala setting. Heavy social interaction."},
-    {t:"Vidorant's Vault",narr:"The final heist: break into the most secure vault in the land, belonging to the corrupt archmage Vidorant. Magical wards, construct guardians, puzzle locks, and layers of defensive magic protect whatever dark secret the Golden Vault needs you to retrieve. This is the job that will define your legacy.",choices:["Disable the wards systematically","Overpower the guardians","Find Vidorant's secret bypass","Recruit a specialist for each obstacle"],encounter:{monsters:["Skeleton","Skeleton","Skeleton","Skeleton"],trigger:"vault"},notes:"Climactic heist. Highest security. Multiple puzzle layers."}
+    {t:"The Murkmire Heist",map:{t:"town",r:[{x:2,y:2,w:8,h:5},{x:13,y:1,w:8,h:6},{x:1,y:9,w:6,h:5},{x:9,y:9,w:6,h:5},{x:18,y:9,w:5,h:5}],c:[[10,4,13,4],[5,7,5,9],[15,7,15,9],[7,14,9,14],[15,11,18,11]],f:[{x:5,y:4,t:"🎪",l:"Sideshow"},{x:16,y:3,t:"🔒",l:"Vault"},{x:3,y:11,t:"🏪",l:"Game Booth"},{x:12,y:11,t:"💎",l:"Cursed Gem"},{x:20,y:11,t:"🚪",l:"Back Exit"}],pc:{x:5,y:4},mn:{x:16,y:3},nm:"Murkmire Carnival"},narr:"Your first job from the Golden Vault: infiltrate a carnival sideshow run by a corrupt collector and steal back a cursed gemstone before it drives the townsfolk mad. The carnival is full of distractions, guards, and unexpected obstacles. You'll need a plan — and the flexibility to improvise when it falls apart.",choices:["Scout the carnival layout","Create a distraction","Go in disguise","Break in after hours"],encounter:{monsters:["Bandit","Bandit","Bandit"],trigger:"caught"},notes:"Level 1 heist. Teaches heist mechanics. Multiple approaches."},
+    {t:"Prisoner 13",map:{t:"dungeon",r:[{x:1,y:1,w:6,h:4},{x:10,y:1,w:7,h:4},{x:20,y:1,w:3,h:4},{x:1,y:7,w:5,h:5},{x:8,y:7,w:8,h:5},{x:19,y:7,w:4,h:5},{x:3,y:14,w:8,h:3},{x:14,y:14,w:8,h:3}],c:[[7,3,10,3],[17,3,20,3],[5,5,5,7],[16,9,19,9],[6,12,8,12],[11,14,14,14]],f:[{x:3,y:2,t:"🚪",l:"Gate"},{x:13,y:2,t:"⛓️",l:"Cell Block A"},{x:21,y:2,t:"🏢",l:"Warden"},{x:3,y:9,t:"⛓️",l:"Cell Block B"},{x:12,y:9,t:"⛓️",l:"Prisoner 13"},{x:21,y:9,t:"👁️",l:"Guard Tower"},{x:7,y:15,t:"🍽️",l:"Mess Hall"},{x:18,y:15,t:"🏋️",l:"Yard"}],pc:{x:3,y:2},mn:{x:12,y:9},nm:"Revel's End Prison"},narr:"The Golden Vault needs you to infiltrate a prison — not to break someone out, but to retrieve a tattoo from a prisoner's back. The prisoner is a retired spy who encoded vital secrets in her body art. The prison is well-guarded, and the warden is both paranoid and corrupt.",choices:["Get arrested to go inside","Pose as inspectors","Bribe the guards","Tunnel in from below"],notes:"Level 4 heist. Social infiltration heavy."},
+    {t:"Masterpiece Imbroglio",map:{t:"castle",r:[{x:2,y:1,w:10,h:5},{x:15,y:1,w:7,h:5},{x:1,y:8,w:7,h:5},{x:10,y:8,w:6,h:5},{x:19,y:8,w:4,h:5}],c:[[12,3,15,3],[6,6,6,8],[16,6,16,8],[7,10,10,10],[16,10,19,10]],f:[{x:6,y:3,t:"🎭",l:"Ballroom"},{x:17,y:3,t:"🖼️",l:"Gallery"},{x:4,y:10,t:"🍷",l:"Wine Cellar"},{x:13,y:10,t:"🔐",l:"Vault"},{x:20,y:10,t:"🚪",l:"Service Exit"}],pc:{x:6,y:3},mn:{x:13,y:10},nm:"Noble Mansion Gala"},narr:"A famous painting has been stolen from a museum and replaced with a forgery. The real painting is in the vault of a noble family's mansion during their annual gala. You must attend the party, locate the vault, steal back the painting, and escape without being noticed — all while navigating high-society intrigue.",choices:["Attend the gala as guests","Infiltrate as serving staff","Enter through the roof","Create a grand diversion"],notes:"Level 7 heist. Gala setting. Heavy social interaction."},
+    {t:"Vidorant's Vault",map:{t:"dungeon",r:[{x:3,y:1,w:8,h:4},{x:14,y:1,w:8,h:4},{x:1,y:7,w:6,h:5},{x:9,y:7,w:6,h:5},{x:18,y:7,w:5,h:5},{x:5,y:14,w:14,h:3}],c:[[11,3,14,3],[5,5,5,7],[15,5,15,7],[7,10,9,10],[15,10,18,10],[10,12,10,14]],f:[{x:7,y:2,t:"⚠️",l:"Ward 1"},{x:18,y:2,t:"⚠️",l:"Ward 2"},{x:3,y:9,t:"🤖",l:"Golem Guard"},{x:12,y:9,t:"🧩",l:"Puzzle Lock"},{x:20,y:9,t:"⚠️",l:"Ward 3"},{x:12,y:15,t:"💎",l:"Vidorant's Secret"}],pc:{x:7,y:2},mn:{x:12,y:15},nm:"Vidorant's Vault"},narr:"The final heist: break into the most secure vault in the land, belonging to the corrupt archmage Vidorant. Magical wards, construct guardians, puzzle locks, and layers of defensive magic protect whatever dark secret the Golden Vault needs you to retrieve. This is the job that will define your legacy.",choices:["Disable the wards systematically","Overpower the guardians","Find Vidorant's secret bypass","Recruit a specialist for each obstacle"],encounter:{monsters:["Skeleton","Skeleton","Skeleton","Skeleton"],trigger:"vault"},notes:"Climactic heist. Highest security. Multiple puzzle layers."}
   ]},
   {n:"Phandelver and Below",lv:"1-12",d:"Expanded Lost Mine of Phandelver that descends into the Underdark and the Far Realm.",h:"What began as a simple escort job leads to the Underdark and threats from beyond reality...",scenes:[
-    {t:"The Road to Phandalin",narr:"The adventure begins familiarly — you're escorting a wagon to Phandalin when you discover dead horses and signs of an ambush. But this time, the goblin threat is just the beginning. Something far stranger lurks beneath the Sword Mountains, and the missing dwarf Gundren Rockseeker has stumbled onto something worse than a lost mine.",choices:["Investigate the ambush site","Follow the goblin trail","Rush to Phandalin for help","Search for Gundren's trail"],encounter:{monsters:["Goblin","Goblin","Goblin","Goblin"],trigger:"trail"},notes:"Familiar start from LMoP. New content diverges at Wave Echo Cave."},
-    {t:"Wave Echo Cave Transformed",narr:"Wave Echo Cave is different from what anyone expected. The Forge of Spells has been corrupted by Far Realm energy seeping through a crack in reality. Strange mutations affect the cave's creatures. Psionic whispers echo through the tunnels. The Black Spider sought power here, but what he found has driven him mad.",choices:["Investigate the Far Realm energy","Confront the corrupted Black Spider","Seal the reality crack","Explore the mutated depths"],encounter:{monsters:["Goblin","Goblin","Skeleton","Skeleton","Zombie"],trigger:"cave"},notes:"Transition point from classic LMoP to new Underdark content."},
-    {t:"The Shattered Obelisk",narr:"Beneath Wave Echo Cave, you discover a shattered obelisk of alien origin — a Far Realm artifact that is slowly tearing open a permanent gateway. Mind flayer influence spreads through the Underdark. The obelisk's fragments must be found and destroyed, but each piece is guarded by aberrant horrors.",choices:["Descend to the obelisk","Search for fragment locations","Seek allies against the Far Realm","Research the obelisk's origin"],encounter:{monsters:["Goblin","Goblin","Goblin","Skeleton","Skeleton","Skeleton"],trigger:"obelisk"},notes:"New content. Far Realm horror themes. Mind flayer presence."}
+    {t:"The Road to Phandalin",map:{t:"road",r:[{x:0,y:6,w:30,h:6}],c:[],f:[{x:3,y:8,t:"🐴",l:"Dead Horse"},{x:5,y:8,t:"🐴",l:"Dead Horse"},{x:4,y:6,t:"📦",l:"Looted Wagon"},{x:12,y:4,t:"🌲"},{x:13,y:3,t:"🌲"},{x:14,y:5,t:"🌲"},{x:11,y:3,t:"🌲"},{x:15,y:3,t:"🌲"},{x:16,y:4,t:"🌲"},{x:12,y:10,t:"🌲"},{x:14,y:11,t:"🌲"},{x:13,y:12,t:"🌲"},{x:11,y:11,t:"🌲"},{x:8,y:3,t:"🌲"},{x:9,y:4,t:"🌲"},{x:7,y:2,t:"🌲"},{x:18,y:4,t:"🌲"},{x:19,y:3,t:"🌲"},{x:20,y:5,t:"🌲"},{x:8,y:11,t:"🌲"},{x:9,y:12,t:"🌲"},{x:7,y:10,t:"🌲"},{x:18,y:11,t:"🌲"},{x:19,y:12,t:"🌲"},{x:20,y:10,t:"🌲"}],pc:{x:1,y:8},mn:{x:14,y:7},nm:"Triboar Trail"},narr:"The adventure begins familiarly — you're escorting a wagon to Phandalin when you discover dead horses and signs of an ambush. But this time, the goblin threat is just the beginning. Something far stranger lurks beneath the Sword Mountains, and the missing dwarf Gundren Rockseeker has stumbled onto something worse than a lost mine.",choices:["Investigate the ambush site","Follow the goblin trail","Rush to Phandalin for help","Search for Gundren's trail"],encounter:{monsters:["Goblin","Goblin","Goblin","Goblin"],trigger:"trail"},notes:"Familiar start from LMoP. New content diverges at Wave Echo Cave."},
+    {t:"Wave Echo Cave Transformed",map:{t:"cave",r:[{x:1,y:1,w:6,h:4},{x:9,y:1,w:7,h:5},{x:19,y:1,w:4,h:4},{x:1,y:7,w:5,h:5},{x:8,y:7,w:8,h:6},{x:19,y:7,w:4,h:5},{x:3,y:14,w:7,h:3},{x:13,y:14,w:9,h:3}],c:[[7,3,9,3],[16,3,19,3],[5,5,5,7],[16,10,19,10],[6,12,8,12],[10,14,13,14]],f:[{x:3,y:2,t:"🔮",l:"Corrupted Forge"},{x:12,y:3,t:"👁️",l:"Far Realm Rift"},{x:20,y:2,t:"💀",l:"Mutated Undead"},{x:3,y:9,t:"🕸️",l:"Corrupted Web"},{x:12,y:10,t:"🧠",l:"Mind Flayer"},{x:20,y:9,t:"🟣",l:"Psionic Crystal"},{x:6,y:15,t:"⛏️",l:"Old Mine"},{x:17,y:15,t:"🌀",l:"Portal"}],pc:{x:3,y:2},mn:{x:12,y:10},nm:"Corrupted Wave Echo Cave"},narr:"Wave Echo Cave is different from what anyone expected. The Forge of Spells has been corrupted by Far Realm energy seeping through a crack in reality. Strange mutations affect the cave's creatures. Psionic whispers echo through the tunnels. The Black Spider sought power here, but what he found has driven him mad.",choices:["Investigate the Far Realm energy","Confront the corrupted Black Spider","Seal the reality crack","Explore the mutated depths"],encounter:{monsters:["Goblin","Goblin","Skeleton","Skeleton","Zombie"],trigger:"cave"},notes:"Transition point from classic LMoP to new Underdark content."},
+    {t:"The Shattered Obelisk",map:{t:"dungeon",r:[{x:3,y:1,w:8,h:5},{x:14,y:1,w:8,h:5},{x:1,y:8,w:6,h:5},{x:9,y:8,w:6,h:5},{x:18,y:8,w:5,h:5},{x:5,y:15,w:14,h:3}],c:[[11,3,14,3],[5,6,5,8],[15,6,15,8],[7,10,9,10],[15,10,18,10],[10,13,10,15]],f:[{x:7,y:3,t:"🟣",l:"Obelisk Shard"},{x:18,y:3,t:"🟣",l:"Obelisk Shard"},{x:3,y:10,t:"🧠",l:"Mind Flayer"},{x:12,y:10,t:"🟣",l:"Main Obelisk"},{x:20,y:10,t:"👁️",l:"Elder Brain"},{x:12,y:16,t:"🌀",l:"Far Realm Gate"}],pc:{x:7,y:3},mn:{x:12,y:10},nm:"Shattered Obelisk Chamber"},narr:"Beneath Wave Echo Cave, you discover a shattered obelisk of alien origin — a Far Realm artifact that is slowly tearing open a permanent gateway. Mind flayer influence spreads through the Underdark. The obelisk's fragments must be found and destroyed, but each piece is guarded by aberrant horrors.",choices:["Descend to the obelisk","Search for fragment locations","Seek allies against the Far Realm","Research the obelisk's origin"],encounter:{monsters:["Goblin","Goblin","Goblin","Skeleton","Skeleton","Skeleton"],trigger:"obelisk"},notes:"New content. Far Realm horror themes. Mind flayer presence."}
   ]},
   {n:"Custom Campaign",lv:"Any",d:"Create your own world. Full DM control.",h:"Your adventure begins here...",scenes:[
-    {t:"Session Start",narr:"The adventure begins. The Dungeon Master will set the scene and guide the story. Players, prepare your characters and await the DM's narration.",choices:["Ready for adventure"],notes:"DM writes their own scenes from here."}
+    {t:"Session Start",map:{t:"dungeon",r:[{x:0,y:0,w:24,h:18}],c:[],f:[],pc:{x:4,y:9},mn:{x:20,y:9},nm:"Open Map"},narr:"The adventure begins. The Dungeon Master will set the scene and guide the story. Players, prepare your characters and await the DM's narration.",choices:["Ready for adventure"],notes:"DM writes their own scenes from here."}
   ]}
 ];
 
 // ─── SESSION PLAY COMPONENT ──────────────────────────────────
-function SessionPlay({camp, isDM, chars, mons, setMons, syncAction, sceneData}) {
+function SessionPlay({camp, isDM, chars, mons, setMons, syncAction, sceneData, setPage}) {
   const {addMsg, pn, sess} = useContext(AppCtx);
   const [dmNarration, setDmNarration] = useState("");
   const [customSceneTitle, setCustomSceneTitle] = useState("");
@@ -375,8 +375,9 @@ function SessionPlay({camp, isDM, chars, mons, setMons, syncAction, sceneData}) 
     setShowEncounter(true);
     const entry = {type:"encounter", text:`Combat! ${monsToAdd.map(m=>m.n).join(", ")} appear!`, ts: Date.now()};
     updateScene({journal: [...journal, entry]});
-    addMsg("system", `⚔️ ENCOUNTER: ${monsToAdd.map(m=>m.n).join(", ")}!`);
-  }, [scene, journal, updateScene, addMsg, syncAction]);
+    addMsg("system", `⚔️ ENCOUNTER: ${monsToAdd.map(m=>m.n).join(", ")}! Switch to Combat tab to fight!`);
+    if (setPage) setTimeout(() => setPage("combat"), 500);
+  }, [scene, journal, updateScene, addMsg, syncAction, setPage]);
 
   const addCustomScene = useCallback(() => {
     if (!customSceneNarr.trim()) return;
@@ -394,14 +395,14 @@ function SessionPlay({camp, isDM, chars, mons, setMons, syncAction, sceneData}) 
     setShowCustom(false);
   }, [customSceneTitle, customSceneNarr, customChoices, journal, updateScene, addMsg]);
 
-  // Auto-load first scene once
+  // Auto-load first scene once (host only to prevent duplicates)
   useEffect(() => {
-    if (scenes.length > 0 && journal.length === 0 && !initRef.current) {
+    if (scenes.length > 0 && journal.length === 0 && !initRef.current && isDM) {
       initRef.current = true;
       const entry = {type:"scene", title: scenes[0].t, text: scenes[0].narr, ts: Date.now()};
       updateScene({journal: [entry]});
     }
-  }, [scenes, journal, updateScene]);
+  }, [scenes, journal, updateScene, isDM]);
 
   const sessionCSS = `
     .sess-journal{max-height:400px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;padding:4px}
@@ -433,7 +434,9 @@ function SessionPlay({camp, isDM, chars, mons, setMons, syncAction, sceneData}) 
       <div className="ph">
         <div>
           <h2 style={{margin:0}}>{camp.n}</h2>
-          <div className="td2 ts">{camp.lv} • Scene {sceneIdx + 1}/{scenes.length}</div>
+          <div className="td2 ts">{camp.lv} • Scene {sceneIdx + 1}/{scenes.length}
+            {isDM && <button className="btn bs bg" style={{marginLeft:8,fontSize:".6rem"}} onClick={()=>syncAction({type:'SET_CAMPAIGN',payload:null})}>Change Campaign</button>}
+          </div>
         </div>
         <div className="fr gs">
           {scene?.encounter && isDM && !showEncounter && (
@@ -528,7 +531,8 @@ function SessionPlay({camp, isDM, chars, mons, setMons, syncAction, sceneData}) 
             </button>
             <button className="btn bs" onClick={() => {
               const roll = rd(20);
-              addJournal({type:"dm", text: `🎲 DM rolled a secret d20: ${roll}`});
+              const entry = {type:"dm", text: `🎲 DM rolled a secret d20: ${roll}`, ts: Date.now()};
+              updateScene({journal: [...journal, entry]});
             }}>🎲 Secret Roll</button>
             <button className="btn bs" onClick={() => {
               const desc = ["A cold wind howls through the corridor.","Torchlight flickers and almost dies.","You hear distant footsteps echoing.","A faint magical glow pulses from ahead.","The ground trembles briefly.","An eerie silence falls.","The smell of something burning drifts toward you.","A raven caws from somewhere unseen."];
@@ -695,7 +699,10 @@ label{font-family:'Cinzel',serif;font-size:.7rem;font-weight:600;color:var(--gol
 .ck input[type="checkbox"]{width:14px;height:14px;accent-color:var(--gold)}
 .dsb{width:18px;height:18px;border:2px solid var(--bdr);border-radius:50%;cursor:pointer;transition:all .2s}
 .dsb.ok{background:var(--nat);border-color:#4a9a4a}.dsb.fl{background:var(--red);border-color:var(--redb)}
-@media(max-width:900px){.g2,.g3{grid-template-columns:1fr}.g6{grid-template-columns:repeat(3,1fr)}h1{font-size:1.4rem}.bx{padding:12px 24px;font-size:.95rem}.pnl{padding:12px}.lay{grid-template-columns:1fr!important}.sb{display:none!important}}
+@media(max-width:900px){.g2,.g3{grid-template-columns:1fr}.g6{grid-template-columns:repeat(3,1fr)}h1{font-size:1.4rem}.bx{padding:12px 24px;font-size:.95rem}.pnl{padding:12px}.lay{grid-template-columns:1fr!important}.sb-desk{display:none!important}.nav{flex-wrap:wrap;gap:4px}}
+.chat-toggle{display:none;position:fixed;bottom:16px;right:16px;z-index:100;width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--goldd));border:none;color:var(--bg);font-size:1.4rem;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.4)}
+.chat-mobile{display:none;position:fixed;bottom:76px;right:16px;width:320px;max-width:calc(100vw - 32px);height:400px;z-index:99;border-radius:var(--rad);overflow:hidden}
+@media(max-width:900px){.chat-toggle{display:flex;align-items:center;justify-content:center}.chat-mobile.open{display:block}}
 `;
 
 // ═══════════════════════════════════════════════════════════════
@@ -790,12 +797,13 @@ function StatGen({stats,setStats}) {
         <div className="tx td2">[{r.rolls.join(",")}]</div><div className="abm">{ms(aMod(r.total))}</div>
       </div>)}</div>}
     </div>}
-    {method==="standard"&&<div className="g6">{ABILITIES.map(ab=>
-      <div key={ab} className="abx"><div className="abl">{ab}</div>
+    {method==="standard"&&<div className="g6">{ABILITIES.map(ab=>{
+      const usedVals=Object.entries(stats).filter(([k,v])=>k!==ab&&STANDARD_ARRAY.includes(v)).map(([,v])=>v);
+      return <div key={ab} className="abx"><div className="abl">{ab}</div>
         <select value={stats[ab]||""} onChange={e=>setStats(p=>({...p,[ab]:parseInt(e.target.value)}))}
           style={{textAlign:"center",fontSize:"1.1rem",fontWeight:700,background:"transparent",border:"none",color:"var(--ink)"}}>
-          {STANDARD_ARRAY.map(v=><option key={v} value={v}>{v}</option>)}
-        </select><div className="abm">{ms(aMod(stats[ab]||10))}</div></div>)}</div>}
+          {STANDARD_ARRAY.map(v=><option key={v} value={v} disabled={usedVals.includes(v)&&stats[ab]!==v}>{v}{usedVals.includes(v)&&stats[ab]!==v?" (used)":""}</option>)}
+        </select><div className="abm">{ms(aMod(stats[ab]||10))}</div></div>})}</div>}
     {method==="pointbuy"&&<div>
       <div className="fb mb"><span className="td2">Points:</span><span className={`bdg ${pbt>27?"bdg-r":"bdg-g"}`}>{pbt}/27</span></div>
       <div className="g6">{ABILITIES.map(ab=><div key={ab} className="abx"><div className="abl">{ab}</div>
@@ -822,7 +830,8 @@ function CharCreate({onDone}) {
   const cHP=useCallback(()=>cls?(cls.hd+aMod(tStats.CON)):10,[cls,tStats]);
   const cAC=useCallback(()=>{const d=aMod(tStats.DEX);if(ch.cls==="Barbarian")return 10+d+aMod(tStats.CON);if(ch.cls==="Monk")return 10+d+aMod(tStats.WIS);return 10+d;},[ch.cls,tStats]);
   const fin=useCallback(()=>{const hp=cHP(),ac=cAC(),p=pb(1),init=aMod(tStats.DEX),pp=10+aMod(tStats.WIS)+(ch.skills.includes("Perception")?p:0);
-    onDone({...ch,stats:tStats,mhp:hp,hp,ac,init,pb:p,pp,st:cls?.st||[],feats:cls?.ft?.[1]||[],speed:race?.sp||30,dv:race?.dv||0,traits:race?.tr||[]});
+    const bgEquip = bg?.eq ? bg.eq.split(", ").filter(Boolean) : [];
+    onDone({...ch,stats:tStats,mhp:hp,hp,ac,init,pb:p,pp,st:cls?.st||[],feats:cls?.ft?.[1]||[],speed:race?.sp||30,dv:race?.dv||0,traits:race?.tr||[],equip:bgEquip,gold:parseInt(bg?.eq?.match(/(\d+)\s*gp/)?.[1])||0});
   },[ch,tStats,cHP,cAC,cls,race,onDone]);
   const steps=["Name & Race","Class","Background","Ability Scores","Skills & Spells","Review"];
 
@@ -948,15 +957,24 @@ function CharSheet({ch,onUp}) {
   return <div className="pnl">
     <div className="fb mb"><div>
       <h2 style={{marginBottom:0}}>{ch.name||"Unnamed"}</h2>
-      <div className="td2 ts">{ch.race} {ch.cls} • Lv{ch.level} • {ch.align}</div>
-    </div><button className="btn bs" onClick={rollInit}>🎲 Initiative</button></div>
+      <div className="td2 ts">{ch.race} {ch.cls} • Level {ch.level} • {ch.align}</div>
+    </div><div className="fr gs">
+      <button className="btn bs" onClick={()=>{
+        const newLv=ch.level+1;if(newLv>20)return;
+        const hitDie=CLASSES[ch.cls]?.hd||8;const hpGain=rd(hitDie)+aMod(ch.stats.CON);
+        const newMaxHp=ch.mhp+Math.max(1,hpGain);
+        onUp({...ch,level:newLv,mhp:newMaxHp,hp:newMaxHp,pb:pb(newLv)});
+        addMsg("system",`🎉 ${ch.name} levels up to ${newLv}! +${Math.max(1,hpGain)} HP (now ${newMaxHp}). Proficiency: +${pb(newLv)}`);
+      }}>⬆️ Level Up</button>
+      <button className="btn bs" onClick={rollInit}>🎲 Initiative</button>
+    </div></div>
 
     <div className="mb">
       <div className="fb ts" style={{marginBottom:3}}>
         <span>HP: {ch.hp}/{ch.mhp}{ch.thp>0?` (+${ch.thp})`:""}</span>
         <div className="fr gs">
-          <button className="btn bs bd" onClick={()=>{const d=parseInt(prompt("Damage:"));if(d>0)onUp({...ch,hp:Math.max(0,ch.hp-d)});}}>−HP</button>
-          <button className="btn bs" style={{borderColor:"var(--nat)",color:"#4a9a4a"}} onClick={()=>{const h=parseInt(prompt("Heal:"));if(h>0)onUp({...ch,hp:Math.min(ch.mhp,ch.hp+h)});}}>+HP</button>
+          <button className="btn bs bd" onClick={()=>{const d=parseInt(prompt("Damage amount:"));if(!isNaN(d)&&d>0)onUp({...ch,hp:Math.max(0,ch.hp-d)});}}>−HP</button>
+          <button className="btn bs" style={{borderColor:"var(--nat)",color:"#4a9a4a"}} onClick={()=>{const h=parseInt(prompt("Heal amount:"));if(!isNaN(h)&&h>0)onUp({...ch,hp:Math.min(ch.mhp,ch.hp+h)});}}>+HP</button>
         </div>
       </div>
       <div className="hpbg"><div className={`hpf ${hpc}`} style={{width:`${hpp}%`}}/></div>
@@ -1002,10 +1020,15 @@ function CharSheet({ch,onUp}) {
       <div className="mm ts td2">Passive Perception: <b className="tg">{ch.pp||10+aMod(ch.stats.WIS)}</b></div>
     </div>}
 
-    {tab==="spells"&&<div className="afu">{ch.spells?.length>0?<div className="fc">
+    {tab==="spells"&&<div className="afu">{ch.spells?.length>0||cls?.sc?<div className="fc">
       {cls?.sa&&<div className="fr mb"><span className="bdg bdg-a">Ability: {cls.sa}</span>
         <span className="bdg bdg-a">Save DC: {8+p+aMod(ch.stats[cls.sa])}</span>
         <span className="bdg bdg-a">Attack: {ms(p+aMod(ch.stats[cls.sa]))}</span></div>}
+      {cls?.sl?.[1]&&cls.sl[1][0]>0&&<div className="fr mb gs"><label>Spell Slots (Lv1):</label>
+        {Array.from({length:cls.sl[1][0]}).map((_,si)=><span key={si} className={`bdg ${si<(ch.usedSlots||0)?"bdg-r":"bdg-a"}`} style={{cursor:"pointer",width:28,textAlign:"center"}} 
+          onClick={()=>onUp({...ch,usedSlots:si<(ch.usedSlots||0)?(ch.usedSlots||0)-1:(ch.usedSlots||0)+1})}>{si<(ch.usedSlots||0)?"✕":"○"}</span>)}
+        <button className="btn bs" onClick={()=>onUp({...ch,usedSlots:0})}>Reset</button>
+      </div>}
       {[0,1,2,3,4,5,6,7,8,9].map(lv=>{const sps=ch.spells.filter(s=>s.l===lv);if(!sps.length)return null;
         return <div key={lv} className="mb"><h3 style={{fontSize:".85rem"}}>{lv===0?"Cantrips":`Level ${lv}`}</h3>
           <div className="fc gs mt">{sps.map(sp=><SpellCard key={sp.n} sp={sp}/>)}</div></div>;})}
@@ -1013,21 +1036,34 @@ function CharSheet({ch,onUp}) {
 
     {tab==="inventory"&&<div className="afu">
       <div className="fb mb"><h3>Equipment</h3><div className="fr gs">
-        <span className="bdg bdg-g">💰 {ch.gold||0} gp</span>
+        <span className="bdg bdg-g" style={{cursor:"pointer"}} onClick={()=>{const g=prompt("Set gold:",ch.gold||0);const gv=parseInt(g);if(!isNaN(gv)&&gv>=0)onUp({...ch,gold:gv});}}>💰 {ch.gold||0} gp</span>
         <button className="btn bs" onClick={()=>{const i=prompt("Add item:");if(i)onUp({...ch,equip:[...(ch.equip||[]),i]});}}>+ Add</button>
       </div></div>
       {(ch.equip||[]).length>0?<div className="fc">{ch.equip.map((it,i)=><div key={i} className="fb" style={{padding:"3px 0",borderBottom:"1px solid rgba(201,168,76,.08)"}}>
-        <span className="ts">{it}</span><button className="btn bs bg td2" onClick={()=>onUp({...ch,equip:ch.equip.filter((_,j)=>j!==i)})}>✕</button>
+        <span className="ts">{typeof it === 'string' ? it : it.name || it}</span><button className="btn bs bg td2" onClick={()=>onUp({...ch,equip:ch.equip.filter((_,j)=>j!==i)})}>✕</button>
       </div>)}</div>:<div className="tc td2" style={{padding:36}}>Empty inventory.</div>}
     </div>}
 
     {tab==="features"&&<div className="afu fc gl">
+      <div><h3>Rest</h3><div className="fr gs mt">
+        <button className="btn" onClick={()=>{
+          const hitDie=CLASSES[ch.cls]?.hd||8;const roll=rd(hitDie)+aMod(ch.stats.CON);const healed=Math.max(1,roll);
+          const newHp=Math.min(ch.mhp,ch.hp+healed);onUp({...ch,hp:newHp});
+          addMsg("roll",`${ch.name} takes a Short Rest: heals 1d${hitDie}${ms(aMod(ch.stats.CON))} = ${healed} HP (now ${newHp}/${ch.mhp})`);
+        }}>☕ Short Rest (1 Hit Die)</button>
+        <button className="btn bp" onClick={()=>{onUp({...ch,hp:ch.mhp,usedSlots:0,ds:{s:0,f:0}});
+          addMsg("system",`${ch.name} takes a Long Rest: full HP restored, spell slots reset.`);
+        }}>🛏️ Long Rest (Full Heal)</button>
+      </div></div>
+      <div className="dv"/>
       {ch.traits?.length>0&&<div><h3>Racial Traits</h3><div className="fr gs mt">{ch.traits.map(t=><span key={t} className="bdg bdg-g">{t}</span>)}</div></div>}
       {ch.feats?.length>0&&<div><h3>Class Features</h3><div className="fr gs mt">{ch.feats.map(f=><span key={f} className="bdg bdg-a">{f}</span>)}</div></div>}
       {ch.conds?.length>0&&<div><h3>Conditions</h3><div className="fr gs mt">{ch.conds.map(c=>{const cd=CONDITIONS.find(x=>x.n===c);
         return <span key={c} className="bdg bdg-r" style={{cursor:"pointer"}} title={cd?.d} onClick={()=>onUp({...ch,conds:ch.conds.filter(x=>x!==c)})}>{cd?.i} {c} ✕</span>;})}</div></div>}
-      <button className="btn bs" onClick={()=>{const c=prompt(`Condition:\n${CONDITIONS.map(c=>c.n).join(", ")}`);
-        if(c){const m=CONDITIONS.find(x=>x.n.toLowerCase()===c.toLowerCase());if(m)onUp({...ch,conds:[...(ch.conds||[]),m.n]});}}}>+ Condition</button>
+      <div className="fr gs" style={{flexWrap:"wrap"}}>{CONDITIONS.map(cd=>
+        <button key={cd.n} className="btn bs" style={{fontSize:".6rem",padding:"2px 6px"}} title={cd.d}
+          onClick={()=>{if(!(ch.conds||[]).includes(cd.n))onUp({...ch,conds:[...(ch.conds||[]),cd.n]});}}>{cd.i} {cd.n}</button>
+      )}</div>
     </div>}
   </div>;
 }
@@ -1044,9 +1080,9 @@ function SpellCard({sp}) {
 
 function Combat({chars, mons, syncAction, isDM, combatState}) {
   const {addMsg, pn} = useContext(AppCtx);
+  const [targetIdx, setTargetIdx] = useState(null);
+  const [attackMode, setAttackMode] = useState(null); // {attackerIdx, atk} when picking target
   const playerName = pn || "Player";
-
-  // Combat state from synced App state
   const {combatants=[], turn=0, round=1, live=false} = combatState || {};
 
   const updateCombat = useCallback((updates) => {
@@ -1055,82 +1091,172 @@ function Combat({chars, mons, syncAction, isDM, combatState}) {
 
   const rollAll = useCallback(() => {
     const e = [];
-    chars.forEach(c => e.push({
-      ...c, init: rd(20) + aMod(c.stats?.DEX || 10), isMon: false,
-      actA: false, actB: false, actR: false
-    }));
+    chars.forEach(c => {
+      const init = rd(20) + aMod(c.stats?.DEX || 10);
+      // Build weapon attacks from class
+      const cls = CLASSES[c.cls];
+      let attacks = [];
+      if (c.equip?.length) {
+        c.equip.forEach(it => {
+          const item = ITEMS.find(x => x.n === it || x.n === it?.name);
+          if (item?.dm) {
+            const dmMatch = item.dm.match(/(\d+d\d+)([+-]\d+)?/);
+            const isFinesse = item.p?.includes("Finesse");
+            const sMod = isFinesse ? Math.max(aMod(c.stats.STR), aMod(c.stats.DEX)) : aMod(c.stats.STR);
+            attacks.push({n: item.n, b: sMod + pb(c.level||1), dm: item.dm});
+          }
+        });
+      }
+      // Default weapons by class if no equipment attacks found
+      if (!attacks.length) {
+        const sMod = aMod(c.stats?.STR || 10);
+        const dMod = aMod(c.stats?.DEX || 10);
+        const p = pb(c.level||1);
+        const clsWpn = {
+          Barbarian:[{n:"Greataxe",b:sMod+p,dm:`1d12+${sMod} slashing`},{n:"Handaxe",b:sMod+p,dm:`1d6+${sMod} slashing`}],
+          Fighter:[{n:"Longsword",b:sMod+p,dm:`1d8+${sMod} slashing`},{n:"Longbow",b:dMod+p,dm:`1d8+${dMod} piercing`}],
+          Paladin:[{n:"Longsword",b:sMod+p,dm:`1d8+${sMod} slashing`}],
+          Ranger:[{n:"Longbow",b:dMod+p,dm:`1d8+${dMod} piercing`},{n:"Shortsword",b:dMod+p,dm:`1d6+${dMod} piercing`}],
+          Rogue:[{n:"Rapier",b:dMod+p,dm:`1d8+${dMod} piercing`},{n:"Shortbow",b:dMod+p,dm:`1d6+${dMod} piercing`}],
+          Monk:[{n:"Unarmed Strike",b:dMod+p,dm:`1d4+${dMod} bludgeoning`},{n:"Quarterstaff",b:sMod+p,dm:`1d6+${sMod} bludgeoning`}],
+          Bard:[{n:"Rapier",b:dMod+p,dm:`1d8+${dMod} piercing`}],
+          Cleric:[{n:"Mace",b:sMod+p,dm:`1d6+${sMod} bludgeoning`}],
+          Druid:[{n:"Quarterstaff",b:sMod+p,dm:`1d6+${sMod} bludgeoning`}],
+          Warlock:[{n:"Dagger",b:dMod+p,dm:`1d4+${dMod} piercing`}],
+          Sorcerer:[{n:"Dagger",b:dMod+p,dm:`1d4+${dMod} piercing`}],
+          Wizard:[{n:"Quarterstaff",b:sMod+p,dm:`1d6+${sMod} bludgeoning`}],
+        };
+        attacks = clsWpn[c.cls] || [{n:"Unarmed Strike",b:sMod+p,dm:`1d4+${sMod} bludgeoning`}];
+      }
+      // Spellcasters get spell attack
+      if (cls?.sc && c.spells?.length) {
+        const spMod = aMod(c.stats?.[cls.sa] || 10) + pb(c.level||1);
+        // Add actual spell attacks from known spells
+        c.spells?.forEach(sp => {
+          if (sp.d && sp.d.match(/\d+d\d+/) && (sp.ct === "1 action" || sp.ct === "1 bonus action")) {
+            const dmMatch = sp.d.match(/(\d+d\d+)/);
+            if (dmMatch) {
+              const spDmg = dmMatch[1];
+              const dmgType = sp.d.includes("fire") ? "fire" : sp.d.includes("cold") ? "cold" : sp.d.includes("radiant") ? "radiant" : sp.d.includes("necrotic") ? "necrotic" : sp.d.includes("force") ? "force" : sp.d.includes("lightning") ? "lightning" : sp.d.includes("thunder") ? "thunder" : sp.d.includes("psychic") ? "psychic" : sp.d.includes("poison") ? "poison" : "magical";
+              attacks.push({n: sp.n, b: spMod, dm: `${spDmg} ${dmgType}`});
+            }
+          }
+        });
+        if (!attacks.some(a => a.b === spMod)) attacks.push({n:"Spell Attack", b: spMod, dm:`1d10 force`});
+      }
+      e.push({...c, init, isMon: false, actA: false, actB: false, actR: false, atk: attacks, moved: 0});
+    });
     mons.forEach(m => e.push({
       n: m.n, ac: m.ac, hp: m.hp, curHp: m.curHp ?? m.hp, id: m.id || uid(),
-      d: m.d, s: m.s, co: m.co, atk: m.atk, tr: m.tr, cr: m.cr, xp: m.xp,
+      d: m.d, s: m.s, co: m.co, i: m.i, w: m.w, ch: m.ch,
+      atk: m.atk || [], tr: m.tr, cr: m.cr, xp: m.xp, sp: m.sp,
       init: rd(20) + aMod(m.d || 10), isMon: true,
-      actA: false, actB: false, actR: false
+      actA: false, actB: false, actR: false, moved: 0
     }));
     e.sort((a, b) => b.init - a.init);
     updateCombat({combatants: e, turn: 0, round: 1, live: true});
-    addMsg("system", `⚔️ Combat begins! ${e.length} combatants. Roll for initiative!`);
-    e.forEach(c => {
-      addMsg("roll", `${c.name || c.n}: Initiative ${c.init}`);
-    });
+    addMsg("system", `⚔️ COMBAT BEGINS! ${e.length} combatants.`);
+    e.forEach(c => addMsg("roll", `${c.name||c.n}: Initiative ${c.init}`));
   }, [chars, mons, addMsg, updateCombat]);
 
   const nextTurn = useCallback(() => {
     if (!combatants.length) return;
+    setAttackMode(null); setTargetIdx(null);
     const n = (turn + 1) % combatants.length;
     const newRound = n === 0 ? round + 1 : round;
     if (n === 0) addMsg("system", `📜 Round ${newRound}!`);
-    const updated = combatants.map((c, i) =>
-      i === n ? {...c, actA: false, actB: false, actR: false} : c
-    );
+    const updated = combatants.map((c, idx) => idx === n ? {...c, actA: false, actB: false, actR: false, moved: 0} : c);
     updateCombat({combatants: updated, turn: n, round: newRound});
     addMsg("system", `➡️ ${updated[n]?.name || updated[n]?.n}'s turn`);
   }, [turn, combatants, round, addMsg, updateCombat]);
 
   const endCombat = useCallback(() => {
+    // Give XP
+    const deadMons = combatants.filter(c => c.isMon && (c.curHp ?? c.hp) <= 0);
+    const totalXP = deadMons.reduce((s, m) => s + (m.xp || 0), 0);
+    if (totalXP > 0) addMsg("system", `🏆 Victory! ${totalXP} XP earned from ${deadMons.length} defeated enemies.`);
     updateCombat({combatants: [], turn: 0, round: 1, live: false});
     addMsg("system", "🏁 Combat ended.");
-  }, [addMsg, updateCombat]);
+  }, [combatants, addMsg, updateCombat]);
 
   const updateCombatant = useCallback((idx, changes) => {
     const updated = combatants.map((c, i) => i === idx ? {...c, ...changes} : c);
     updateCombat({combatants: updated});
   }, [combatants, updateCombat]);
 
-  const rollAttack = useCallback((attackerIdx, attackData) => {
-    const attacker = combatants[attackerIdx];
-    const aName = attacker.name || attacker.n;
+  // ── ATTACK WITH TARGET ──
+  const executeAttack = useCallback((attackerIdx, atkData, defenderIdx) => {
+    const atk = combatants[attackerIdx];
+    const def = combatants[defenderIdx];
+    const aName = atk.name || atk.n;
+    const dName = def.name || def.n;
+    const defAC = def.ac || 10;
     const roll = rd(20);
-    const total = roll + (attackData.b || 0);
+    const total = roll + (atkData.b || 0);
     const isNat20 = roll === 20;
     const isNat1 = roll === 1;
+    const hits = isNat20 || (!isNat1 && total >= defAC);
 
-    let msg = `${aName} attacks with ${attackData.n}: 🎲 ${roll}`;
-    if (attackData.b) msg += ` ${ms(attackData.b)}`;
-    msg += ` = ${total}`;
-    if (isNat20) msg += " ✨ CRITICAL HIT!";
-    if (isNat1) msg += " 💀 CRITICAL MISS!";
+    let msg = `🗡️ ${aName} attacks ${dName} with ${atkData.n}: 🎲 ${roll}${atkData.b ? ` ${ms(atkData.b)}` : ""} = ${total} vs AC ${defAC}`;
+    if (isNat20) msg += " — ✨ CRITICAL HIT!";
+    else if (isNat1) msg += " — 💀 CRITICAL MISS!";
+    else if (hits) msg += " — HIT!";
+    else msg += " — MISS!";
     addMsg("roll", msg);
 
-    // Roll damage too
-    if (!isNat1) {
-      const dmgMatch = attackData.dm?.match(/(\d+)d(\d+)([+-]\d+)?/);
+    // Build all changes in one pass
+    let dmgDealt = 0;
+    if (hits && atkData.dm && atkData.dm !== "See spell") {
+      const dmgMatch = atkData.dm.match(/(\d+)d(\d+)([+-]\d+)?/);
       if (dmgMatch) {
-        const [, count, sides, modStr2] = dmgMatch;
-        const mod2 = parseInt(modStr2) || 0;
-        let dmgRolls = rdN(parseInt(count), parseInt(sides));
-        if (isNat20) dmgRolls = [...dmgRolls, ...rdN(parseInt(count), parseInt(sides))]; // double dice on crit
-        const dmgTotal = dmgRolls.reduce((a, b) => a + b, 0) + mod2;
-        addMsg("roll", `  ⚔️ Damage: [${dmgRolls.join(",")}]${mod2 ? ms(mod2) : ""} = ${dmgTotal} ${attackData.dm.replace(/\d+d\d+[+-]?\d*\s*/, '')}${isNat20 ? " (CRIT!)" : ""}`);
+        const [, cnt, sides, modS] = dmgMatch;
+        const mod2 = parseInt(modS) || 0;
+        let dmgRolls = rdN(parseInt(cnt), parseInt(sides));
+        if (isNat20) dmgRolls = [...dmgRolls, ...rdN(parseInt(cnt), parseInt(sides))];
+        dmgDealt = Math.max(1, dmgRolls.reduce((a, b) => a + b, 0) + mod2);
+        const dmgType = atkData.dm.replace(/[\d\s+d-]+/, '').trim();
+        addMsg("roll", `  💥 ${dmgDealt} damage [${dmgRolls.join(",")}${mod2 ? ms(mod2) : ""}] ${dmgType}${isNat20 ? " (CRIT)" : ""}`);
       }
     }
-  }, [combatants, addMsg]);
+
+    // Apply ALL changes in one single update
+    const updated = combatants.map((c, i) => {
+      if (i === attackerIdx) return {...c, actA: true};
+      if (i === defenderIdx && dmgDealt > 0) {
+        const curHp = c.isMon ? (c.curHp ?? c.hp) : c.hp;
+        const newHp = Math.max(0, curHp - dmgDealt);
+        if (c.isMon) return {...c, curHp: newHp};
+        else return {...c, hp: newHp};
+      }
+      return c;
+    });
+    updateCombat({combatants: updated});
+
+    // Sync PC HP back to character sheet
+    if (dmgDealt > 0 && !def.isMon && def.id) {
+      const newHp = Math.max(0, (def.hp || 0) - dmgDealt);
+      syncAction({type:'UPDATE_CHAR', payload: {...def, hp: newHp}});
+    }
+
+    if (dmgDealt > 0) {
+      const curHp = def.isMon ? (def.curHp ?? def.hp) : def.hp;
+      const newHp = Math.max(0, curHp - dmgDealt);
+      if (newHp === 0) addMsg("system", `💀 ${dName} drops to 0 HP!`);
+    }
+
+    setAttackMode(null);
+    setTargetIdx(null);
+  }, [combatants, updateCombat, addMsg, syncAction]);
 
   const rollSave = useCallback((idx, ability) => {
     const c = combatants[idx];
-    const cName = c.name || c.n;
-    const score = c.stats?.[ability] || c[ability.toLowerCase()] || c[{STR:'s',DEX:'d',CON:'co',INT:'i',WIS:'w',CHA:'ch'}[ability]] || 10;
+    const abMap = {STR:'s',DEX:'d',CON:'co',INT:'i',WIS:'w',CHA:'ch'};
+    const score = c.stats?.[ability] || c[abMap[ability]] || 10;
     const mod = aMod(score);
+    const prof = (c.st || c.savingThrows || []).includes(ability) ? pb(c.level || 1) : 0;
     const roll = rd(20);
-    addMsg("roll", `${cName} ${ability} Save: 🎲 ${roll} ${ms(mod)} = ${roll + mod}`);
+    const total = roll + mod + prof;
+    addMsg("roll", `${c.name||c.n} ${ability} Save: 🎲 ${roll} ${ms(mod+prof)} = ${total}`);
   }, [combatants, addMsg]);
 
   const dealDamage = useCallback((idx, amount) => {
@@ -1139,16 +1265,15 @@ function Combat({chars, mons, syncAction, isDM, combatState}) {
     const cName = c.name || c.n;
     const curHp = c.isMon ? (c.curHp ?? c.hp) : c.hp;
     const newHp = Math.max(0, curHp - amount);
-    if (c.isMon) {
-      updateCombatant(idx, {curHp: newHp});
-    } else {
-      updateCombatant(idx, {hp: newHp});
-      // Also sync character HP back
-      if (c.id) syncAction({type:'UPDATE_CHAR', payload: {...c, hp: newHp, isMon: undefined, init: undefined, actA: undefined, actB: undefined, actR: undefined}});
-    }
-    addMsg("system", `💥 ${cName} takes ${amount} damage! (${newHp} HP remaining)`);
+    const updated = combatants.map((x, i) => {
+      if (i !== idx) return x;
+      return c.isMon ? {...x, curHp: newHp} : {...x, hp: newHp};
+    });
+    updateCombat({combatants: updated});
+    if (!c.isMon && c.id) syncAction({type:'UPDATE_CHAR', payload: {...c, hp: newHp}});
+    addMsg("system", `💥 ${cName} takes ${amount} damage! (${newHp} HP)`);
     if (newHp === 0) addMsg("system", `💀 ${cName} drops to 0 HP!`);
-  }, [combatants, updateCombatant, addMsg, syncAction]);
+  }, [combatants, updateCombat, addMsg, syncAction]);
 
   const healTarget = useCallback((idx, amount) => {
     if (!amount || amount <= 0) return;
@@ -1157,37 +1282,94 @@ function Combat({chars, mons, syncAction, isDM, combatState}) {
     const maxHp = c.isMon ? c.hp : c.mhp;
     const curHp = c.isMon ? (c.curHp ?? c.hp) : c.hp;
     const newHp = Math.min(maxHp, curHp + amount);
-    if (c.isMon) {
-      updateCombatant(idx, {curHp: newHp});
-    } else {
-      updateCombatant(idx, {hp: newHp});
-      if (c.id) syncAction({type:'UPDATE_CHAR', payload: {...c, hp: newHp, isMon: undefined, init: undefined, actA: undefined, actB: undefined, actR: undefined}});
-    }
-    addMsg("system", `💚 ${cName} heals ${amount} HP! (${newHp} HP)`);
-  }, [combatants, updateCombatant, addMsg, syncAction]);
+    const updated = combatants.map((x, i) => {
+      if (i !== idx) return x;
+      return c.isMon ? {...x, curHp: newHp} : {...x, hp: newHp};
+    });
+    updateCombat({combatants: updated});
+    if (!c.isMon && c.id) syncAction({type:'UPDATE_CHAR', payload: {...c, hp: newHp}});
+    addMsg("system", `💚 ${cName} heals ${amount}! (${newHp} HP)`);
+  }, [combatants, updateCombat, addMsg, syncAction]);
 
   const removeCombatant = useCallback((idx) => {
     const c = combatants[idx];
     const updated = combatants.filter((_, i) => i !== idx);
     const newTurn = idx < turn ? turn - 1 : (idx === turn && turn >= updated.length ? 0 : turn);
     updateCombat({combatants: updated, turn: newTurn});
-    addMsg("system", `❌ ${c.name || c.n} removed from combat.`);
+    addMsg("system", `❌ ${c.name||c.n} removed.`);
   }, [combatants, turn, updateCombat, addMsg]);
 
+  // Check if all monsters or all PCs dead
+  const totalMons = combatants.filter(c => c.isMon).length;
+  const totalPCs = combatants.filter(c => !c.isMon).length;
+  const monsAlive = combatants.filter(c => c.isMon && (c.curHp ?? c.hp) > 0).length;
+  const pcsAlive = combatants.filter(c => !c.isMon && c.hp > 0).length;
+  const showVictory = totalMons > 0 && monsAlive === 0;
+  const showDefeat = totalPCs > 0 && pcsAlive === 0;
+
   return <div className="pnl">
-    <div className="ph"><h3>⚔️ Combat Tracker</h3><div className="fr gs">
+    <div className="ph"><h3>⚔️ Combat {live ? `(${totalPCs}v${totalMons})` : ""}</h3><div className="fr gs">
       {!live ? (
-        <button className="btn bp bs" onClick={rollAll} disabled={!chars.length && !mons.length}>
-          🎲 Roll Initiative ({chars.length} PCs, {mons.length} monsters)
-        </button>
+        <div className="fr gs">
+          <button className="btn bp bs" onClick={rollAll} disabled={!mons.length}>
+            🎲 Roll Initiative ({chars.length} PCs vs {mons.length} monsters)
+          </button>
+          {!chars.length && <span className="tx tr">⚠️ No characters! Create one in the Character tab first.</span>}
+        </div>
       ) : (<>
         <span className="bdg bdg-r">Round {round}</span>
+        <span className="bdg bdg-g">{pcsAlive} PCs / {monsAlive} Monsters</span>
         <button className="btn bs" onClick={nextTurn}>Next Turn →</button>
-        <button className="btn bs bd" onClick={endCombat}>End Combat</button>
+        <button className="btn bs bd" onClick={endCombat}>End</button>
+        {isDM && <button className="btn bs" onClick={() => {
+          // Add any chars/mons not already in combat
+          let added = 0;
+          const ids = new Set(combatants.map(c => c.id));
+          const newCmbs = [...combatants];
+          chars.forEach(c => {
+            if (!ids.has(c.id)) {
+              const cls2 = CLASSES[c.cls];
+              const sMod2 = aMod(c.stats?.STR||10), dMod2 = aMod(c.stats?.DEX||10), p2 = pb(c.level||1);
+              let atk2 = [];
+              const clsW = {Barbarian:[{n:"Greataxe",b:sMod2+p2,dm:`1d12+${sMod2} slashing`}],Fighter:[{n:"Longsword",b:sMod2+p2,dm:`1d8+${sMod2} slashing`}],Rogue:[{n:"Rapier",b:dMod2+p2,dm:`1d8+${dMod2} piercing`}],Ranger:[{n:"Longbow",b:dMod2+p2,dm:`1d8+${dMod2} piercing`}],Bard:[{n:"Rapier",b:dMod2+p2,dm:`1d8+${dMod2} piercing`}],Cleric:[{n:"Mace",b:sMod2+p2,dm:`1d6+${sMod2} bludgeoning`}],Paladin:[{n:"Longsword",b:sMod2+p2,dm:`1d8+${sMod2} slashing`}],Monk:[{n:"Unarmed",b:dMod2+p2,dm:`1d4+${dMod2} bludgeoning`}],Druid:[{n:"Staff",b:sMod2+p2,dm:`1d6+${sMod2} bludgeoning`}],Warlock:[{n:"Eldritch Blast",b:aMod(c.stats?.CHA||10)+p2,dm:"1d10 force"}],Sorcerer:[{n:"Fire Bolt",b:aMod(c.stats?.CHA||10)+p2,dm:"1d10 fire"}],Wizard:[{n:"Fire Bolt",b:aMod(c.stats?.INT||10)+p2,dm:"1d10 fire"}]};
+              atk2 = clsW[c.cls] || [{n:"Unarmed",b:sMod2+p2,dm:`1d4+${sMod2} bludgeoning`}];
+              if(cls2?.sc&&c.spells?.length){c.spells.forEach(sp=>{if(sp.d?.match(/\d+d\d+/)&&(sp.ct==="1 action"||sp.ct==="1 bonus action")){const dm=sp.d.match(/(\d+d\d+)/);if(dm)atk2.push({n:sp.n,b:aMod(c.stats?.[cls2.sa]||10)+p2,dm:`${dm[1]} magical`});}});}
+              const init2 = rd(20)+aMod(c.stats?.DEX||10);
+              newCmbs.push({...c,init:init2,isMon:false,actA:false,actB:false,actR:false,atk:atk2,moved:0});
+              added++;
+              addMsg("roll",`${c.name} joins combat! Initiative: ${init2}`);
+            }
+          });
+          mons.forEach(m => {
+            if (!ids.has(m.id)) {
+              const init2 = rd(20)+aMod(m.d||10);
+              newCmbs.push({n:m.n,ac:m.ac,hp:m.hp,curHp:m.curHp??m.hp,id:m.id||uid(),d:m.d,s:m.s,co:m.co,i:m.i,w:m.w,ch:m.ch,atk:m.atk||[],tr:m.tr,cr:m.cr,xp:m.xp,sp:m.sp,init:init2,isMon:true,actA:false,actB:false,actR:false,moved:0});
+              added++;
+              addMsg("roll",`${m.n} joins combat! Initiative: ${init2}`);
+            }
+          });
+          if (added > 0) {
+            newCmbs.sort((a,b) => b.init - a.init);
+            updateCombat({combatants: newCmbs});
+            addMsg("system",`${added} combatant${added>1?"s":""} added!`);
+          } else addMsg("system","All characters and monsters are already in combat.");
+        }}>+ Add Missing</button>}
       </>)}
     </div></div>
 
-    {live && combatants.length > 0 ? <div className="fc" style={{gap:2}}>
+    {/* Target selection banner */}
+    {attackMode && <div style={{background:"rgba(139,26,26,.15)",border:"1px solid rgba(139,26,26,.3)",borderRadius:5,padding:"8px 12px",marginBottom:8,textAlign:"center"}}>
+      <span className="ts tr">🎯 Select a target for <b>{attackMode.atk.n}</b></span>
+      <button className="btn bs ml" style={{marginLeft:12}} onClick={()=>{setAttackMode(null);setTargetIdx(null);}}>Cancel</button>
+    </div>}
+
+    {live && combatants.length > 0 ? <>
+      {(showVictory || showDefeat) && <div className="pnl mb tc" style={{background: showVictory ? "rgba(58,138,74,.1)" : "rgba(139,26,26,.1)", borderColor: showVictory ? "rgba(58,138,74,.3)" : "rgba(139,26,26,.3)"}}>
+        <div style={{fontSize:"1.5rem"}}>{showVictory ? "🏆" : "💀"}</div>
+        <h3>{showVictory ? "Victory!" : "Defeat..."}</h3>
+        <button className="btn bp bs mm" onClick={endCombat}>{showVictory ? "Collect Rewards" : "End Combat"}</button>
+      </div>}
+      <div className="fc" style={{gap:2}}>
       {combatants.map((c, i) => {
         const act = i === turn;
         const hp = c.isMon ? (c.curHp ?? c.hp) : c.hp;
@@ -1195,118 +1377,272 @@ function Combat({chars, mons, syncAction, isDM, combatState}) {
         const pct = mx > 0 ? Math.max(0, (hp / mx) * 100) : 0;
         const isDead = hp <= 0;
         const cName = c.name || c.n;
+        const isTarget = attackMode && i !== attackMode.attackerIdx && !isDead;
 
-        return <div key={c.id || i} className={`ii ${act ? "act" : ""}`}
-          style={{opacity: isDead ? 0.4 : 1, borderLeft: act ? "3px solid var(--gold)" : "3px solid transparent", paddingLeft: 8}}>
+        return <div key={c.id || i}
+          className={`ii ${act ? "act" : ""}`}
+          onClick={() => { if (attackMode && isTarget) executeAttack(attackMode.attackerIdx, attackMode.atk, i); }}
+          style={{
+            opacity: isDead ? 0.35 : 1,
+            borderLeft: act ? "3px solid var(--gold)" : "3px solid transparent",
+            paddingLeft: 8,
+            cursor: isTarget ? "crosshair" : "default",
+            background: isTarget ? "rgba(139,26,26,.08)" : "transparent",
+            outline: isTarget ? "1px dashed var(--redb)" : "none"
+          }}>
           <div className="io">{c.init}</div>
           <div style={{flex:1}}>
             <div className="fb">
               <span style={{fontFamily:"Cinzel",fontWeight:600,color:c.isMon?"var(--redb)":"var(--ink)",fontSize:".9rem"}}>
-                {c.isMon ? "👹" : "🛡️"} {cName} {isDead ? "💀" : ""}
+                {c.isMon?"👹":"🛡️"} {cName} {isDead?"💀":""}
+                {isTarget && <span className="tr" style={{fontSize:".7rem"}}> ← Click to target</span>}
               </span>
               <span className="tx td2">AC {c.ac}</span>
             </div>
             <div className="hpbg" style={{height:8,marginTop:3}}>
               <div className={`hpf ${pct>50?"hpg":pct>25?"hpy":"hpr"}`} style={{width:`${pct}%`}}/>
             </div>
-            <div className="tx td2">{hp}/{mx} HP</div>
+            <div className="tx td2">{hp}/{mx} HP
+              {c.tr?.length > 0 && <span className="td2"> | {c.tr.slice(0,2).join(", ")}</span>}
+              {c.isMon && isDM && c.atk?.length > 0 && !act && <span className="td2"> | {c.atk.map(a=>`${a.n}+${a.b}`).join(", ")}</span>}
+            </div>
 
-            {/* Active turn panel */}
-            {act && !isDead && <div className="mm" style={{padding:"8px 0"}}>
-              {/* Action economy */}
-              <div className="fr gs mb" style={{marginBottom:6}}>
+            {(act || (c.isMon && isDM)) && !isDead && !attackMode && <div className="mm" style={{padding:"6px 0"}}>
+              <div className="fr gs" style={{marginBottom:6}}>
                 <span className={`bdg ${c.actA?"bdg-g":"bdg-r"}`} style={{cursor:"pointer"}}
                   onClick={()=>updateCombatant(i,{actA:!c.actA})}>{c.actA?"✓":"○"} Action</span>
                 <span className={`bdg ${c.actB?"bdg-g":"bdg-r"}`} style={{cursor:"pointer"}}
                   onClick={()=>updateCombatant(i,{actB:!c.actB})}>{c.actB?"✓":"○"} Bonus</span>
                 <span className={`bdg ${c.actR?"bdg-g":"bdg-r"}`} style={{cursor:"pointer"}}
                   onClick={()=>updateCombatant(i,{actR:!c.actR})}>{c.actR?"✓":"○"} Reaction</span>
+                <span className="bdg bdg-g tx">Move: {c.moved||0}/{c.speed||30}ft</span>
               </div>
 
-              {/* Attack buttons */}
-              {c.atk && c.atk.length > 0 && <div className="fr gs" style={{marginBottom:6}}>
-                {c.atk.map((atk, ai) => (
-                  <button key={ai} className="btn bs" onClick={() => rollAttack(i, atk)}
-                    title={`+${atk.b} to hit, ${atk.dm}${atk.r ? `, range ${atk.r}` : ''}`}>
-                    ⚔️ {atk.n} (+{atk.b})
+              {/* ATTACKS — click to pick target */}
+              {c.atk?.length > 0 && <div style={{marginBottom:6}}>
+                <label style={{fontSize:".6rem"}}>Attacks (click then pick target):</label>
+                <div className="fr gs mt">{c.atk.map((atk, ai) => (
+                  <button key={ai} className="btn bs" style={{borderColor:"var(--redb)",color:"var(--redb)"}}
+                    onClick={() => setAttackMode({attackerIdx: i, atk})}
+                    title={`+${atk.b} to hit, ${atk.dm}${atk.r ? ` (${atk.r})` : ''}`}>
+                    🗡️ {atk.n} <span className="tg">(+{atk.b}, {atk.dm})</span>
                   </button>
-                ))}
+                ))}</div>
               </div>}
 
-              {/* Quick actions */}
               <div className="fr gs">
-                <button className="btn bs" onClick={()=>{const r=rd(20),m=aMod(c.stats?.DEX||c.d||10);addMsg("roll",`${cName} rolls d20: ${r} ${ms(m)} = ${r+m}`);}}>🎲 d20</button>
-                {["STR","DEX","CON","INT","WIS","CHA"].map(ab=>(
-                  <button key={ab} className="btn bs" style={{padding:"2px 6px",fontSize:".6rem"}} onClick={()=>rollSave(i,ab)}>{ab} Save</button>
-                ))}
+                <button className="btn bs" onClick={()=>{const r=rd(20);addMsg("roll",`${cName} d20: ${r}${r===20?" ✨NAT 20!":""}${r===1?" 💀NAT 1!":""}`);}}>🎲 d20</button>
+                <button className="btn bs" onClick={()=>rollSave(i,"STR")}>STR</button>
+                <button className="btn bs" onClick={()=>rollSave(i,"DEX")}>DEX</button>
+                <button className="btn bs" onClick={()=>rollSave(i,"CON")}>CON</button>
+                <button className="btn bs" onClick={()=>rollSave(i,"INT")}>INT</button>
+                <button className="btn bs" onClick={()=>rollSave(i,"WIS")}>WIS</button>
+                <button className="btn bs" onClick={()=>rollSave(i,"CHA")}>CHA</button>
+                <button className="btn bs" onClick={()=>{updateCombatant(i,{actA:true});addMsg("system",`${cName} takes the Dodge action — attacks against have disadvantage.`);}}>🛡️ Dodge</button>
+                <button className="btn bs" onClick={()=>{addMsg("system",`${cName} dashes — movement doubled this turn.`);updateCombatant(i,{actA:true});}}>🏃 Dash</button>
               </div>
             </div>}
           </div>
 
-          {/* HP controls — always visible */}
-          <div className="fc gs" style={{alignItems:"center",minWidth:70}}>
+          {!attackMode && <div className="fc gs" style={{alignItems:"center",minWidth:70}}>
             <div className="fr gs">
-              <button className="btn bs bd" style={{padding:"2px 8px",fontSize:".7rem"}} onClick={()=>{
-                const d=prompt(`Damage to ${cName}:`);if(d&&parseInt(d)>0) dealDamage(i,parseInt(d));
+              <button className="btn bs bd" style={{padding:"2px 8px",fontSize:".7rem"}} onClick={(e)=>{e.stopPropagation();
+                const d=prompt(`Damage to ${cName}:`);const dv=parseInt(d);if(!isNaN(dv)&&dv>0) dealDamage(i,dv);
               }}>−HP</button>
-              <button className="btn bs" style={{padding:"2px 8px",fontSize:".7rem",borderColor:"var(--nat)",color:"#4a9a4a"}} onClick={()=>{
-                const h=prompt(`Heal ${cName}:`);if(h&&parseInt(h)>0) healTarget(i,parseInt(h));
+              <button className="btn bs" style={{padding:"2px 8px",fontSize:".7rem",borderColor:"var(--nat)",color:"#4a9a4a"}} onClick={(e)=>{e.stopPropagation();
+                const h=prompt(`Heal ${cName}:`);const hv=parseInt(h);if(!isNaN(hv)&&hv>0) healTarget(i,hv);
               }}>+HP</button>
             </div>
-            {isDM && <button className="btn bs bg tx" style={{padding:"1px 4px",fontSize:".55rem"}} onClick={()=>removeCombatant(i)}>Remove</button>}
-          </div>
+            {isDM && <button className="btn bs bg tx" style={{padding:"1px 4px",fontSize:".55rem"}} onClick={(e)=>{e.stopPropagation();removeCombatant(i);}}>Remove</button>}
+          </div>}
         </div>;
       })}
-    </div> : !live ? (
-      <div style={{padding:30}}>
+    </div></> : !live ? (
+      <div style={{padding:24}}>
         <div className="tc td2 mb">
           {chars.length === 0 && mons.length === 0
-            ? "Create characters and spawn monsters before starting combat."
-            : `Ready: ${chars.length} character${chars.length!==1?"s":""}, ${mons.length} monster${mons.length!==1?"s":""}`}
+            ? "Create characters on the Character tab and trigger an encounter from the Play tab."
+            : <><span>{chars.length} PC{chars.length!==1?"s":""} and {mons.length} monster{mons.length!==1?"s":""} ready.</span>
+              <br/><span className="tx">Click "Roll Initiative" above to start combat.</span></>}
         </div>
-        {chars.length > 0 && <div className="mb">
-          <label>Party</label>
-          <div className="fc gs mt">{chars.map(c => <div key={c.id} className="fr ts" style={{padding:"2px 6px"}}>
-            🛡️ <b>{c.name}</b> <span className="td2">— {c.race} {c.cls}, AC {c.ac}, {c.hp}/{c.mhp} HP, Init {ms(aMod(c.stats?.DEX||10))}</span>
-          </div>)}</div>
-        </div>}
-        {mons.length > 0 && <div>
-          <label>Monsters</label>
-          <div className="fc gs mt">{mons.map((m,i) => <div key={m.id||i} className="fr ts" style={{padding:"2px 6px"}}>
-            👹 <b>{m.n}</b> <span className="td2">— CR {m.cr}, AC {m.ac}, {m.hp} HP</span>
-            {m.atk && <span className="td2">| {m.atk.map(a=>`${a.n} +${a.b}`).join(", ")}</span>}
-          </div>)}</div>
-        </div>}
+        {chars.length > 0 && <div className="mb"><label>Party</label>
+          <div className="fc gs mt">{chars.map(c=>{const hpp=c.mhp>0?Math.max(0,(c.hp/c.mhp)*100):100;return <div key={c.id} className="fr ts" style={{padding:"4px 6px"}}>
+            🛡️ <b>{c.name}</b> <span className="td2">{c.race} {c.cls} Lv{c.level} | AC {c.ac}</span>
+            <div style={{flex:1,maxWidth:100}}><div className="hpbg" style={{height:6}}><div className={`hpf ${hpp>50?"hpg":hpp>25?"hpy":"hpr"}`} style={{width:`${hpp}%`}}/></div></div>
+            <span className="tx">{c.hp}/{c.mhp}</span>
+          </div>})}</div></div>}
+        {mons.length > 0 && <div><label>Monsters</label>
+          <div className="fc gs mt">{mons.map((m,i)=><div key={m.id||i} className="fr ts" style={{padding:"2px 6px"}}>👹 <b>{m.n}</b> <span className="td2">CR {m.cr} | AC {m.ac} | {m.hp} HP | {m.atk?.map(a=>`${a.n}+${a.b}`).join(", ")}</span></div>)}</div></div>}
       </div>
     ) : null}
   </div>;
 }
 
-function BattleMap({chars,mons}) {
-  const [toks,setToks]=useState([]);const [fog,setFog]=useState(new Set());const [fogM,setFogM]=useState(false);const [sel,setSel]=useState(null);
-  const cols=20,rows=14;
+function BattleMap({chars, mons, combatState, syncAction, camp, sceneData}) {
+  const {addMsg} = useContext(AppCtx);
+  const [fog, setFog] = useState(new Set());
+  const [fogM, setFogM] = useState(false);
+  const [sel, setSel] = useState(null);
+  const [wallM, setWallM] = useState(false);
+  const [customWalls, setCustomWalls] = useState(new Set());
+  const cols = 24, rows = 18;
 
-  useEffect(()=>{const t=[];
-    chars.forEach((c,i)=>t.push({id:c.id,name:c.name,em:"🛡️",col:2,row:2+i*2,isMon:false}));
-    mons.forEach((m,i)=>t.push({id:m.id||uid(),name:m.n,em:"👹",col:15,row:2+i*2,isMon:true}));
-    setToks(t);
-  },[chars.length,mons.length]);
+  // Get current scene map data
+  const scenes = camp?.scenes || [];
+  const sceneIdx = sceneData?.sceneIdx || 0;
+  const scene = scenes[sceneIdx];
+  const sceneMap = scene?.map;
 
-  const click=(c,r)=>{if(fogM){const k=`${c}-${r}`;setFog(p=>{const n=new Set(p);n.has(k)?n.delete(k):n.add(k);return n;});return;}
-    if(sel!=null){setToks(p=>p.map(t=>t.id===sel?{...t,col:c,row:r}:t));setSel(null);}};
-  const at=(c,r)=>toks.find(t=>t.col===c&&t.row===r);
+  // Terrain colors by type
+  const terrainStyles = {
+    dungeon: {floor:"rgba(50,40,28,.65)",wall:"rgba(85,70,50,.92)",void:"rgba(8,6,4,.9)",grid:"rgba(201,168,76,.05)"},
+    cave: {floor:"rgba(45,38,32,.6)",wall:"rgba(75,60,45,.88)",void:"rgba(10,8,5,.9)",grid:"rgba(140,120,80,.05)"},
+    town: {floor:"rgba(55,50,35,.5)",wall:"rgba(90,75,55,.85)",void:"rgba(30,45,20,.4)",grid:"rgba(201,168,76,.06)"},
+    road: {floor:"rgba(50,45,30,.45)",wall:"rgba(30,55,25,.7)",void:"rgba(25,40,18,.5)",grid:"rgba(201,168,76,.04)"},
+    castle: {floor:"rgba(55,45,35,.6)",wall:"rgba(95,80,60,.92)",void:"rgba(8,6,4,.9)",grid:"rgba(201,168,76,.06)"},
+    forest: {floor:"rgba(30,45,20,.5)",wall:"rgba(20,50,15,.8)",void:"rgba(15,30,10,.6)",grid:"rgba(100,160,80,.05)"},
+  };
+
+  // Build map tiles from scene data
+  const mapTiles = useMemo(() => {
+    const floor = new Set();
+    const walls = new Set();
+    const features = new Map(); // key -> {emoji, label}
+
+    if (sceneMap) {
+      // Add rooms
+      (sceneMap.r || []).forEach(r => {
+        for(let x=r.x; x<r.x+r.w; x++) for(let y=r.y; y<r.y+r.h; y++) floor.add(`${x}-${y}`);
+      });
+      // Add corridors
+      (sceneMap.c || []).forEach(([x1,y1,x2,y2]) => {
+        const sx=Math.min(x1,x2),ex=Math.max(x1,x2),sy=Math.min(y1,y2),ey=Math.max(y1,y2);
+        for(let x=sx;x<=ex;x++) for(let y=sy;y<=ey;y++) floor.add(`${x}-${y}`);
+      });
+      // Add features
+      (sceneMap.f || []).forEach(f => {
+        features.set(`${f.x}-${f.y}`, {emoji: f.t, label: f.l || ""});
+        floor.add(`${f.x}-${f.y}`); // features are walkable
+      });
+    } else {
+      // Default: open grid
+      for(let x=0;x<cols;x++) for(let y=0;y<rows;y++) floor.add(`${x}-${y}`);
+    }
+    return {floor, walls, features};
+  }, [sceneMap, cols, rows]);
+
+  // Tokens
+  const [toks, setToks] = useState([]);
+  useEffect(() => {
+    setToks(prev => {
+      const existing = new Map(prev.map(t => [t.id, t]));
+      const t = [];
+      const pcSpawn = sceneMap?.pc || {x:2,y:2};
+      const mnSpawn = sceneMap?.mn || {x:18,y:2};
+      chars.forEach((c, i) => {
+        const old = existing.get(c.id);
+        t.push(old ? {...old, name: c.name} : {id: c.id, name: c.name, em: "🛡️", col: pcSpawn.x+i, row: pcSpawn.y, isMon: false, color: ["#5a8ac5","#4a9a4a","#c9a84c","#c42b2b","#9a6abf","#c97a3c"][i%6]});
+      });
+      mons.forEach((m, i) => {
+        const mid = m.id || `mon-${i}`;
+        const old = existing.get(mid);
+        t.push(old ? {...old, name: m.n} : {id: mid, name: m.n, em: "👹", col: mnSpawn.x, row: mnSpawn.y+i, isMon: true, color: "#c42b2b"});
+      });
+      return t;
+    });
+  }, [chars, mons, sceneMap]);
+
+  const click = (c, r) => {
+    const key = `${c}-${r}`;
+    if (wallM) { setCustomWalls(p => { const n=new Set(p); n.has(key)?n.delete(key):n.add(key); return n; }); return; }
+    if (fogM) { setFog(p => { const n=new Set(p); n.has(key)?n.delete(key):n.add(key); return n; }); return; }
+    if (sel != null) {
+      if (customWalls.has(key) || !mapTiles.floor.has(key)) { setSel(null); return; }
+      const occupant = toks.find(t => t.col === c && t.row === r);
+      if (occupant) { setSel(occupant.id); return; }
+      const tok = toks.find(t => t.id === sel);
+      if (tok) {
+        const dist = (Math.abs(tok.col-c) + Math.abs(tok.row-r)) * 5;
+        setToks(p => p.map(t => t.id === sel ? {...t, col: c, row: r} : t));
+        addMsg("system", `🗺️ ${tok.name} moves ${dist}ft`);
+      }
+      setSel(null);
+    }
+  };
+  const at = (c, r) => toks.find(t => t.col === c && t.row === r);
+
+  const ts = terrainStyles[sceneMap?.t] || terrainStyles.dungeon;
+
+  const mapCSS = `
+    .map-cell{width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:.85rem;cursor:pointer;transition:all .1s;position:relative;border:none}
+    .map-floor{background:${ts.floor}}
+    .map-wall{background:${ts.wall};box-shadow:inset 0 0 4px rgba(0,0,0,.5)}
+    .map-void{background:${ts.void}}
+    .map-floor:hover{background:rgba(201,168,76,.15)}
+    .map-sel{outline:2px solid #e8c84c;z-index:2}
+    .map-fog{background:rgba(0,0,0,.95)!important}
+    .map-cwall{background:rgba(100,80,55,.95)!important;box-shadow:inset 0 0 6px rgba(0,0,0,.6)!important}
+    .map-token{font-size:.7rem;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:grab;position:relative;z-index:3;border:2px solid;box-shadow:0 2px 6px rgba(0,0,0,.5)}
+    .map-feat{font-size:.7rem;position:absolute;opacity:.7;pointer-events:none;z-index:1;text-shadow:0 1px 2px rgba(0,0,0,.8)}
+    .map-grid-overlay{position:absolute;inset:0;border:1px solid ${ts.grid};pointer-events:none}
+    .map-label{position:absolute;bottom:-1px;left:50%;transform:translateX(-50%);font-size:.35rem;font-family:Cinzel,serif;color:#c9a84c;white-space:nowrap;text-shadow:0 1px 3px rgba(0,0,0,.9);pointer-events:none;z-index:4;letter-spacing:.03em}
+  `;
 
   return <div className="pnl">
-    <div className="ph"><h3>🗺️ Battle Map</h3><div className="fr gs">
-      <button className={`btn bs ${fogM?"bp":""}`} onClick={()=>setFogM(!fogM)}>🌫️ Fog{fogM?" ON":""}</button>
-      {sel&&<span className="bdg bdg-g">Click destination</span>}</div></div>
-    <div className="bgrd" style={{gridTemplateColumns:`repeat(${cols},36px)`,gridTemplateRows:`repeat(${rows},36px)`}}>
-      {Array.from({length:rows*cols}).map((_,idx)=>{const c=idx%cols,r=Math.floor(idx/cols),tok=at(c,r),isFog=fog.has(`${c}-${r}`);
-        return <div key={idx} className={`gc ${tok?"occ":""} ${isFog?"fog":""} ${tok&&tok.id===sel?"hl":""}`}
-          onClick={()=>tok&&!fogM?setSel(tok.id):click(c,r)} title={tok?`${tok.name} (${c*5}ft,${r*5}ft)`:`${c*5}ft,${r*5}ft`}>
-          {!isFog&&tok&&<span style={{fontSize:"1.05rem",cursor:"grab"}}>{tok.em}</span>}</div>;})}
+    <style>{mapCSS}</style>
+    <div className="ph"><h3>🗺️ {sceneMap?.nm || "Battle Map"}</h3><div className="fr gs">
+      <button className={`btn bs ${fogM?"bp":""}`} onClick={()=>{setFogM(!fogM);setWallM(false);}}>🌫️ Fog{fogM?" ON":""}</button>
+      <button className={`btn bs ${wallM?"bp":""}`} onClick={()=>{setWallM(!wallM);setFogM(false);}}>🧱 Walls{wallM?" ON":""}</button>
+      {sel && <span className="bdg bdg-g">🎯 Click to move</span>}
+      {sceneMap && <span className="bdg bdg-g tx">{sceneMap.t}</span>}
+    </div></div>
+
+    {/* Map name and scene info */}
+    {sceneMap?.nm && <div className="ts td2 mb" style={{fontStyle:"italic"}}>{scene?.t} — {sceneMap.nm}</div>}
+
+    <div style={{overflow:"auto",maxHeight:560,border:"1px solid var(--bdr)",borderRadius:5}}>
+      <div style={{display:"grid",gridTemplateColumns:`repeat(${cols},28px)`,gridTemplateRows:`repeat(${rows},28px)`,gap:0,background:ts.void}}>
+        {Array.from({length: rows * cols}).map((_, idx) => {
+          const c = idx % cols, r = Math.floor(idx / cols);
+          const key = `${c}-${r}`;
+          const tok = at(c, r);
+          const isFog = fog.has(key);
+          const isCWall = customWalls.has(key);
+          const isFloor = mapTiles.floor.has(key);
+          const feat = mapTiles.features.get(key);
+          const isSelected = tok && tok.id === sel;
+
+          let cellClass = "map-cell";
+          if (isFog) cellClass += " map-fog";
+          else if (isCWall) cellClass += " map-cwall";
+          else if (isFloor) cellClass += " map-floor";
+          else cellClass += " map-void";
+          if (isSelected) cellClass += " map-sel";
+
+          return <div key={idx} className={cellClass}
+            onClick={() => tok && !fogM && !wallM ? setSel(tok.id) : click(c, r)}
+            title={`${c*5}ft, ${r*5}ft${tok ? ` — ${tok.name}` : ""}${feat?.label ? ` [${feat.label}]` : ""}${isCWall ? " [Wall]" : ""}`}>
+            <div className="map-grid-overlay"/>
+            {/* Feature emoji */}
+            {!isFog && !tok && feat && <span className="map-feat">{feat.emoji}</span>}
+            {/* Feature label */}
+            {!isFog && feat?.label && !tok && <span className="map-label">{feat.label}</span>}
+            {/* Token */}
+            {!isFog && tok && (
+              <div className="map-token" style={{background:tok.isMon?"rgba(139,26,26,.85)":"rgba(25,40,70,.85)", borderColor:tok.color||"#c9a84c"}}>
+                {tok.em}
+              </div>
+            )}
+          </div>;
+        })}
+      </div>
     </div>
-    <div className="tx td2 mt">Click token → click cell to move. Each cell = 5ft.</div>
+    <div className="fr mt" style={{gap:12}}>
+      <div className="tx td2">5ft/cell • Click token → click destination</div>
+      {sceneMap && <div className="fr gs tx td2">
+        {(sceneMap.f || []).filter(f=>f.l).slice(0,6).map((f,i) => <span key={i}>{f.t} {f.l}</span>)}
+      </div>}
+    </div>
   </div>;
 }
 
@@ -1413,7 +1749,7 @@ function Chat({msgs}) {
     <div className="chbx" ref={ref} style={{flex:1}}>{msgs.map((m,i)=><div key={i} className={`chm ${m.t}`}>
       {m.t==="chat"&&<span className="chs">{m.s}: </span>}
       {m.t==="system"&&<span style={{color:"var(--goldd)"}}>⚙️ </span>}
-      {m.t==="roll"&&<span style={{color:"var(--arc)"}}>🎲 {m.s||pn} </span>}
+      {m.t==="roll"&&<span style={{color:"var(--arc)"}}>🎲 {m.s} </span>}
       {m.tx}</div>)}</div>
     <div className="fr mt"><input type="text" value={inp} onChange={e=>setInp(e.target.value)} onKeyDown={e=>e.key==="Enter"&&send()} placeholder="Type..." style={{flex:1}}/>
       <button className="btn bs" onClick={send}>Send</button></div>
@@ -1927,9 +2263,11 @@ export default function App() {
           setChars(p => [...p, action.payload]);
           setMsgs(p => [...p, {t:"system",tx:`🛡️ ${action.payload.name} the ${action.payload.race} ${action.payload.cls} joins!`,s:"System",ts:Date.now()}]);
           break;
-        case 'UPDATE_CHAR':
-          setChars(p => p.map(c => c.id === action.payload.id ? action.payload : c));
+        case 'UPDATE_CHAR': {
+          const {isMon,init,actA,actB,actR,moved,atk:_a,...cleanChar} = action.payload;
+          setChars(p => p.map(c => c.id === cleanChar.id ? {...c,...cleanChar} : c));
           break;
+        }
         case 'CHAT':
           setMsgs(p => [...p, action.payload]);
           break;
@@ -1982,9 +2320,11 @@ export default function App() {
         case 'ADD_CHAR':
           setChars(p => [...p, action.payload]);
           break;
-        case 'UPDATE_CHAR':
-          setChars(p => p.map(c => c.id === action.payload.id ? action.payload : c));
+        case 'UPDATE_CHAR': {
+          const {isMon,init,actA,actB,actR,moved,atk:_a,...cleanChar} = action.payload;
+          setChars(p => p.map(c => c.id === cleanChar.id ? {...c,...cleanChar} : c));
           break;
+        }
         case 'CHAT':
           setMsgs(p => [...p, action.payload]);
           break;
@@ -2054,9 +2394,9 @@ export default function App() {
             syncAction({type:'SCENE_UPDATE', payload: {sceneIdx:0,journal:[],choiceMade:false,waitingForDM:false,playerActions:[]}});
             addMsg("system",`📜 Campaign: ${c.n}`);
           }}/>}
-          {page==="campaign"&&camp&&<SessionPlay camp={camp} isDM={isDM} chars={chars} mons={mons} sceneData={sceneData} setMons={newMons=>{
-            if(typeof newMons==='function'){setMons(p=>{const next=newMons(p);syncAction({type:'SET_MONSTERS',payload:next});return next;});}
-            else syncAction({type:'SET_MONSTERS',payload:newMons});
+          {page==="campaign"&&camp&&<SessionPlay camp={camp} isDM={isDM} chars={chars} mons={mons} sceneData={sceneData} setPage={setPage} setMons={(newMons)=>{
+            const val = typeof newMons === 'function' ? newMons(mons) : newMons;
+            syncAction({type:'SET_MONSTERS',payload:val});
           }} syncAction={syncAction}/>}
 
           {page==="characters"&&!creating&&<div className="afu">
@@ -2077,16 +2417,27 @@ export default function App() {
           }}/>}
 
           {page==="combat"&&<Combat chars={chars} mons={mons} syncAction={syncAction} isDM={isDM} combatState={combatState}/>}
-          {page==="map"&&<BattleMap chars={chars} mons={mons}/>}
-          {page==="dm"&&isDM&&<DMTools mons={mons} setMons={newMons=>{
-            if(typeof newMons==='function'){setMons(p=>{const next=newMons(p);syncAction({type:'SET_MONSTERS',payload:next});return next;});}
-            else syncAction({type:'SET_MONSTERS',payload:newMons});
+          {page==="map"&&<BattleMap chars={chars} mons={mons} combatState={combatState} syncAction={syncAction} camp={camp} sceneData={sceneData}/>}
+          {page==="dm"&&isDM&&<DMTools mons={mons} setMons={(newMons)=>{
+            const val = typeof newMons === 'function' ? newMons(mons) : newMons;
+            syncAction({type:'SET_MONSTERS',payload:val});
           }} camp={camp}/>}
           {page==="spells"&&<SpellRef/>}
           {page==="dice"&&<div style={{maxWidth:480,margin:"0 auto"}}><DiceRoller/></div>}
         </div>
-        <div className="sb" style={{position:"sticky",top:56,height:"calc(100vh - 72px)"}}><Chat msgs={msgs}/></div>
+        <div className="sb-desk" style={{position:"sticky",top:56,height:"calc(100vh - 72px)"}}><Chat msgs={msgs}/></div>
       </div>
     </div>
+
+    {/* Mobile chat */}
+    <MobileChat msgs={msgs}/>
   </div></AppCtx.Provider>;
+}
+
+function MobileChat({msgs}) {
+  const [open,setOpen]=useState(false);
+  return <>
+    <button className="chat-toggle" onClick={()=>setOpen(!open)}>{open?"✕":"💬"}</button>
+    <div className={`chat-mobile pnl ${open?"open":""}`}><Chat msgs={msgs}/></div>
+  </>;
 }
