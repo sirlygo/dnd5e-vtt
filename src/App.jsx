@@ -2241,9 +2241,28 @@ const AI_NARR = {
 };
 const AI_TRANS = ["A new challenge presents itself...","The consequences ripple outward...","The adventure continues...","Events unfold rapidly...","The path forward becomes clearer..."];
 
-function useAIDM({aiDM,camp,sceneData,combatState,chars,mons,syncAction,addMsg,setPage}) {
+function useAIDM({aiDM,camp,sceneData,combatState,chars,mons,syncAction,addMsg,setPage,apiKey}) {
   const aiRef = useRef(null);
   const cbtRef = useRef(null);
+
+  // ── Call Claude API for narration ──
+  const callClaude = useCallback(async (prompt) => {
+    if (!apiKey) return null;
+    try {
+      const res = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-api-key": apiKey, "anthropic-version": "2023-06-01", "anthropic-dangerous-direct-browser-access": "true" },
+        body: JSON.stringify({
+          model: "claude-sonnet-4-20250514", max_tokens: 300,
+          system: "You are an expert D&D 5e Dungeon Master narrating a campaign. Write vivid, atmospheric, second-person narration (2-4 sentences). Be dramatic but concise. Never break character. Never use markdown formatting.",
+          messages: [{ role: "user", content: prompt }]
+        })
+      });
+      if (!res.ok) return null;
+      const data = await res.json();
+      return data.content?.[0]?.text || null;
+    } catch (e) { console.warn("Claude API error:", e); return null; }
+  }, [apiKey]);
 
   // ── Auto-advance scenes after player choice ──
   useEffect(() => {
@@ -2252,18 +2271,30 @@ function useAIDM({aiDM,camp,sceneData,combatState,chars,mons,syncAction,addMsg,s
     const lastChoice = sceneData.playerActions?.[sceneData.playerActions.length-1]?.choice||"";
     if(aiRef.current)clearTimeout(aiRef.current);
 
-    aiRef.current = setTimeout(()=>{
-      const cl=lastChoice.toLowerCase();
-      let pool=AI_NARR.default;
-      for(const[k,v]of Object.entries(AI_NARR)){if(k!=="default"&&cl.includes(k)){pool=v;break;}}
-      if(cl.includes("careful")||cl.includes("stealth"))pool=AI_NARR.sneak;
-      if(cl.includes("fight")||cl.includes("confront")||cl.includes("storm"))pool=AI_NARR.attack;
-      if(cl.includes("speak")||cl.includes("negotiate"))pool=AI_NARR.talk;
-      const narr=pool[Math.floor(Math.random()*pool.length)];
-      const trans=AI_TRANS[Math.floor(Math.random()*AI_TRANS.length)];
-      const entry={type:"narration",title:"🤖 AI Dungeon Master",text:`${narr} ${trans}`,ts:Date.now()};
+    aiRef.current = setTimeout(async ()=>{
+      // Try Claude API first, fall back to canned narration
+      const partyDesc = chars.map(c=>`${c.name} the ${c.race} ${c.cls}`).join(", ");
+      const prompt = `Campaign: ${camp.n}. Scene: "${scene?.t}". Current situation: ${scene?.narr?.substring(0,200)}. The party (${partyDesc}) chose: "${lastChoice}". ${scene?.encounter ? "There may be enemies nearby ("+scene.encounter.monsters.join(", ")+")." : ""} Narrate what happens next as the DM. Be vivid and atmospheric.`;
+      
+      let narr = null;
+      addMsg("system","🤖 DM is thinking...");
+      narr = await callClaude(prompt);
+      
+      if (!narr) {
+        // Fallback to canned
+        const cl=lastChoice.toLowerCase();
+        let pool=AI_NARR.default;
+        for(const[k,v]of Object.entries(AI_NARR)){if(k!=="default"&&cl.includes(k)){pool=v;break;}}
+        if(cl.includes("careful")||cl.includes("stealth"))pool=AI_NARR.sneak;
+        if(cl.includes("fight")||cl.includes("confront")||cl.includes("storm"))pool=AI_NARR.attack;
+        if(cl.includes("speak")||cl.includes("negotiate"))pool=AI_NARR.talk;
+        narr=pool[Math.floor(Math.random()*pool.length)]+" "+AI_TRANS[Math.floor(Math.random()*AI_TRANS.length)];
+      }
+      
+      const entry={type:"narration",title: apiKey ? "🤖 AI Dungeon Master" : "🤖 AI DM (set API key for better narration)",text:narr,ts:Date.now()};
       const j2=[...sceneData.journal,entry];
-      addMsg("system",`🤖 DM: ${narr}`);
+      addMsg("system",`🤖 DM: ${narr.substring(0,120)}${narr.length>120?"...":""}`);
+
 
       const shouldFight=scene?.encounter&&(cl.includes("attack")||cl.includes("fight")||cl.includes("confront")||cl.includes("storm")||cl.includes("enter")||scene.encounter.trigger==="always"||Math.random()>0.5);
 
@@ -2335,6 +2366,12 @@ function useAIDM({aiDM,camp,sceneData,combatState,chars,mons,syncAction,addMsg,s
       let msg2=`🤖 🗡️ ${mn} attacks ${tgt.name} with ${atk.n}: 🎲 ${roll2}${atk.b?` ${ms(atk.b)}`:""} = ${total} vs AC ${tgt.ac}`;
       if(n20)msg2+=" ✨ CRIT!";else if(n1)msg2+=" 💀 MISS!";else if(hits)msg2+=" HIT!";else msg2+=" MISS!";
       addMsg("roll",msg2);
+      // AI combat flavor (non-blocking)
+      if(apiKey && hits){
+        callClaude(`D&D combat. ${mn} attacks ${tgt.name} with ${atk.n} and ${hits?"hits":"misses"}. Write ONE dramatic sentence describing the attack.`).then(flavor=>{
+          if(flavor) addMsg("system",`🤖 ${flavor}`);
+        }).catch(()=>{});
+      }
       let dmg=0;
       if(hits&&atk.dm){const dm=atk.dm.match(/(\d+)d(\d+)([+-]\d+)?/);
         if(dm){let dr=rdN(parseInt(dm[1]),parseInt(dm[2]));if(n20)dr=[...dr,...rdN(parseInt(dm[1]),parseInt(dm[2]))];
@@ -2376,14 +2413,34 @@ function useAIDM({aiDM,camp,sceneData,combatState,chars,mons,syncAction,addMsg,s
 // ═══════════════════════════════════════════════════════════
 // MAIN APP — with multiplayer sync
 // ═══════════════════════════════════════════════════════════
+// ── Save/Load Helpers ──
+const SAVE_KEY = 'dnd5e-vtt-save';
+const loadSave = () => { try { const d=localStorage.getItem(SAVE_KEY); return d?JSON.parse(d):null; } catch(e){ return null; } };
+const writeSave = (data) => { try { localStorage.setItem(SAVE_KEY, JSON.stringify(data)); } catch(e){ console.warn('Save failed',e); } };
+const clearSave = () => { try { localStorage.removeItem(SAVE_KEY); } catch(e){} };
+const API_KEY_STORE = 'dnd5e-vtt-apikey';
+const loadApiKey = () => { try { return localStorage.getItem(API_KEY_STORE)||""; } catch(e){ return ""; } };
+const saveApiKey = (k) => { try { localStorage.setItem(API_KEY_STORE, k); } catch(e){} };
+
 export default function App() {
+  const [savedGame] = useState(() => loadSave());
   const [sess,setSess]=useState(null);const [page,setPage]=useState("campaign");
-  const [chars,setChars]=useState([]);const [aCh,setACh]=useState(0);
-  const [mons,setMons]=useState([]);const [camp,setCamp]=useState(null);
-  const [msgs,setMsgs]=useState([]);const [creating,setCreating]=useState(false);
-  const [sceneData,setSceneData]=useState({sceneIdx:0,journal:[],choiceMade:false,waitingForDM:false,playerActions:[]});
-  const [combatState,setCombatState]=useState({combatants:[],turn:0,round:1,live:false});
+  const [chars,setChars]=useState(savedGame?.chars||[]);const [aCh,setACh]=useState(0);
+  const [mons,setMons]=useState(savedGame?.mons||[]);const [camp,setCamp]=useState(savedGame?.camp||null);
+  const [msgs,setMsgs]=useState(savedGame?.msgs?.slice(-50)||[]);const [creating,setCreating]=useState(false);
+  const [sceneData,setSceneData]=useState(savedGame?.sceneData||{sceneIdx:0,journal:[],choiceMade:false,waitingForDM:false,playerActions:[]});
+  const [combatState,setCombatState]=useState(savedGame?.combatState||{combatants:[],turn:0,round:1,live:false});
+  const [apiKey,setApiKey]=useState(loadApiKey);
+  const [showSettings,setShowSettings]=useState(false);
   const stateVerRef = useRef(0); // version counter to detect changes
+
+  // ── Auto-save game state to localStorage ──
+  useEffect(() => {
+    const saveTimer = setTimeout(() => {
+      writeSave({ chars, mons, camp, msgs: msgs.slice(-100), sceneData, combatState, savedAt: Date.now() });
+    }, 500);
+    return () => clearTimeout(saveTimer);
+  }, [chars, mons, camp, msgs, sceneData, combatState]);
 
   const mp = useMultiplayer(sess);
 
@@ -2514,7 +2571,7 @@ export default function App() {
   const aiDM = !isDM && !!sess?.host;
 
   // AI DM hook must be called before any conditional returns (Rules of Hooks)
-  useAIDM({aiDM: aiDM && !!camp, camp, sceneData, combatState, chars, mons, syncAction, addMsg, setPage});
+  useAIDM({aiDM: aiDM && !!camp, camp, sceneData, combatState, chars, mons, syncAction, addMsg, setPage, apiKey});
 
   if(!sess) return <Lobby onJoin={setSess}/>;
 
@@ -2535,11 +2592,44 @@ export default function App() {
       </span>
     </div><div className="fr gs" style={{flexWrap:"wrap"}}>
       {nav.map(n=><button key={n.k} className={`nb ${page===n.k?"a":""}`} onClick={()=>setPage(n.k)}>{n.i} {n.l}</button>)}
-    </div><button className="btn bs bd" onClick={()=>setSess(null)}>Leave</button></div>
+    </div><div className="fr gs">
+      <button className="btn bs" onClick={()=>setShowSettings(!showSettings)}>⚙️</button>
+      <button className="btn bs bd" onClick={()=>setSess(null)}>Leave</button>
+    </div></div>
+
+    {/* Settings Panel */}
+    {showSettings && <div style={{background:"var(--pnl)",borderBottom:"1px solid var(--bdr)",padding:"12px 16px"}}>
+      <div className="fr gs" style={{maxWidth:1360,margin:"0 auto",flexWrap:"wrap"}}>
+        <div className="fr gs" style={{flex:1,minWidth:280}}>
+          <label style={{whiteSpace:"nowrap"}}>Claude API Key:</label>
+          <input type="password" value={apiKey} onChange={e=>{setApiKey(e.target.value);saveApiKey(e.target.value);}}
+            placeholder="sk-ant-... (enables AI DM narration)" style={{flex:1,fontSize:".8rem"}}/>
+          {apiKey && <span className="bdg bdg-g tx">✓ Set</span>}
+        </div>
+        <div className="fr gs">
+          <button className="btn bs" onClick={()=>{if(confirm("Save current game state?"))addMsg("system","💾 Game saved!");}}>💾 Save</button>
+          <button className="btn bs bd" onClick={()=>{if(confirm("Clear ALL saved data? This cannot be undone.")){clearSave();setChars([]);setMons([]);setCamp(null);setSceneData({sceneIdx:0,journal:[],choiceMade:false,waitingForDM:false,playerActions:[]});setCombatState({combatants:[],turn:0,round:1,live:false});setMsgs([]);addMsg("system","🗑️ Save data cleared.");}}}> 🗑️ Clear Save</button>
+          {savedGame && <span className="tx td2">Last save: {new Date(savedGame?.savedAt||0).toLocaleString()}</span>}
+        </div>
+        <button className="btn bs bg" onClick={()=>setShowSettings(false)}>Close ✕</button>
+      </div>
+    </div>}
 
     {/* Connection error banner */}
     {mp.error && <div style={{background:'rgba(139,26,26,.2)',borderBottom:'1px solid rgba(139,26,26,.3)',padding:'8px 16px',textAlign:'center',fontSize:'.85rem',color:'var(--redb)'}}>
       ⚠️ {mp.error}
+    </div>}
+
+    {/* Resume banner if save exists and no campaign selected */}
+    {!camp && savedGame?.camp && <div style={{background:"rgba(201,168,76,.08)",borderBottom:"1px solid rgba(201,168,76,.2)",padding:"10px 16px",textAlign:"center"}}>
+      <span className="ts">💾 Saved game found: <b className="tg">{savedGame?.camp?.n}</b> — Scene {(savedGame?.sceneData?.sceneIdx||0)+1} with {savedGame?.chars?.length||0} characters</span>
+      <button className="btn bs bp" style={{marginLeft:12}} onClick={()=>{
+        if(savedGame?.chars)setChars(savedGame.chars);if(savedGame?.mons)setMons(savedGame.mons);
+        if(savedGame?.camp)setCamp(savedGame.camp);if(savedGame?.sceneData)setSceneData(savedGame.sceneData);
+        if(savedGame?.combatState)setCombatState(savedGame.combatState);if(savedGame?.msgs)setMsgs(savedGame.msgs.slice(-50));
+        addMsg("system","💾 Game resumed from save!");
+      }}>Resume Game</button>
+      <button className="btn bs" style={{marginLeft:8}} onClick={()=>{clearSave();}}>Dismiss</button>
     </div>}
 
     <div className="container" style={{maxWidth:1360,margin:"0 auto",padding:"16px 14px 40px"}}>
