@@ -120,6 +120,20 @@ const SPELLS = [
   {n:"Lightning Bolt",l:3,s:"Evocation",ct:"1 action",rng:"Self (100-ft line)",dur:"Instantaneous",d:"5-ft wide 100-ft line. DEX save: 8d6 lightning (half). +1d6 per slot above 3rd.",cls:["Sorcerer","Wizard"],c:false},
   {n:"Revivify",l:3,s:"Necromancy",ct:"1 action",rng:"Touch",dur:"Instantaneous",d:"Dead ≤1 min returns with 1 HP. 300 gp diamond consumed.",cls:["Cleric","Paladin"],c:false},
   {n:"Spirit Guardians",l:3,s:"Conjuration",ct:"1 action",rng:"Self (15-ft radius)",dur:"Conc, 10 min",d:"Spirits protect 15 ft. Enemies: half speed, WIS save or 3d8 radiant/necrotic.",cls:["Cleric"],c:true},
+  {n:"Misty Step",l:2,s:"Conjuration",ct:"1 bonus action",rng:"Self",dur:"Instantaneous",d:"Teleport up to 30 ft to an unoccupied space you can see.",cls:["Sorcerer","Warlock","Wizard"],c:false},
+  {n:"Hold Person",l:2,s:"Enchantment",ct:"1 action",rng:"60 ft",dur:"Conc, 1 min",d:"WIS save or paralyzed. Repeat save each turn. +1 target per slot above 2nd.",cls:["Bard","Cleric","Druid","Sorcerer","Warlock","Wizard"],c:true},
+  {n:"Spiritual Weapon",l:2,s:"Evocation",ct:"1 bonus action",rng:"60 ft",dur:"1 minute",d:"Spectral weapon attacks: 1d8+spell mod force. Bonus action to move and attack.",cls:["Cleric"],c:false},
+  {n:"Shatter",l:2,s:"Evocation",ct:"1 action",rng:"60 ft",dur:"Instantaneous",d:"10-ft sphere. CON save: 3d8 thunder (half save). Disadvantage for inorganic. +1d8/slot.",cls:["Bard","Sorcerer","Warlock","Wizard"],c:false},
+  {n:"Lesser Restoration",l:2,s:"Abjuration",ct:"1 action",rng:"Touch",dur:"Instantaneous",d:"End one disease or one condition: blinded, deafened, paralyzed, or poisoned.",cls:["Bard","Cleric","Druid","Paladin","Ranger"],c:false},
+  {n:"Scorching Ray",l:2,s:"Evocation",ct:"1 action",rng:"120 ft",dur:"Instantaneous",d:"Three rays. Ranged spell attack each: 2d6 fire. +1 ray per slot above 2nd.",cls:["Sorcerer","Wizard"],c:false},
+  {n:"Web",l:2,s:"Conjuration",ct:"1 action",rng:"60 ft",dur:"Conc, 1 hr",d:"20-ft cube of webs. DEX save or restrained. STR check DC 12 to break free. Flammable.",cls:["Sorcerer","Wizard"],c:true},
+  {n:"Dispel Magic",l:3,s:"Abjuration",ct:"1 action",rng:"120 ft",dur:"Instantaneous",d:"End one spell on target. Auto if 3rd or lower. Higher: ability check DC 10+level.",cls:["Bard","Cleric","Druid","Paladin","Sorcerer","Warlock","Wizard"],c:false},
+  {n:"Haste",l:3,s:"Transmutation",ct:"1 action",rng:"30 ft",dur:"Conc, 1 min",d:"Target: doubled speed, +2 AC, advantage DEX saves, extra action (attack/dash/disengage/hide/use object).",cls:["Sorcerer","Wizard"],c:true},
+  {n:"Fly",l:3,s:"Transmutation",ct:"1 action",rng:"Touch",dur:"Conc, 10 min",d:"Target gains 60 ft flying speed. Falls if spell ends mid-air.",cls:["Sorcerer","Warlock","Wizard"],c:true},
+  {n:"Polymorph",l:4,s:"Transmutation",ct:"1 action",rng:"60 ft",dur:"Conc, 1 hr",d:"WIS save (unwilling). Transform into beast of CR ≤ target level. New HP = beast HP.",cls:["Bard","Druid","Sorcerer","Wizard"],c:true},
+  {n:"Greater Invisibility",l:4,s:"Illusion",ct:"1 action",rng:"Touch",dur:"Conc, 1 min",d:"Target invisible for duration. Can attack and cast spells while invisible.",cls:["Bard","Sorcerer","Wizard"],c:true},
+  {n:"Wall of Fire",l:4,s:"Evocation",ct:"1 action",rng:"120 ft",dur:"Conc, 1 min",d:"60-ft wall of fire. One side: 5d8 fire damage to creatures within 10 ft. DEX half.",cls:["Druid","Sorcerer","Wizard"],c:true},
+  {n:"Cone of Cold",l:5,s:"Evocation",ct:"1 action",rng:"Self (60-ft cone)",dur:"Instantaneous",d:"60-ft cone. CON save: 8d8 cold (half save). Kills freeze solid. +1d8/slot above 5th.",cls:["Sorcerer","Wizard"],c:false}
 ];
 
 const MONSTERS = [
@@ -136,7 +150,26 @@ const MONSTERS = [
   {n:"Troll",cr:"5",t:"Giant",ac:15,hp:84,sp:"30ft",s:18,d:13,co:20,i:7,w:9,ch:7,atk:[{n:"Bite",b:7,dm:"1d6+4 pierce"},{n:"Claw (x2)",b:7,dm:"2d6+4 slash"}],tr:["Multiattack","Regeneration 10HP (fire/acid stops)","Keen Smell"],xp:1800},
   {n:"Young Red Dragon",cr:"10",t:"Dragon",ac:18,hp:178,sp:"40ft/fly 80ft",s:23,d:10,co:21,i:14,w:11,ch:19,atk:[{n:"Bite",b:10,dm:"2d10+6 pierce + 1d6 fire"},{n:"Claw",b:10,dm:"2d6+6 slash"}],tr:["Multiattack","Fire Breath (DC17 DEX, 16d6 fire, recharge 5-6)","Immune: fire"],xp:5900},
   {n:"Adult Red Dragon",cr:"17",t:"Dragon",ac:19,hp:256,sp:"40ft/fly 80ft",s:27,d:10,co:25,i:16,w:13,ch:21,atk:[{n:"Bite",b:14,dm:"2d10+8+2d6 fire"},{n:"Claw",b:14,dm:"2d6+8 slash"},{n:"Tail",b:14,dm:"2d8+8 bludg"}],tr:["Multiattack","Frightful Presence (DC19)","Fire Breath (DC21, 18d6)","3 Legendary Actions"],xp:18000},
-  {n:"Lich",cr:"21",t:"Undead",ac:17,hp:135,sp:"30ft",s:11,d:16,co:16,i:20,w:14,ch:16,atk:[{n:"Paralyzing Touch",b:12,dm:"3d6 cold + DC18 CON or paralyzed"}],tr:["Legendary Resistance (3/day)","Rejuvenation","18th-level Spellcaster","3 Legendary Actions","Turn Resistance"],xp:33000}
+  {n:"Lich",cr:"21",t:"Undead",ac:17,hp:135,sp:"30ft",s:11,d:16,co:16,i:20,w:14,ch:16,atk:[{n:"Paralyzing Touch",b:12,dm:"3d6 cold + DC18 CON or paralyzed"}],tr:["Legendary Resistance (3/day)","Rejuvenation","18th-level Spellcaster","3 Legendary Actions","Turn Resistance"],xp:33000},
+  {n:"Bugbear",cr:"1",t:"Humanoid",ac:16,hp:27,sp:"30ft",s:15,d:14,co:13,i:8,w:11,ch:9,atk:[{n:"Morningstar",b:4,dm:"2d8+2 piercing"},{n:"Javelin",b:4,dm:"1d6+2 piercing",r:"30/120ft"}],tr:["Surprise Attack (+2d6)","Brute"],xp:200},
+  {n:"Dire Wolf",cr:"1",t:"Beast",ac:14,hp:37,sp:"50ft",s:17,d:15,co:15,i:3,w:12,ch:7,atk:[{n:"Bite",b:5,dm:"2d6+3 piercing + DC13 STR or prone"}],tr:["Pack Tactics","Keen Hearing/Smell"],xp:200},
+  {n:"Ghoul",cr:"1",t:"Undead",ac:12,hp:22,sp:"30ft",s:13,d:15,co:10,i:7,w:10,ch:6,atk:[{n:"Bite",b:2,dm:"2d6+2 piercing"},{n:"Claws",b:4,dm:"2d4+2 slashing + DC10 CON or paralyzed"}],tr:["Turning Defiance"],xp:200},
+  {n:"Mimic",cr:"2",t:"Monstrosity",ac:12,hp:58,sp:"15ft",s:17,d:12,co:15,i:5,w:13,ch:8,atk:[{n:"Pseudopod",b:5,dm:"1d8+3 bludgeoning"},{n:"Bite",b:5,dm:"1d8+3 piercing + grapple"}],tr:["Shapechanger","Adhesive","False Appearance"],xp:450},
+  {n:"Gelatinous Cube",cr:"2",t:"Ooze",ac:6,hp:84,sp:"15ft",s:14,d:3,co:20,i:1,w:6,ch:1,atk:[{n:"Pseudopod",b:4,dm:"3d6 acid"},{n:"Engulf",b:0,dm:"6d6 acid (DC12 DEX)"}],tr:["Transparent","Ooze Cube"],xp:450},
+  {n:"Wight",cr:"3",t:"Undead",ac:14,hp:45,sp:"30ft",s:15,d:14,co:16,i:10,w:13,ch:15,atk:[{n:"Longsword",b:4,dm:"1d8+2 slashing"},{n:"Life Drain",b:4,dm:"1d6+2 necrotic + HP max reduce"}],tr:["Sunlight Sensitivity","Multiattack"],xp:700},
+  {n:"Basilisk",cr:"3",t:"Monstrosity",ac:15,hp:52,sp:"20ft",s:16,d:8,co:15,i:2,w:8,ch:7,atk:[{n:"Bite",b:5,dm:"2d6+3 piercing + 2d6 poison"}],tr:["Petrifying Gaze (DC12 CON)"],xp:700},
+  {n:"Hell Hound",cr:"3",t:"Fiend",ac:15,hp:45,sp:"50ft",s:17,d:12,co:14,i:6,w:13,ch:6,atk:[{n:"Bite",b:5,dm:"1d8+3 piercing + 2d6 fire"}],tr:["Pack Tactics","Fire Breath (DC12 DEX, 6d6 fire)","Immune: fire"],xp:700},
+  {n:"Banshee",cr:"4",t:"Undead",ac:12,hp:58,sp:"40ft fly",s:1,d:14,co:10,i:12,w:11,ch:17,atk:[{n:"Corrupting Touch",b:4,dm:"3d6+2 necrotic"}],tr:["Horrifying Visage (DC13 WIS)","Wail (DC13 CON or 0 HP)","Incorporeal"],xp:1100},
+  {n:"Ettin",cr:"4",t:"Giant",ac:12,hp:85,sp:"40ft",s:21,d:8,co:17,i:6,w:10,ch:8,atk:[{n:"Battleaxe",b:7,dm:"2d8+5 slashing"},{n:"Morningstar",b:7,dm:"2d8+5 piercing"}],tr:["Two Heads","Wakeful","Multiattack"],xp:1100},
+  {n:"Bulette",cr:"5",t:"Monstrosity",ac:17,hp:94,sp:"40ft burrow 40ft",s:19,d:11,co:21,i:2,w:10,ch:5,atk:[{n:"Bite",b:7,dm:"4d12+4 piercing"}],tr:["Standing Leap","Deadly Leap (DC16 DEX, 3d6+4)"],xp:1800},
+  {n:"Shambling Mound",cr:"5",t:"Plant",ac:15,hp:136,sp:"20ft swim 20ft",s:18,d:8,co:16,i:5,w:10,ch:5,atk:[{n:"Slam",b:7,dm:"2d8+4 bludgeoning"},{n:"Slam",b:7,dm:"2d8+4 bludgeoning"}],tr:["Multiattack","Engulf","Lightning Absorption"],xp:1800},
+  {n:"Medusa",cr:"6",t:"Monstrosity",ac:15,hp:127,sp:"30ft",s:10,d:15,co:16,i:12,w:13,ch:15,atk:[{n:"Snake Hair",b:5,dm:"1d4+2 piercing + 4d6 poison"},{n:"Shortsword",b:5,dm:"1d6+2 piercing"}],tr:["Petrifying Gaze (DC14 CON)","Multiattack"],xp:2300},
+  {n:"Young White Dragon",cr:"6",t:"Dragon",ac:17,hp:133,sp:"40ft fly 80ft",s:18,d:10,co:18,i:6,w:11,ch:12,atk:[{n:"Bite",b:7,dm:"2d10+4 piercing + 1d8 cold"},{n:"Claw",b:7,dm:"2d6+4 slashing"}],tr:["Multiattack","Cold Breath (DC15 CON, 10d8 cold, recharge 5-6)","Immune: cold"],xp:2300},
+  {n:"Mummy Lord",cr:"15",t:"Undead",ac:17,hp:97,sp:"20ft",s:18,d:10,co:17,i:11,w:18,ch:16,atk:[{n:"Rotting Fist",b:9,dm:"3d6+4 bludgeoning + 6d6 necrotic + Mummy Rot"}],tr:["Rejuvenation","Spellcasting (10th level)","Legendary Actions (3)","Frightful Presence"],xp:13000},
+  {n:"Beholder",cr:"13",t:"Aberration",ac:18,hp:180,sp:"20ft fly",s:10,d:14,co:18,i:17,w:15,ch:17,atk:[{n:"Bite",b:5,dm:"4d6 piercing"},{n:"Eye Rays",b:7,dm:"Various (see traits)"}],tr:["Antimagic Cone","Eye Rays (10 different)","Legendary Actions (3)"],xp:10000},
+  {n:"Mind Flayer",cr:"7",t:"Aberration",ac:15,hp:71,sp:"30ft",s:11,d:12,co:12,i:19,w:17,ch:17,atk:[{n:"Tentacles",b:7,dm:"2d10+4 psychic + grapple"},{n:"Extract Brain",b:7,dm:"10d10 piercing (grappled only)"}],tr:["Mind Blast (DC15 INT, 4d8+4 psychic + stunned)","Magic Resistance","Innate Spellcasting"],xp:2900},
+  {n:"Vampire",cr:"13",t:"Undead",ac:16,hp:144,sp:"30ft",s:18,d:18,co:18,i:17,w:15,ch:18,atk:[{n:"Unarmed",b:9,dm:"1d8+4 bludgeoning + grapple"},{n:"Bite",b:9,dm:"1d6+4 piercing + 3d6 necrotic (grappled)"}],tr:["Shapechanger","Legendary Resistance (3)","Regeneration 20","Legendary Actions (3)","Spider Climb","Charm"],xp:10000},
+  {n:"Death Knight",cr:"17",t:"Undead",ac:20,hp:180,sp:"30ft",s:20,d:11,co:20,i:12,w:16,ch:18,atk:[{n:"Longsword",b:11,dm:"1d8+5 slashing + 4d8 necrotic"}],tr:["Multiattack (3 attacks)","Hellfire Orb (DC18 DEX, 10d6 fire + 10d6 necrotic)","Spellcasting (19th level)","Magic Resistance","Legendary Actions"],xp:18000}
 ];
 
 const ITEMS = [
@@ -452,7 +485,8 @@ function SessionPlay({camp, isDM, aiDM, chars, mons, setMons, syncAction, sceneD
           <span className="tx td2">Scenes:</span>
           {scenes.map((s, i) => (
             <div key={i} className={`scene-dot ${i === sceneIdx ? 'active' : i < sceneIdx ? 'visited' : ''}`}
-              onClick={() => isDM && advanceScene(i)} title={s.t}/>
+              onClick={() => isDM && advanceScene(i)} title={isDM ? `Click to jump: ${s.t}` : s.t}
+              style={{cursor: isDM ? "pointer" : "default"}}/>
           ))}
           {isDM && sceneIdx < scenes.length - 1 && (
             <button className="btn bs" onClick={() => advanceScene()}>Next Scene →</button>
@@ -551,9 +585,9 @@ function SessionPlay({camp, isDM, aiDM, chars, mons, setMons, syncAction, sceneD
           </div>
 
           {/* DM Notes */}
-          {scene?.notes && (
+          {isDM && scene?.notes && (
             <div className="dm-note">
-              <b>📋 DM Notes:</b> {scene.notes}
+              <b>📋 DM Notes (only you see this):</b> {scene.notes}
             </div>
           )}
 
@@ -601,6 +635,26 @@ function SessionPlay({camp, isDM, aiDM, chars, mons, setMons, syncAction, sceneD
     </div>
   </>;
 }
+
+// ─── SOUND EFFECTS ──────────────────────────────────────────
+const SFX = {
+  _ctx: null,
+  _getCtx() { if(!this._ctx) this._ctx = new (window.AudioContext||window.webkitAudioContext)(); return this._ctx; },
+  play(type) {
+    try {
+      const ctx = this._getCtx(); const osc = ctx.createOscillator(); const gain = ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
+      gain.gain.setValueAtTime(0.15, ctx.currentTime);
+      if (type==="roll") { osc.frequency.setValueAtTime(200,ctx.currentTime); osc.frequency.exponentialRampToValueAtTime(800,ctx.currentTime+0.1); gain.gain.exponentialRampToValueAtTime(0.01,ctx.currentTime+0.2); osc.start(ctx.currentTime); osc.stop(ctx.currentTime+0.2); }
+      else if (type==="hit") { osc.type="sawtooth"; osc.frequency.setValueAtTime(150,ctx.currentTime); osc.frequency.exponentialRampToValueAtTime(50,ctx.currentTime+0.15); gain.gain.exponentialRampToValueAtTime(0.01,ctx.currentTime+0.2); osc.start(ctx.currentTime); osc.stop(ctx.currentTime+0.2); }
+      else if (type==="crit") { osc.type="square"; osc.frequency.setValueAtTime(400,ctx.currentTime); osc.frequency.exponentialRampToValueAtTime(1200,ctx.currentTime+0.1); osc.frequency.exponentialRampToValueAtTime(400,ctx.currentTime+0.3); gain.gain.setValueAtTime(0.2,ctx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01,ctx.currentTime+0.4); osc.start(ctx.currentTime); osc.stop(ctx.currentTime+0.4); }
+      else if (type==="miss") { osc.type="sine"; osc.frequency.setValueAtTime(300,ctx.currentTime); osc.frequency.exponentialRampToValueAtTime(100,ctx.currentTime+0.2); gain.gain.exponentialRampToValueAtTime(0.01,ctx.currentTime+0.15); osc.start(ctx.currentTime); osc.stop(ctx.currentTime+0.2); }
+      else if (type==="death") { osc.type="sawtooth"; osc.frequency.setValueAtTime(200,ctx.currentTime); osc.frequency.exponentialRampToValueAtTime(30,ctx.currentTime+0.5); gain.gain.exponentialRampToValueAtTime(0.01,ctx.currentTime+0.6); osc.start(ctx.currentTime); osc.stop(ctx.currentTime+0.6); }
+      else if (type==="victory") { const play=(f,t)=>{const o=ctx.createOscillator();const g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.frequency.value=f;g.gain.setValueAtTime(0.12,ctx.currentTime+t);g.gain.exponentialRampToValueAtTime(0.01,ctx.currentTime+t+0.3);o.start(ctx.currentTime+t);o.stop(ctx.currentTime+t+0.3);}; play(523,0);play(659,0.15);play(784,0.3);play(1047,0.45); }
+      else if (type==="levelup") { const play=(f,t)=>{const o=ctx.createOscillator();const g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.type="triangle";o.frequency.value=f;g.gain.setValueAtTime(0.15,ctx.currentTime+t);g.gain.exponentialRampToValueAtTime(0.01,ctx.currentTime+t+0.25);o.start(ctx.currentTime+t);o.stop(ctx.currentTime+t+0.25);}; play(440,0);play(554,0.12);play(659,0.24);play(880,0.36); }
+    } catch(e) {}
+  }
+};
 
 // ─── UTILS ──────────────────────────────────────────────────
 const rd = s => Math.floor(Math.random()*s)+1;
@@ -699,9 +753,47 @@ label{font-family:'Cinzel',serif;font-size:.7rem;font-weight:600;color:var(--gol
 .ck input[type="checkbox"]{width:14px;height:14px;accent-color:var(--gold)}
 .dsb{width:18px;height:18px;border:2px solid var(--bdr);border-radius:50%;cursor:pointer;transition:all .2s}
 .dsb.ok{background:var(--nat);border-color:#4a9a4a}.dsb.fl{background:var(--red);border-color:var(--redb)}
+/* ── Enhanced animations ── */
+@keyframes dmgFloat{0%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(-30px)}}
+@keyframes turnPulse{0%,100%{box-shadow:0 0 8px rgba(201,168,76,.15)}50%{box-shadow:0 0 20px rgba(201,168,76,.3)}}
+@keyframes victoryGlow{0%{text-shadow:0 0 10px rgba(58,138,74,.3)}50%{text-shadow:0 0 30px rgba(58,138,74,.6)}100%{text-shadow:0 0 10px rgba(58,138,74,.3)}}
+.ii.act{animation:turnPulse 2s ease-in-out infinite}
+.choice-btn{transition:all .25s cubic-bezier(.34,1.56,.64,1)}
+.choice-btn:hover{transform:translateX(6px);border-color:var(--gold);background:rgba(201,168,76,.1)}
+.sess-scene{animation:fu .5s ease-out}
+.sess-enc{animation:sx .4s ease-in-out,fu .3s ease-out}
+.map-token{transition:all .3s cubic-bezier(.34,1.56,.64,1)}
+.hpf{transition:width .6s cubic-bezier(.4,0,.2,1),background .4s}
+.bdg{transition:all .2s}
+.spell-card,.sc{transition:all .25s}
+.sc:hover{transform:translateY(-1px)}
+.campaign-card,.cc{transition:all .35s cubic-bezier(.34,1.56,.64,1)}
+.cc:hover{transform:translateY(-3px)}
+/* ── Tooltip on hover ── */
+[title]{position:relative}
+.btn:disabled{opacity:.35;cursor:not-allowed;transform:none!important}
 @media(max-width:900px){.g2,.g3{grid-template-columns:1fr}.g6{grid-template-columns:repeat(3,1fr)}h1{font-size:1.4rem}.bx{padding:12px 24px;font-size:.95rem}.pnl{padding:12px}.lay{grid-template-columns:1fr!important}.sb-desk{display:none!important}.nav{flex-wrap:wrap;gap:4px}}
 .chat-toggle{display:none;position:fixed;bottom:16px;right:16px;z-index:100;width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--goldd));border:none;color:var(--bg);font-size:1.4rem;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.4)}
 .chat-mobile{display:none;position:fixed;bottom:76px;right:16px;width:320px;max-width:calc(100vw - 32px);height:400px;z-index:99;border-radius:var(--rad);overflow:hidden}
+/* ── Enhanced animations ── */
+@keyframes dmgFloat{0%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(-30px)}}
+@keyframes turnPulse{0%,100%{box-shadow:0 0 8px rgba(201,168,76,.15)}50%{box-shadow:0 0 20px rgba(201,168,76,.3)}}
+@keyframes victoryGlow{0%{text-shadow:0 0 10px rgba(58,138,74,.3)}50%{text-shadow:0 0 30px rgba(58,138,74,.6)}100%{text-shadow:0 0 10px rgba(58,138,74,.3)}}
+.ii.act{animation:turnPulse 2s ease-in-out infinite}
+.choice-btn{transition:all .25s cubic-bezier(.34,1.56,.64,1)}
+.choice-btn:hover{transform:translateX(6px);border-color:var(--gold);background:rgba(201,168,76,.1)}
+.sess-scene{animation:fu .5s ease-out}
+.sess-enc{animation:sx .4s ease-in-out,fu .3s ease-out}
+.map-token{transition:all .3s cubic-bezier(.34,1.56,.64,1)}
+.hpf{transition:width .6s cubic-bezier(.4,0,.2,1),background .4s}
+.bdg{transition:all .2s}
+.spell-card,.sc{transition:all .25s}
+.sc:hover{transform:translateY(-1px)}
+.campaign-card,.cc{transition:all .35s cubic-bezier(.34,1.56,.64,1)}
+.cc:hover{transform:translateY(-3px)}
+/* ── Tooltip on hover ── */
+[title]{position:relative}
+.btn:disabled{opacity:.35;cursor:not-allowed;transform:none!important}
 @media(max-width:900px){.chat-toggle{display:flex;align-items:center;justify-content:center}.chat-mobile.open{display:block}}
 `;
 
@@ -729,6 +821,7 @@ function DiceRoller({onRoll}) {
         nat20:sides===20&&count===1&&(rolls[0]===20||(extra===20)),
         nat1:sides===20&&count===1&&rolls[0]===1&&(!extra||extra===1),ts:Date.now()};
       setRes(p=>[r,...p].slice(0,15));setAnim(false);onRoll?.(r);
+      SFX.play(r.nat20?"crit":r.nat1?"miss":"roll");
       addMsg("roll",`rolled ${r.label} = ${r.total}${r.nat20?" ✨ NAT 20!":""}${r.nat1?" 💀 NAT 1!":""}`,{rolls:r.rolls,extra:r.extra});
     }, 280);
   }, [mod,adv,onRoll,addMsg]);
@@ -964,7 +1057,7 @@ function CharSheet({ch,onUp}) {
         const hitDie=CLASSES[ch.cls]?.hd||8;const hpGain=rd(hitDie)+aMod(ch.stats.CON);
         const newMaxHp=ch.mhp+Math.max(1,hpGain);
         onUp({...ch,level:newLv,mhp:newMaxHp,hp:newMaxHp,pb:pb(newLv)});
-        addMsg("system",`🎉 ${ch.name} levels up to ${newLv}! +${Math.max(1,hpGain)} HP (now ${newMaxHp}). Proficiency: +${pb(newLv)}`);
+        SFX.play("levelup"); addMsg("system",`🎉 ${ch.name} levels up to ${newLv}! +${Math.max(1,hpGain)} HP (now ${newMaxHp}). Proficiency: +${pb(newLv)}`);
       }}>⬆️ Level Up</button>
       <button className="btn bs" onClick={rollInit}>🎲 Initiative</button>
     </div></div>
@@ -1202,6 +1295,7 @@ function Combat({chars, mons, syncAction, isDM, combatState}) {
     else if (isNat1) msg += " — 💀 CRITICAL MISS!";
     else if (hits) msg += " — HIT!";
     else msg += " — MISS!";
+    SFX.play(isNat20?"crit":isNat1?"miss":hits?"hit":"miss");
     addMsg("roll", msg);
 
     // Build all changes in one pass
@@ -1241,7 +1335,7 @@ function Combat({chars, mons, syncAction, isDM, combatState}) {
     if (dmgDealt > 0) {
       const curHp = def.isMon ? (def.curHp ?? def.hp) : def.hp;
       const newHp = Math.max(0, curHp - dmgDealt);
-      if (newHp === 0) addMsg("system", `💀 ${dName} drops to 0 HP!`);
+      if (newHp === 0) { SFX.play("death"); addMsg("system", `💀 ${dName} drops to 0 HP!`); }
     }
 
     setAttackMode(null);
@@ -1390,20 +1484,21 @@ function Combat({chars, mons, syncAction, isDM, combatState}) {
             background: isTarget ? "rgba(139,26,26,.08)" : "transparent",
             outline: isTarget ? "1px dashed var(--redb)" : "none"
           }}>
-          <div className="io">{c.init}</div>
+          <div className="io">{(!c.isMon || isDM) ? c.init : "?"}</div>
           <div style={{flex:1}}>
             <div className="fb">
               <span style={{fontFamily:"Cinzel",fontWeight:600,color:c.isMon?"var(--redb)":"var(--ink)",fontSize:".9rem"}}>
                 {c.isMon?"👹":"🛡️"} {cName} {isDead?"💀":""}
-                {isTarget && <span className="tr" style={{fontSize:".7rem"}}> ← Click to target</span>}
+                {isTarget && <span className="tr" style={{fontSize:".7rem"}}> ← Target</span>}
               </span>
-              <span className="tx td2">AC {c.ac}</span>
+              <span className="tx td2">{(isDM || !c.isMon) ? `AC ${c.ac}` : ""}</span>
             </div>
             <div className="hpbg" style={{height:8,marginTop:3}}>
               <div className={`hpf ${pct>50?"hpg":pct>25?"hpy":"hpr"}`} style={{width:`${pct}%`}}/>
             </div>
-            <div className="tx td2">{hp}/{mx} HP
-              {c.tr?.length > 0 && <span className="td2"> | {c.tr.slice(0,2).join(", ")}</span>}
+            <div className="tx td2">
+              {(!c.isMon || isDM) ? `${hp}/${mx} HP` : (hp > mx*0.75 ? "Healthy" : hp > mx*0.5 ? "Wounded" : hp > mx*0.25 ? "Bloodied" : hp > 0 ? "Critical" : "Dead")}
+              {isDM && c.tr?.length > 0 && <span className="td2"> | {c.tr.slice(0,2).join(", ")}</span>}
               {c.isMon && isDM && c.atk?.length > 0 && !act && <span className="td2"> | {c.atk.map(a=>`${a.n}+${a.b}`).join(", ")}</span>}
             </div>
 
@@ -1449,6 +1544,9 @@ function Combat({chars, mons, syncAction, isDM, combatState}) {
               <button className="btn bs bd" style={{padding:"2px 8px",fontSize:".7rem"}} onClick={(e)=>{e.stopPropagation();
                 const d=prompt(`Damage to ${cName}:`);const dv=parseInt(d);if(!isNaN(dv)&&dv>0) dealDamage(i,dv);
               }}>−HP</button>
+              <button className="btn bs" style={{padding:"1px 6px",fontSize:".6rem",borderColor:"var(--redb)",color:"var(--redb)"}} onClick={(e)=>{e.stopPropagation();dealDamage(i,1);}}>-1</button>
+              <button className="btn bs" style={{padding:"1px 6px",fontSize:".6rem",borderColor:"var(--redb)",color:"var(--redb)"}} onClick={(e)=>{e.stopPropagation();dealDamage(i,5);}}>-5</button>
+              <button className="btn bs" style={{padding:"1px 6px",fontSize:".6rem",borderColor:"var(--nat)",color:"#4a9a4a"}} onClick={(e)=>{e.stopPropagation();healTarget(i,5);}}>+5</button>
               <button className="btn bs" style={{padding:"2px 8px",fontSize:".7rem",borderColor:"var(--nat)",color:"#4a9a4a"}} onClick={(e)=>{e.stopPropagation();
                 const h=prompt(`Heal ${cName}:`);const hv=parseInt(h);if(!isNaN(hv)&&hv>0) healTarget(i,hv);
               }}>+HP</button>
@@ -1472,13 +1570,15 @@ function Combat({chars, mons, syncAction, isDM, combatState}) {
             <span className="tx">{c.hp}/{c.mhp}</span>
           </div>})}</div></div>}
         {mons.length > 0 && <div><label>Monsters</label>
-          <div className="fc gs mt">{mons.map((m,i)=><div key={m.id||i} className="fr ts" style={{padding:"2px 6px"}}>👹 <b>{m.n}</b> <span className="td2">CR {m.cr} | AC {m.ac} | {m.hp} HP | {m.atk?.map(a=>`${a.n}+${a.b}`).join(", ")}</span></div>)}</div></div>}
+          <div className="fc gs mt">{mons.map((m,i)=><div key={m.id||i} className="fr ts" style={{padding:"2px 6px"}}>
+            👹 <b>{m.n}</b> {isDM ? <span className="td2">CR {m.cr} | AC {m.ac} | {m.hp} HP | {m.atk?.map(a=>`${a.n}+${a.b}`).join(", ")}</span> : <span className="td2">{m.n} lurks menacingly...</span>}
+          </div>)}</div></div>}
       </div>
     ) : null}
   </div>;
 }
 
-function BattleMap({chars, mons, combatState, syncAction, camp, sceneData}) {
+function BattleMap({chars, mons, combatState, syncAction, camp, sceneData, isDM}) {
   const {addMsg} = useContext(AppCtx);
   const [fog, setFog] = useState(new Set());
   const [fogM, setFogM] = useState(false);
@@ -1591,8 +1691,8 @@ function BattleMap({chars, mons, combatState, syncAction, camp, sceneData}) {
   return <div className="pnl">
     <style>{mapCSS}</style>
     <div className="ph"><h3>🗺️ {sceneMap?.nm || "Battle Map"}</h3><div className="fr gs">
-      <button className={`btn bs ${fogM?"bp":""}`} onClick={()=>{setFogM(!fogM);setWallM(false);}}>🌫️ Fog{fogM?" ON":""}</button>
-      <button className={`btn bs ${wallM?"bp":""}`} onClick={()=>{setWallM(!wallM);setFogM(false);}}>🧱 Walls{wallM?" ON":""}</button>
+      {isDM && <><button className={`btn bs ${fogM?"bp":""}`} onClick={()=>{setFogM(!fogM);setWallM(false);}}>🌫️ Fog{fogM?" ON":""}</button>
+      <button className={`btn bs ${wallM?"bp":""}`} onClick={()=>{setWallM(!wallM);setFogM(false);}}>🧱 Walls{wallM?" ON":""}</button></>}
       {sel && <span className="bdg bdg-g">🎯 Click to move</span>}
       {sceneMap && <span className="bdg bdg-g tx">{sceneMap.t}</span>}
     </div></div>
@@ -1713,6 +1813,17 @@ function DMTools({mons,setMons,camp}) {
         <span>👹 {m.n} <span className="td2 tx">(CR {m.cr}, {m.hp}HP)</span></span>
         <button className="btn bs bd" onClick={()=>setMons(p=>p.filter((_,j)=>j!==i))}>Remove</button></div>)}</div>
       :<div className="td2 ts mt">No monsters. Use Monsters tab to spawn.</div>}</div>
+      <div className="g2 mb">
+        <button className="btn" onClick={()=>{
+          chars.forEach(c=>{const hd=CLASSES[c.cls]?.hd||8;const heal=Math.max(1,rd(hd)+aMod(c.stats?.CON||10));
+            syncAction({type:'UPDATE_CHAR',payload:{...c,hp:Math.min(c.mhp,c.hp+heal)}});});
+          addMsg("system",`☕ The party takes a Short Rest. Everyone rolls hit dice to heal.`);
+        }}>☕ Party Short Rest</button>
+        <button className="btn bp" onClick={()=>{
+          chars.forEach(c=>syncAction({type:'UPDATE_CHAR',payload:{...c,hp:c.mhp,usedSlots:0,ds:{s:0,f:0}}}));
+          addMsg("system",`🛏️ The party takes a Long Rest. Full HP and spell slots restored!`);
+        }}>🛏️ Party Long Rest</button>
+      </div>
       <button className="btn" onClick={()=>{const enc=["2d4 goblins ambush!","A lone ogre demands a toll.","1d6 wolves emerge!","Bandits block the road.","A giant spider drops from above!","An owlbear crashes through!","Skeletons rise around you!"];
         addMsg("system",`⚔️ Random: ${pick(enc)}`);}}>🎲 Random Encounter</button>
     </div>}
@@ -1725,6 +1836,16 @@ function DMTools({mons,setMons,camp}) {
       <button className="btn" onClick={()=>{const rooms=Math.floor(Math.random()*8)+3;const feats=["pit trap","locked iron door","mysterious altar","dark pool","crumbling stairs","ancient runes","treasure chest","scattered bones","flickering torchlight"];
         addMsg("system",`🏰 Dungeon: ${rooms} rooms. ${Array.from({length:Math.min(rooms,4)},()=>pick(feats)).join("; ")}`);}}>🏰 Generate Dungeon</button>
       <button className="btn" onClick={()=>addMsg("roll",`DM secret roll: d20 = ${rd(20)}`)}>🎲 Secret Roll</button>
+      <button className="btn" onClick={()=>{
+        const partyLvl = chars.length > 0 ? Math.round(chars.reduce((s,c)=>s+(c.level||1),0)/chars.length) : 1;
+        const xpThresh = {1:[25,50,75,100],2:[50,100,150,200],3:[75,150,225,400],4:[125,250,375,500],5:[250,500,750,1100],6:[300,600,900,1400],7:[350,750,1100,1700],8:[450,900,1400,2100],9:[550,1100,1600,2400],10:[600,1200,1900,2800],11:[800,1600,2400,3600],12:[1000,2000,3000,4500],13:[1100,2200,3400,5100],14:[1250,2500,3800,5700],15:[1400,2800,4300,6400],16:[1600,3200,4800,7200],17:[2000,3900,5900,8800],18:[2100,4200,6300,9500],19:[2400,4900,7300,10900],20:[2800,5700,8500,12700]};
+        const thresholds = xpThresh[partyLvl] || xpThresh[1];
+        const totalXP = mons.reduce((s,m)=>s+(m.xp||0),0);
+        const mult = mons.length<=1?1:mons.length<=2?1.5:mons.length<=6?2:mons.length<=10?2.5:mons.length<=14?3:4;
+        const adjXP = Math.round(totalXP * mult);
+        const diff = adjXP >= thresholds[3]*chars.length ? "DEADLY ☠️" : adjXP >= thresholds[2]*chars.length ? "Hard 🔴" : adjXP >= thresholds[1]*chars.length ? "Medium 🟡" : "Easy 🟢";
+        addMsg("system",`📊 Encounter: ${mons.length} monsters (${totalXP} XP × ${mult} multiplier = ${adjXP} adjusted) vs ${chars.length} Lv${partyLvl} PCs → ${diff}`);
+      }}>📊 CR Check</button>
     </div>}
     {tool==="loot"&&<div className="afu"><h3 className="mb">Loot Generator</h3><div className="g3 gs">
       {["1/4","1","3","5","10","15"].map(cr=><button key={cr} className="btn" onClick={()=>{const g=Math.floor(parseFloat(cr)*parseFloat(cr)*10+Math.random()*parseFloat(cr)*20);
@@ -1748,8 +1869,8 @@ function Chat({msgs}) {
     <div className="ph"><h3>💬 Chat</h3><span className="td2 tx">{msgs.length}</span></div>
     <div className="chbx" ref={ref} style={{flex:1}}>{msgs.map((m,i)=><div key={i} className={`chm ${m.t}`}>
       {m.t==="chat"&&<span className="chs">{m.s}: </span>}
-      {m.t==="system"&&<span style={{color:"var(--goldd)"}}>⚙️ </span>}
-      {m.t==="roll"&&<span style={{color:"var(--arc)"}}>🎲 {m.s} </span>}
+      {m.t==="system"&&<span style={{color:"var(--goldd)"}}>{m.tx?.startsWith("🤖")?"":"⚙️ "}</span>}
+      {m.t==="roll"&&<span style={{color:m.tx?.includes("CRIT")?"var(--goldb)":m.tx?.includes("MISS")?"var(--redb)":"var(--arc)"}}>🎲 {m.s} </span>}
       {m.tx}</div>)}</div>
     <div className="fr mt"><input type="text" value={inp} onChange={e=>setInp(e.target.value)} onKeyDown={e=>e.key==="Enter"&&send()} placeholder="Type..." style={{flex:1}}/>
       <button className="btn bs" onClick={send}>Send</button></div>
@@ -2575,13 +2696,30 @@ export default function App() {
 
   if(!sess) return <Lobby onJoin={setSess}/>;
 
-  const nav=isDM||aiDM?[{k:"campaign",l:"Play",i:"📜"},{k:"characters",l:"Characters",i:"🛡️"},{k:"combat",l:"Combat",i:"⚔️"},{k:"map",l:"Map",i:"🗺️"},{k:"dm",l:"DM Tools",i:"🎭"},{k:"spells",l:"Spells",i:"✨"},{k:"dice",l:"Dice",i:"🎲"}]
+  const nav=isDM?[{k:"campaign",l:"Play",i:"📜"},{k:"characters",l:"Characters",i:"🛡️"},{k:"combat",l:"Combat",i:"⚔️"},{k:"map",l:"Map",i:"🗺️"},{k:"dm",l:"DM Tools",i:"🎭"},{k:"spells",l:"Spells",i:"✨"},{k:"dice",l:"Dice",i:"🎲"}]
     :[{k:"campaign",l:"Play",i:"📜"},{k:"characters",l:"Character",i:"🛡️"},{k:"combat",l:"Combat",i:"⚔️"},{k:"map",l:"Map",i:"🗺️"},{k:"spells",l:"Spells",i:"✨"},{k:"dice",l:"Dice",i:"🎲"}];
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handler = (e) => {
+      if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA" || e.target.tagName === "SELECT") return;
+      if (e.key === "1") setPage("campaign");
+      if (e.key === "2") setPage("characters");
+      if (e.key === "3") setPage("combat");
+      if (e.key === "4") setPage("map");
+      if (e.key === "5" && isDM) setPage("dm");
+      if (e.key === "6") setPage("spells");
+      if (e.key === "7") setPage("dice");
+      if (e.key === "r" && e.ctrlKey) { e.preventDefault(); const r=rd(20); addMsg("roll",`Quick d20: ${r}${r===20?" ✨NAT 20!":""}${r===1?" 💀NAT 1!":""}`); SFX.play(r===20?"crit":r===1?"miss":"roll"); }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [isDM, aiDM, addMsg, setPage]);
 
   return <AppCtx.Provider value={ctx}><style>{CSS}</style><div className="abg">
     <div className="nav"><div className="fr gs">
       <span style={{fontFamily:"Cinzel Decorative",fontWeight:700,color:"var(--gold)",fontSize:".95rem"}}>⚔️ D&D 5e</span>
-      <span className="bdg bdg-g">{sess.rc}</span><span className="td2 tx">{sess.name} • {isDM?"DM":aiDM?"Player + 🤖AI DM":"Player"}</span>
+      <span className="bdg bdg-g">{sess.rc}</span><span className="td2 tx">{sess.name} • {isDM?"DM":"Player"}{aiDM&&<span className="bdg bdg-a tx" style={{marginLeft:4}}>🤖 AI DM</span>}</span>
       {/* Connection status */}
       <span className="bdg" style={{
         background: mp.connected ? 'rgba(58,138,74,.15)' : 'rgba(139,26,26,.15)',
@@ -2591,7 +2729,7 @@ export default function App() {
         {mp.connected ? `● ${mp.players.length} online` : '○ connecting...'}
       </span>
     </div><div className="fr gs" style={{flexWrap:"wrap"}}>
-      {nav.map(n=><button key={n.k} className={`nb ${page===n.k?"a":""}`} onClick={()=>setPage(n.k)}>{n.i} {n.l}</button>)}
+      {nav.map((n,ni)=><button key={n.k} className={`nb ${page===n.k?"a":""}`} onClick={()=>setPage(n.k)} title={`${n.l} (${ni+1})`}>{n.i} {n.l}</button>)}
     </div><div className="fr gs">
       <button className="btn bs" onClick={()=>setShowSettings(!showSettings)}>⚙️</button>
       <button className="btn bs bd" onClick={()=>setSess(null)}>Leave</button>
@@ -2601,10 +2739,10 @@ export default function App() {
     {showSettings && <div style={{background:"var(--pnl)",borderBottom:"1px solid var(--bdr)",padding:"12px 16px"}}>
       <div className="fr gs" style={{maxWidth:1360,margin:"0 auto",flexWrap:"wrap"}}>
         <div className="fr gs" style={{flex:1,minWidth:280}}>
-          <label style={{whiteSpace:"nowrap"}}>Claude API Key:</label>
+          {(isDM || aiDM) && <><label style={{whiteSpace:"nowrap"}}>Claude API Key:</label>
           <input type="password" value={apiKey} onChange={e=>{setApiKey(e.target.value);saveApiKey(e.target.value);}}
             placeholder="sk-ant-... (enables AI DM narration)" style={{flex:1,fontSize:".8rem"}}/>
-          {apiKey && <span className="bdg bdg-g tx">✓ Set</span>}
+          {apiKey && <span className="bdg bdg-g tx">✓ Set</span>}</>}
         </div>
         <div className="fr gs">
           <button className="btn bs" onClick={()=>{if(confirm("Save current game state?"))addMsg("system","💾 Game saved!");}}>💾 Save</button>
@@ -2640,7 +2778,7 @@ export default function App() {
             syncAction({type:'SCENE_UPDATE', payload: {sceneIdx:0,journal:[],choiceMade:false,waitingForDM:false,playerActions:[]}});
             addMsg("system",`📜 Campaign: ${c.n}`);
           }}/>}
-          {page==="campaign"&&camp&&<SessionPlay camp={camp} isDM={isDM||aiDM} aiDM={aiDM} chars={chars} mons={mons} sceneData={sceneData} setPage={setPage} setMons={(newMons)=>{
+          {page==="campaign"&&camp&&<SessionPlay camp={camp} isDM={isDM} aiDM={aiDM} chars={chars} mons={mons} sceneData={sceneData} setPage={setPage} setMons={(newMons)=>{
             const val = typeof newMons === 'function' ? newMons(mons) : newMons;
             syncAction({type:'SET_MONSTERS',payload:val});
           }} syncAction={syncAction}/>}
@@ -2662,9 +2800,9 @@ export default function App() {
             addMsg("system",`🛡️ ${ch.name} the ${ch.race} ${ch.cls} joins!`);
           }}/>}
 
-          {page==="combat"&&<Combat chars={chars} mons={mons} syncAction={syncAction} isDM={isDM||aiDM} combatState={combatState}/>}
-          {page==="map"&&<BattleMap chars={chars} mons={mons} combatState={combatState} syncAction={syncAction} camp={camp} sceneData={sceneData}/>}
-          {page==="dm"&&(isDM||aiDM)&&<DMTools mons={mons} setMons={(newMons)=>{
+          {page==="combat"&&<Combat chars={chars} mons={mons} syncAction={syncAction} isDM={isDM} combatState={combatState}/>}
+          {page==="map"&&<BattleMap chars={chars} mons={mons} combatState={combatState} syncAction={syncAction} camp={camp} sceneData={sceneData} isDM={isDM}/>}
+          {page==="dm"&&isDM&&<DMTools mons={mons} setMons={(newMons)=>{
             const val = typeof newMons === 'function' ? newMons(mons) : newMons;
             syncAction({type:'SET_MONSTERS',payload:val});
           }} camp={camp}/>}
