@@ -430,12 +430,12 @@ function SessionPlay({camp, isDM, aiDM, chars, mons, setMons, syncAction, sceneD
 
   // Auto-load first scene once (host only to prevent duplicates)
   useEffect(() => {
-    if (scenes.length > 0 && journal.length === 0 && !initRef.current && isDM) {
+    if (scenes.length > 0 && journal.length === 0 && !initRef.current && (isDM || aiDM)) {
       initRef.current = true;
       const entry = {type:"scene", title: scenes[0].t, text: scenes[0].narr, ts: Date.now()};
       updateScene({journal: [entry]});
     }
-  }, [scenes, journal, updateScene, isDM]);
+  }, [scenes, journal, updateScene, isDM, aiDM]);
 
   const sessionCSS = `
     .sess-journal{max-height:400px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;padding:4px}
@@ -468,7 +468,7 @@ function SessionPlay({camp, isDM, aiDM, chars, mons, setMons, syncAction, sceneD
         <div>
           <h2 style={{margin:0}}>{camp.n}</h2>
           <div className="td2 ts">{camp.lv} • Scene {sceneIdx + 1}/{scenes.length}
-            {isDM && <button className="btn bs bg" style={{marginLeft:8,fontSize:".6rem"}} onClick={()=>syncAction({type:'SET_CAMPAIGN',payload:null})}>Change Campaign</button>}
+            {(isDM || aiDM) && <button className="btn bs bg" style={{marginLeft:8,fontSize:".6rem"}} onClick={()=>syncAction({type:'SET_CAMPAIGN',payload:null})}>Change Campaign</button>}
           </div>
         </div>
         <div className="fr gs">
@@ -2694,13 +2694,9 @@ export default function App() {
   // AI DM hook must be called before any conditional returns (Rules of Hooks)
   useAIDM({aiDM: aiDM && !!camp, camp, sceneData, combatState, chars, mons, syncAction, addMsg, setPage, apiKey});
 
-  if(!sess) return <Lobby onJoin={setSess}/>;
-
-  const nav=isDM?[{k:"campaign",l:"Play",i:"📜"},{k:"characters",l:"Characters",i:"🛡️"},{k:"combat",l:"Combat",i:"⚔️"},{k:"map",l:"Map",i:"🗺️"},{k:"dm",l:"DM Tools",i:"🎭"},{k:"spells",l:"Spells",i:"✨"},{k:"dice",l:"Dice",i:"🎲"}]
-    :[{k:"campaign",l:"Play",i:"📜"},{k:"characters",l:"Character",i:"🛡️"},{k:"combat",l:"Combat",i:"⚔️"},{k:"map",l:"Map",i:"🗺️"},{k:"spells",l:"Spells",i:"✨"},{k:"dice",l:"Dice",i:"🎲"}];
-
-  // Keyboard shortcuts
+  // Keyboard shortcuts (must be before conditional return)
   useEffect(() => {
+    if (!sess) return;
     const handler = (e) => {
       if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA" || e.target.tagName === "SELECT") return;
       if (e.key === "1") setPage("campaign");
@@ -2714,7 +2710,12 @@ export default function App() {
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-  }, [isDM, aiDM, addMsg, setPage]);
+  }, [sess, isDM, aiDM, addMsg, setPage]);
+
+  if(!sess) return <Lobby onJoin={setSess}/>;
+
+  const nav=isDM?[{k:"campaign",l:"Play",i:"📜"},{k:"characters",l:"Characters",i:"🛡️"},{k:"combat",l:"Combat",i:"⚔️"},{k:"map",l:"Map",i:"🗺️"},{k:"dm",l:"DM Tools",i:"🎭"},{k:"spells",l:"Spells",i:"✨"},{k:"dice",l:"Dice",i:"🎲"}]
+    :[{k:"campaign",l:"Play",i:"📜"},{k:"characters",l:"Character",i:"🛡️"},{k:"combat",l:"Combat",i:"⚔️"},{k:"map",l:"Map",i:"🗺️"},{k:"spells",l:"Spells",i:"✨"},{k:"dice",l:"Dice",i:"🎲"}];
 
   return <AppCtx.Provider value={ctx}><style>{CSS}</style><div className="abg">
     <div className="nav"><div className="fr gs">
