@@ -2305,7 +2305,7 @@ function useMultiplayer(sess) {
           setError(`Connection error: ${err.type}`);
         }
       });
-    });
+    }).catch(err => { console.error('PeerJS load failed:', err); setError('Multiplayer unavailable — playing offline.'); setConnected(true); });
 
     return () => {
       destroyed = true;
@@ -2546,11 +2546,11 @@ const saveApiKey = (k) => { try { localStorage.setItem(API_KEY_STORE, k); } catc
 export default function App() {
   const [savedGame] = useState(() => loadSave());
   const [sess,setSess]=useState(null);const [page,setPage]=useState("campaign");
-  const [chars,setChars]=useState(savedGame?.chars||[]);const [aCh,setACh]=useState(0);
-  const [mons,setMons]=useState(savedGame?.mons||[]);const [camp,setCamp]=useState(savedGame?.camp||null);
-  const [msgs,setMsgs]=useState(savedGame?.msgs?.slice(-50)||[]);const [creating,setCreating]=useState(false);
-  const [sceneData,setSceneData]=useState(savedGame?.sceneData||{sceneIdx:0,journal:[],choiceMade:false,waitingForDM:false,playerActions:[]});
-  const [combatState,setCombatState]=useState(savedGame?.combatState||{combatants:[],turn:0,round:1,live:false});
+  const [chars,setChars]=useState([]);const [aCh,setACh]=useState(0);
+  const [mons,setMons]=useState([]);const [camp,setCamp]=useState(null);
+  const [msgs,setMsgs]=useState([]);const [creating,setCreating]=useState(false);
+  const [sceneData,setSceneData]=useState({sceneIdx:0,journal:[],choiceMade:false,waitingForDM:false,playerActions:[]});
+  const [combatState,setCombatState]=useState({combatants:[],turn:0,round:1,live:false});
   const [apiKey,setApiKey]=useState(loadApiKey);
   const [showSettings,setShowSettings]=useState(false);
   const stateVerRef = useRef(0); // version counter to detect changes
@@ -2720,7 +2720,7 @@ export default function App() {
   return <AppCtx.Provider value={ctx}><style>{CSS}</style><div className="abg">
     <div className="nav"><div className="fr gs">
       <span style={{fontFamily:"Cinzel Decorative",fontWeight:700,color:"var(--gold)",fontSize:".95rem"}}>⚔️ D&D 5e</span>
-      <span className="bdg bdg-g">{sess.rc}</span><span className="td2 tx">{sess.name} • {isDM?"DM":"Player"}{aiDM&&<span className="bdg bdg-a tx" style={{marginLeft:4}}>🤖 AI DM</span>}</span>
+      <span className="bdg bdg-g">{sess.rc}</span><span className="td2 tx">{sess.name} • {isDM?"DM":"Player"}{aiDM?" 🤖AI DM":""}</span>
       {/* Connection status */}
       <span className="bdg" style={{
         background: mp.connected ? 'rgba(58,138,74,.15)' : 'rgba(139,26,26,.15)',
