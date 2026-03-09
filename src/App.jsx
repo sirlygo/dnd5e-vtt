@@ -2386,16 +2386,22 @@ function useAIDM({aiDM,camp,sceneData,combatState,chars,mons,syncAction,addMsg,s
   }, [apiKey]);
 
   // ── Auto-advance scenes after player choice ──
+  const aiProcessing = useRef(false);
   useEffect(() => {
-    if (!aiDM||!camp||!sceneData.waitingForDM) return;
+    if (!aiDM||!camp||!sceneData.waitingForDM||aiProcessing.current) return;
+    aiProcessing.current = true;
     const scenes=camp.scenes||[];const scene=scenes[sceneData.sceneIdx];
     const lastChoice = sceneData.playerActions?.[sceneData.playerActions.length-1]?.choice||"";
+    const cl = lastChoice.toLowerCase();
+    const currentJournal = sceneData.journal;
+    const currentSceneIdx = sceneData.sceneIdx;
     if(aiRef.current)clearTimeout(aiRef.current);
 
     aiRef.current = setTimeout(async ()=>{
+      try {
       // Try Claude API first, fall back to canned narration
       const partyDesc = chars.map(c=>`${c.name} the ${c.race} ${c.cls}`).join(", ");
-      const prompt = `Campaign: ${camp.n}. Scene: "${scene?.t}". Current situation: ${scene?.narr?.substring(0,200)}. The party (${partyDesc}) chose: "${lastChoice}". ${scene?.encounter ? "There may be enemies nearby ("+scene.encounter.monsters.join(", ")+")." : ""} Narrate what happens next as the DM. Be vivid and atmospheric.`;
+      const prompt = `Campaign: ${camp.n}. Scene: "${scene?.t}". Current situation: ${scene?.narr?.substring(0,200)}. The party (${partyDesc}) chose: "${lastChoice}". ${scene?.encounter ? "There may be enemies nearby ("+scene.encounter.monsters.join(", ")+")." : ""} Narrate what happens next as the DM in 2-4 vivid sentences.`;
       
       let narr = null;
       addMsg("system","🤖 DM is thinking...");
@@ -2403,7 +2409,6 @@ function useAIDM({aiDM,camp,sceneData,combatState,chars,mons,syncAction,addMsg,s
       
       if (!narr) {
         // Fallback to canned
-        const cl=lastChoice.toLowerCase();
         let pool=AI_NARR.default;
         for(const[k,v]of Object.entries(AI_NARR)){if(k!=="default"&&cl.includes(k)){pool=v;break;}}
         if(cl.includes("careful")||cl.includes("stealth"))pool=AI_NARR.sneak;
@@ -2412,49 +2417,51 @@ function useAIDM({aiDM,camp,sceneData,combatState,chars,mons,syncAction,addMsg,s
         narr=pool[Math.floor(Math.random()*pool.length)]+" "+AI_TRANS[Math.floor(Math.random()*AI_TRANS.length)];
       }
       
-      const entry={type:"narration",title: apiKey ? "🤖 AI Dungeon Master" : "🤖 AI DM (set API key for better narration)",text:narr,ts:Date.now()};
-      const j2=[...sceneData.journal,entry];
-      addMsg("system",`🤖 DM: ${narr.substring(0,120)}${narr.length>120?"...":""}`);
-
+      const entry={type:"narration",title:"🤖 AI Dungeon Master",text:narr,ts:Date.now()};
+      const j2=[...currentJournal,entry];
+      addMsg("system",`🤖 DM: ${narr}`);
 
       const shouldFight=scene?.encounter&&(cl.includes("attack")||cl.includes("fight")||cl.includes("confront")||cl.includes("storm")||cl.includes("enter")||scene.encounter.trigger==="always"||Math.random()>0.5);
 
       if(shouldFight&&scene?.encounter){
+        // Combat path
+        const monsToAdd=scene.encounter.monsters.map(mn=>{const t=MONSTERS.find(m=>m.n===mn);return t?{...t,id:uid(),curHp:t.hp}:null;}).filter(Boolean);
+        syncAction({type:'SET_MONSTERS',payload:monsToAdd});
+        const ee={type:"encounter",text:`⚔️ ${monsToAdd.map(m=>m.n).join(", ")} attack!`,ts:Date.now()};
+        addMsg("system",`🤖 DM: ⚔️ Roll for initiative!`);
+        
         setTimeout(()=>{
-          const monsToAdd=scene.encounter.monsters.map(mn=>{const t=MONSTERS.find(m=>m.n===mn);return t?{...t,id:uid(),curHp:t.hp}:null;}).filter(Boolean);
-          syncAction({type:'SET_MONSTERS',payload:monsToAdd});
-          const ee={type:"encounter",text:`⚔️ ${monsToAdd.map(m=>m.n).join(", ")} attack!`,ts:Date.now()};
-          addMsg("system",`🤖 DM: ⚔️ Roll for initiative!`);
-          setTimeout(()=>{
-            const cmbs=[];
-            chars.forEach(c=>{
-              const init=rd(20)+aMod(c.stats?.DEX||10);const sm=aMod(c.stats?.STR||10),dm2=aMod(c.stats?.DEX||10),p2=pb(c.level||1);const cls2=CLASSES[c.cls];
-              const cW={Barbarian:[{n:"Greataxe",b:sm+p2,dm:`1d12+${sm} slash`}],Fighter:[{n:"Longsword",b:sm+p2,dm:`1d8+${sm} slash`}],Rogue:[{n:"Rapier",b:dm2+p2,dm:`1d8+${dm2} pierce`}],Ranger:[{n:"Longbow",b:dm2+p2,dm:`1d8+${dm2} pierce`}],Bard:[{n:"Rapier",b:dm2+p2,dm:`1d8+${dm2} pierce`}],Cleric:[{n:"Mace",b:sm+p2,dm:`1d6+${sm} bludg`}],Paladin:[{n:"Longsword",b:sm+p2,dm:`1d8+${sm} slash`}],Monk:[{n:"Unarmed",b:dm2+p2,dm:`1d4+${dm2} bludg`}],Druid:[{n:"Staff",b:sm+p2,dm:`1d6+${sm} bludg`}],Warlock:[{n:"Eldritch Blast",b:aMod(c.stats?.CHA||10)+p2,dm:"1d10 force"}],Sorcerer:[{n:"Fire Bolt",b:aMod(c.stats?.CHA||10)+p2,dm:"1d10 fire"}],Wizard:[{n:"Fire Bolt",b:aMod(c.stats?.INT||10)+p2,dm:"1d10 fire"}]};
-              let atk=cW[c.cls]||[{n:"Unarmed",b:sm+p2,dm:`1d4+${sm} bludg`}];
-              if(cls2?.sc&&c.spells?.length)c.spells.forEach(sp=>{const dm3=sp.d?.match(/(\d+d\d+)/);if(dm3)atk.push({n:sp.n,b:aMod(c.stats?.[cls2.sa]||10)+p2,dm:`${dm3[1]} magical`});});
-              cmbs.push({...c,init,isMon:false,actA:false,actB:false,actR:false,atk,moved:0});
-            });
-            monsToAdd.forEach(m=>cmbs.push({n:m.n,ac:m.ac,hp:m.hp,curHp:m.hp,id:m.id,d:m.d,s:m.s,co:m.co,atk:m.atk||[],tr:m.tr,cr:m.cr,xp:m.xp,sp:m.sp,init:rd(20)+aMod(m.d||10),isMon:true,actA:false,actB:false,actR:false,moved:0}));
-            cmbs.sort((a,b)=>b.init-a.init);
-            syncAction({type:'COMBAT_UPDATE',payload:{combatants:cmbs,turn:0,round:1,live:true}});
-            cmbs.forEach(c=>addMsg("roll",`${c.name||c.n}: Initiative ${c.init}`));
-            setPage("combat");
-          },1500);
-          syncAction({type:'SCENE_UPDATE',payload:{...sceneData,journal:[...j2,ee],choiceMade:true,waitingForDM:false}});
-        },2000);
+          const cmbs=[];
+          chars.forEach(c=>{
+            const init=rd(20)+aMod(c.stats?.DEX||10);const sm=aMod(c.stats?.STR||10),dm2=aMod(c.stats?.DEX||10),p2=pb(c.level||1);const cls2=CLASSES[c.cls];
+            const cW={Barbarian:[{n:"Greataxe",b:sm+p2,dm:`1d12+${sm} slash`}],Fighter:[{n:"Longsword",b:sm+p2,dm:`1d8+${sm} slash`}],Rogue:[{n:"Rapier",b:dm2+p2,dm:`1d8+${dm2} pierce`}],Ranger:[{n:"Longbow",b:dm2+p2,dm:`1d8+${dm2} pierce`}],Bard:[{n:"Rapier",b:dm2+p2,dm:`1d8+${dm2} pierce`}],Cleric:[{n:"Mace",b:sm+p2,dm:`1d6+${sm} bludg`}],Paladin:[{n:"Longsword",b:sm+p2,dm:`1d8+${sm} slash`}],Monk:[{n:"Unarmed",b:dm2+p2,dm:`1d4+${dm2} bludg`}],Druid:[{n:"Staff",b:sm+p2,dm:`1d6+${sm} bludg`}],Warlock:[{n:"Eldritch Blast",b:aMod(c.stats?.CHA||10)+p2,dm:"1d10 force"}],Sorcerer:[{n:"Fire Bolt",b:aMod(c.stats?.CHA||10)+p2,dm:"1d10 fire"}],Wizard:[{n:"Fire Bolt",b:aMod(c.stats?.INT||10)+p2,dm:"1d10 fire"}]};
+            let atk=cW[c.cls]||[{n:"Unarmed",b:sm+p2,dm:`1d4+${sm} bludg`}];
+            if(cls2?.sc&&c.spells?.length)c.spells.forEach(sp=>{const dm3=sp.d?.match(/(\d+d\d+)/);if(dm3)atk.push({n:sp.n,b:aMod(c.stats?.[cls2.sa]||10)+p2,dm:`${dm3[1]} magical`});});
+            cmbs.push({...c,init,isMon:false,actA:false,actB:false,actR:false,atk,moved:0});
+          });
+          monsToAdd.forEach(m=>cmbs.push({n:m.n,ac:m.ac,hp:m.hp,curHp:m.hp,id:m.id,d:m.d,s:m.s,co:m.co,atk:m.atk||[],tr:m.tr,cr:m.cr,xp:m.xp,sp:m.sp,init:rd(20)+aMod(m.d||10),isMon:true,actA:false,actB:false,actR:false,moved:0}));
+          cmbs.sort((a,b)=>b.init-a.init);
+          syncAction({type:'COMBAT_UPDATE',payload:{combatants:cmbs,turn:0,round:1,live:true}});
+          cmbs.forEach(c=>addMsg("roll",`${c.name||c.n}: Initiative ${c.init}`));
+          setPage("combat");
+          aiProcessing.current = false;
+        },1500);
+        syncAction({type:'SCENE_UPDATE',payload:{sceneIdx:currentSceneIdx,journal:[...j2,ee],choiceMade:true,waitingForDM:false,playerActions:[]}});
       } else {
+        // Advance to next scene
+        const ni=currentSceneIdx+1;
         setTimeout(()=>{
-          const ni=sceneData.sceneIdx+1;
           if(ni<scenes.length){const s=scenes[ni];
             syncAction({type:'SCENE_UPDATE',payload:{sceneIdx:ni,journal:[...j2,{type:"scene",title:s.t,text:s.narr,ts:Date.now()}],choiceMade:false,waitingForDM:false,playerActions:[]}});
             addMsg("system",`🤖 DM: 📜 ${s.t}`);
           } else {
-            syncAction({type:'SCENE_UPDATE',payload:{...sceneData,journal:[...j2,{type:"scene",title:"🏆 Campaign Complete!",text:"The AI Dungeon Master declares your quest a triumph!",ts:Date.now()}],choiceMade:true,waitingForDM:false}});
+            syncAction({type:'SCENE_UPDATE',payload:{sceneIdx:currentSceneIdx,journal:[...j2,{type:"scene",title:"🏆 Campaign Complete!",text:"The AI Dungeon Master declares your quest a triumph!",ts:Date.now()}],choiceMade:true,waitingForDM:false,playerActions:[]}});
             addMsg("system","🤖 DM: 🏆 Campaign Complete!");
           }
-        },3500);
-        syncAction({type:'SCENE_UPDATE',payload:{...sceneData,journal:j2}});
+          aiProcessing.current = false;
+        },2500);
       }
+      } catch(e) { console.error("AI DM error:", e); aiProcessing.current = false; }
     },1500);
     return()=>{if(aiRef.current)clearTimeout(aiRef.current);};
   },[aiDM,sceneData.waitingForDM,sceneData.sceneIdx]);
